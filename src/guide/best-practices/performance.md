@@ -6,23 +6,23 @@ outline: deep
 
 ## 概述 {#overview}
 
-Vue 在大多数常见场景下性能都是很优秀的，通常不需要手动优化。然而，总会有一些具有挑战性的场景需要进行针对性的微调。在本节中，我们将讨论用 Vue 开发的应用在性能方面该注意些什么。
+Vue 在多数场景下性能已经不错，一般不用刻意优化。少数复杂场景才需要针对性调整。本节讲用 Vue 做应用时，性能上该注意什么。
 
-首先，让我们区分一下 web 应用性能的两个主要方面：
+Web 应用性能主要看两方面：
 
-- **页面加载性能**：首次访问时，应用展示出内容与达到可交互状态的速度。这通常会用 Google 所定义的一系列 [Web 指标](https://web.dev/vitals/#core-web-vitals) (Web Vitals) 来进行衡量，如[最大内容绘制](https://web.dev/lcp/) (Largest Contentful Paint，缩写为 LCP) 和[交互至下一次绘制，即 INP](https://web.dev/articles/inp)。
+- **页面加载**：首次打开时，多快能看到内容、能操作。常用 Google 的 [Web 指标](https://web.dev/vitals/#core-web-vitals)衡量，如 [LCP](https://web.dev/lcp/)（最大内容绘制）和 [INP](https://web.dev/articles/inp)（交互到下次绘制）。
 
-- **更新性能**：应用响应用户输入更新的速度。比如当用户在搜索框中输入时结果列表的更新速度，或者用户在一个单页面应用 (SPA) 中点击链接跳转页面时的切换速度。
+- **更新性能**：用户操作后界面多快更新。例如搜索框输入时列表刷新速度，或 SPA 切页速度。
 
-虽然最理想的情况是将两者都最大化，但是不同的前端架构往往会影响到在这些方面是否能达到更理想的性能。此外，你所构建的应用的类型极大地影响了你在性能方面应该优先考虑的问题。因此，优化性能的第一步是为你的应用类型确定合适的架构：
+理想是两者都好，但架构不同，侧重点也不同。应用类型也决定你先优化哪一块。第一步是先选对架构：
 
-- 查看[使用 Vue 的多种方式](/guide/extras/ways-of-using-vue)这一章看看如何用不同的方式围绕 Vue 组织架构。
+- 见[使用 Vue 的多种方式](/guide/extras/ways-of-using-vue)，了解不同架构。
 
-- Jason Miller 在 [Application Holotypes](https://jasonformat.com/application-holotypes/) 一文中讨论了 Web 应用的类型以及它们各自的理想实现/交付方式。
+- Jason Miller 的 [Application Holotypes](https://jasonformat.com/application-holotypes/) 讨论了各类 Web 应用适合的实现与交付方式。
 
 ## 分析选项 {#profiling-options}
 
-为了提高性能，我们首先需要知道如何衡量它。在这方面，有一些很棒的工具可以提供帮助：
+要优化性能，先会测量。常用工具：
 
 用于生产部署的负载性能分析：
 
@@ -31,43 +31,43 @@ Vue 在大多数常见场景下性能都是很优秀的，通常不需要手动�
 
 用于本地开发期间的性能分析：
 
-- [Chrome 开发者工具“性能”面板](https://developer.chrome.com/docs/devtools/evaluate-performance/)
-  - [`app.config.performance`](/api/application#app-config-performance) 将会开启 Vue 特有的性能标记，标记在 Chrome 开发者工具的性能时间线上。
-- [Vue 开发者扩展](/guide/scaling-up/tooling#browser-devtools)也提供了性能分析的功能。
+- [Chrome 开发者工具「性能」面板](https://developer.chrome.com/docs/devtools/evaluate-performance/)
+  - [`app.config.performance`](/api/application#app-config-performance) 会开启 Vue 性能标记，显示在时间线上。
+- [Vue 开发者工具](/guide/scaling-up/tooling#browser-devtools)也支持性能分析。
 
 ## 页面加载优化 {#page-load-optimizations}
 
-页面加载优化有许多跟框架无关的方面 - 这份 [web.dev 指南](https://web.dev/fast/)提供了一个全面的总结。这里，我们将主要关注和 Vue 相关的技巧。
+页面加载优化很多与框架无关，[web.dev 指南](https://web.dev/fast/)有全面总结。这里主要讲和 Vue 相关的。
 
 ### 选用正确的架构 {#choosing-the-right-architecture}
 
-如果你的用例对页面加载性能很敏感，请避免将其部署为纯客户端的 SPA，而是让服务器直接发送包含用户想要查看的内容的 HTML 代码。纯客户端渲染存在首屏加载缓慢的问题，这可以通过[服务器端渲染 (SSR)](/guide/extras/ways-of-using-vue#fullstack-ssr) 或[静态站点生成 (SSG)](/guide/extras/ways-of-using-vue#jamstack-ssg) 来缓解。查看 [SSR 指南](/guide/scaling-up/ssr)以了解如何使用 Vue 实现 SSR。如果应用对交互性要求不高，你还可以使用传统的后端服务器来渲染 HTML，并在客户端使用 Vue 对其进行增强。
+若首屏速度很重要，尽量不要做成纯客户端 SPA，而让服务器直接返回用户要看的 HTML。纯 CSR 首屏往往慢，可用 [SSR](/guide/extras/ways-of-using-vue#fullstack-ssr) 或 [SSG](/guide/extras/ways-of-using-vue#jamstack-ssg) 改善。见 [SSR 指南](/guide/scaling-up/ssr)。交互要求不高时，也可由后端渲染 HTML，前端再用 Vue 增强。
 
-如果你的主应用必须是 SPA，但还有其他的营销相关页面 (落地页、关于页、博客等)，请单独部署这些页面！理想情况下，营销页面应该是包含尽可能少 JS 的静态 HTML，并用 SSG 方式部署。
+主应用必须是 SPA，但还有落地页、关于页、博客等营销页时，请单独部署。营销页最好用 JS 很少的静态 HTML，走 SSG。
 
 ### 包体积与 Tree-shaking 优化 {#bundle-size-and-tree-shaking}
 
-一个最有效的提升页面加载速度的方法就是压缩 JavaScript 打包产物的体积。当使用 Vue 时有下面一些办法来减小打包产物体积：
+加快首屏，很有效的一招是减小 JS 包体积。用 Vue 时可以这样做：
 
 - 尽可能地采用构建步骤
 
-  - 如果使用的是相对现代的打包工具，许多 Vue 的 API 都是可以被 [tree-shake](https://developer.mozilla.org/en-US/docs/Glossary/Tree_shaking) 的。举例来说，如果你根本没有使用到内置的 `<Transition>` 组件，它将不会被打包进入最终的产物里。Tree-shaking 也可以移除你源代码中其他未使用到的模块。
+  - 现代打包工具支持 [tree-shake](https://developer.mozilla.org/en-US/docs/Glossary/Tree_shaking)。没用到的 Vue API（例如 `<Transition>`）不会进最终包。未使用的源码模块也会被去掉。
 
-  - 当使用了构建步骤时，模板会被预编译，因此我们无须在浏览器中载入 Vue 编译器。这在同样最小化加上 gzip 优化下会相对缩小 **14kb** 并避免运行时的编译开销。
+  - 有构建步骤时，模板会预编译，浏览器不必再加载 Vue 编译器。压缩并 gzip 后大约能少 **14kb**，也省掉运行时编译。
 
-- 在引入新的依赖项时要小心包体积膨胀！在现实的应用中，包体积膨胀通常因为无意识地引入了过重的依赖导致的。
+- 加新依赖时注意体积，常见原因是引入了过重的库。
 
-  - 如果使用了构建步骤，应当尽量选择提供 ES 模块格式的依赖，它们对 tree-shaking 更友好。举例来说，选择 `lodash-es` 比 `lodash` 更好。
+  - 有构建步骤时，优先选 ES 模块版依赖，便于 tree-shake。例如用 `lodash-es` 而不是 `lodash`。
 
-  - 查看依赖的体积，并评估与其所提供的功能之间的性价比。如果依赖对 tree-shaking 友好，实际增加的体积大小将取决于你从它之中导入的 API。像 [bundlejs.com](https://bundlejs.com/) 这样的工具可以用来做快速的检查，但是根据实际的构建设置来评估总是最准确的。
+  - 看依赖体积是否值得。支持 tree-shake 的库，实际增加多少取决于你 import 了哪些 API。可用 [bundlejs.com](https://bundlejs.com/) 粗查，但以真实构建结果为准。
 
-- 如果你只在渐进式增强的场景下使用 Vue，并想要避免使用构建步骤，请考虑使用 [petite-vue](https://github.com/vuejs/petite-vue) (只有 **6kb**) 来代替。
+- 只做渐进增强、不想上构建时，可考虑 [petite-vue](https://github.com/vuejs/petite-vue)（约 **6kb**）。
 
 ### 代码分割 {#code-splitting}
 
-代码分割是指构建工具将构建后的 JavaScript 包拆分为多个较小的，可以按需或并行加载的文件。通过适当的代码分割，页面加载时需要的功能可以立即下载，而额外的块只在需要时才加载，从而提高性能。
+代码分割是把打包后的 JS 拆成多个小文件，按需或并行加载。首屏只下必要代码，其余用时再下，能提升性能。
 
-像 Rollup (Vite 就是基于它之上开发的) 或者 webpack 这样的打包工具可以通过分析 ESM 动态导入的语法来自动进行代码分割：
+Rollup（Vite 基于它）或 webpack 会识别 ESM 动态 `import` 并自动分割：
 
 ```js
 // lazy.js 及其依赖会被拆分到一个单独的文件中
@@ -77,7 +77,7 @@ function loadLazy() {
 }
 ```
 
-懒加载对于页面初次加载时的优化帮助极大，它帮助应用暂时略过了那些不是立即需要的功能。在 Vue 应用中，这可以与 Vue 的[异步组件](/guide/components/async)搭配使用，为组件树创建分离的代码块：
+懒加载对首屏帮助很大，先跳过暂时用不到的功能。在 Vue 里可配合[异步组件](/guide/components/async)拆出独立代码块：
 
 ```js
 import { defineAsyncComponent } from 'vue'
@@ -88,13 +88,13 @@ import { defineAsyncComponent } from 'vue'
 const Foo = defineAsyncComponent(() => import('./Foo.vue'))
 ```
 
-对于使用了 Vue Router 的应用，强烈建议使用异步组件作为路由组件。Vue Router 已经显性地支持了独立于 `defineAsyncComponent` 的懒加载。查看[懒加载路由](https://router.vuejs.org/zh/guide/advanced/lazy-loading.html)了解更多细节。
+用 Vue Router 时，建议路由组件也用异步组件。Router 自带懒加载（不必一定用 `defineAsyncComponent`）。见[懒加载路由](https://router.vuejs.org/zh/guide/advanced/lazy-loading.html)。
 
 ## 更新优化 {#update-optimizations}
 
 ### Props 稳定性 {#props-stability}
 
-在 Vue 之中，一个子组件只会在其至少一个 props 改变时才会更新。思考以下示例：
+在 Vue 里，子组件至少有一个 prop 变了才会更新。例如：
 
 ```vue-html
 <ListItem
@@ -103,9 +103,9 @@ const Foo = defineAsyncComponent(() => import('./Foo.vue'))
   :active-id="activeId" />
 ```
 
-在 `<ListItem>` 组件中，它使用了 `id` 和 `activeId` 两个 props 来确定它是否是当前活跃的那一项。虽然这是可行的，但问题是每当 `activeId` 更新时，列表中的**每一个** `<ListItem>` 都会跟着更新！
+`<ListItem>` 用 `id` 和 `activeId` 判断是否选中。可行，但 `activeId` 一变，列表里**每一项**都会更新。
 
-理想情况下，只有活跃状态发生改变的项才应该更新。我们可以将活跃状态比对的逻辑移入父组件来实现这一点，然后让 `<ListItem>` 改为接收一个 `active` prop：
+更好的是只有选中项变化时才更新：在父组件里算好是否选中，只传 `active` prop：
 
 ```vue-html
 <ListItem
@@ -114,19 +114,19 @@ const Foo = defineAsyncComponent(() => import('./Foo.vue'))
   :active="item.id === activeId" />
 ```
 
-现在，对于大多数的组件来说，`activeId` 改变时，它们的 `active` prop 都会保持不变，因此它们无需再更新。总结一下，这个技巧的核心思想就是让传给子组件的 props 尽量保持稳定。
+这样 `activeId` 变时，多数项的 `active` 不变，就不会无谓更新。要点：尽量让传给子组件的 props 保持稳定。
 
 ### `v-once` {#v-once}
 
-`v-once` 是一个内置的指令，可以用来渲染依赖运行时数据但无需再更新的内容。它的整个子树都会在未来的更新中被跳过。查看它的 [API 参考手册](/api/built-in-directives#v-once)可以了解更多细节。
+`v-once` 是内置指令，适合渲染一次、之后不必再变的子树。详见 [API](/api/built-in-directives#v-once)。
 
 ### `v-memo` {#v-memo}
 
-`v-memo` 是一个内置指令，可以用来有条件地跳过某些大型子树或者 `v-for` 列表的更新。查看它的 [API 参考手册](/api/built-in-directives#v-memo)可以了解更多细节。
+`v-memo` 可有条件地跳过大型子树或 `v-for` 列表的更新。详见 [API](/api/built-in-directives#v-memo)。
 
 ### 计算属性稳定性 {#computed-stability}
 
-在 Vue 3.4 及更高版本中，计算属性仅在其计算值较前一个值发生更改时才会触发副作用。例如，以下 `isEven` 计算属性仅在返回值从 `true` 更改为 `false` 时才会触发副作用，反之亦然：
+Vue 3.4+ 中，计算属性只有结果真的变了才会触发依赖它的副作用。例如下面 `isEven`，只有 `true`/`false` 切换时才会触发 `watchEffect`：
 
 ```js
 const count = ref(0)
@@ -139,7 +139,7 @@ count.value = 2
 count.value = 4
 ```
 
-这减少了非必要副作用的触发。但不幸的是，如果计算属性在每次计算时都创建一个新对象，则不起作用：
+这能减少多余更新。但若每次计算都返回新对象，就不起作用：
 
 ```js
 const computedObj = computed(() => {
@@ -149,9 +149,7 @@ const computedObj = computed(() => {
 })
 ```
 
-由于每次都会创建一个新对象，因此从技术上讲，新旧值始终不同。即使 `isEven` 属性保持不变，Vue 也无法知道，除非它对旧值和新值进行深度比较。这种比较可能代价高昂，并不值得。
-
-相反，我们可以通过手动比较新旧值来优化。如果我们知道没有变化，则有条件地返回旧值：
+每次是新对象，引用总不同，Vue 会认为变了，除非做深度比较（成本高）。可以手动比较，没变化就返回旧对象：
 
 ```js
 const computedObj = computed((oldValue) => {
@@ -167,7 +165,7 @@ const computedObj = computed((oldValue) => {
 
 [演练场示例](https://play.vuejs.org/#eNqVVMtu2zAQ/JUFgSZK4UpuczMkow/40AJ9IC3aQ9mDIlG2EokUyKVt1PC/d0lKtoEminMQQC1nZ4c7S+7Yu66L11awGUtNoesOwQi03ZzLuu2URtiBFtUECtV2FkU5gU2OxWpRVaJA2EOlVQuXxHDJJZeFkgYJayVC5hKj6dUxLnzSjZXmV40rZfFrh3Vb/82xVrLH//5DCQNNKPkweNiNVFP+zBsrIJvDjksgGrRahjVAbRZrIWdBVLz2yBfwBrIsg6mD7LncPyryfIVnywupUmz68HOEEqqCI+XFBQzrOKR79MDdx66GCn1jhpQDZx8f0oZ+nBgdRVcH/aMuBt1xZ80qGvGvh/X6nlXwnGpPl6qsLLxTtitzFFTNl0oSN/79AKOCHHQuS5pw4XorbXsr9ImHZN7nHFdx1SilI78MeOJ7Ca+nbvgd+GgomQOv6CNjSQqXaRJuHd03+kHRdg3JoT+A3a7XsfcmpbcWkQS/LZq6uM84C8o5m4fFuOg0CemeOXXX2w2E6ylsgj2gTgeYio/f1l5UEqj+Z3yC7lGuNDlpApswNNTrql7Gd0ZJeqW8TZw5t+tGaMdDXnA2G4acs7xp1OaTj6G2YjLEi5Uo7h+I35mti3H2TQsj9Jp6etjDXC8Fhu3F9y9iS+vDZqtK2xB6ZPNGGNVYpzHA3ltZkuwTnFf70b+1tVz+MIstCmmGQzmh/p56PGf00H4YOfpR7nV8PTxubP8P2GAP9Q==)
 
-值得注意的是，你应该始终在比较和返回旧值之前执行完整计算，以便在每次运行时都可以收集到相同的依赖项。
+注意：比较和返回旧值之前，仍要完整算一遍，保证依赖收集正确。
 
 ## 通用优化 {#general-optimizations}
 
@@ -175,11 +173,11 @@ const computedObj = computed((oldValue) => {
 
 ### 大型虚拟列表 {#virtualize-large-lists}
 
-所有的前端应用中最常见的性能问题就是渲染大型列表。无论一个框架性能有多好，渲染成千上万个列表项**都会**变得很慢，因为浏览器需要处理大量的 DOM 节点。
+大列表渲染是最常见的性能瓶颈。框架再快，成千上万 DOM 节点也会慢。
 
-但是，我们并不需要立刻渲染出全部的列表。在大多数场景中，用户的屏幕尺寸只会展示这个巨大列表中的一小部分。我们可以通过**列表虚拟化**来提升性能，这项技术使我们只需要渲染用户视口中能看到的部分。
+不必一次渲染全部。屏幕上通常只看得见一小段。用**虚拟列表**只渲染视口内的项，能明显提升性能。
 
-要实现列表虚拟化并不简单，幸运的是，你可以直接使用现有的社区库：
+虚拟列表实现较复杂，可直接用社区库：
 
 - [vue-virtual-scroller](https://github.com/Akryum/vue-virtual-scroller)
 - [vue-virtual-scroll-grid](https://github.com/rocwang/vue-virtual-scroll-grid)
@@ -187,9 +185,9 @@ const computedObj = computed((oldValue) => {
 
 ### 减少大型不可变数据的响应性开销 {#reduce-reactivity-overhead-for-large-immutable-structures}
 
-Vue 的响应性系统默认是深度的。虽然这让状态管理变得更直观，但在数据量巨大时，深度响应性也会导致不小的性能负担，因为每个属性访问都将触发代理的依赖追踪。好在这种性能负担通常只有在处理超大型数组或层级很深的对象时，例如一次渲染需要访问 100,000+ 个属性时，才会变得比较明显。因此，它只会影响少数特定的场景。
+Vue 默认深度响应，写起来直观，但数据特别大时，每次访问深层属性都要走代理，开销不小。通常要一次访问 10 万+ 属性才明显，属于少数场景。
 
-Vue 确实也为此提供了一种解决方案，通过使用 [`shallowRef()`](/api/reactivity-advanced#shallowref) 和 [`shallowReactive()`](/api/reactivity-advanced#shallowreactive) 来绕开深度响应。浅层式 API 创建的状态只在其顶层是响应式的，对所有深层的对象不会做任何处理。这使得对深层级属性的访问变得更快，但代价是，我们现在必须将所有深层级对象视为不可变的，并且只能通过替换整个根状态来触发更新：
+可用 [`shallowRef()`](/api/reactivity-advanced#shallowref) 和 [`shallowReactive()`](/api/reactivity-advanced#shallowreactive) 只做浅层响应：深层对象不再被代理，读深层更快，但深层要当不可变，只能替换根状态来触发更新：
 
 ```js
 const shallowArray = shallowRef([
@@ -215,6 +213,6 @@ shallowArray.value = [
 
 ### 避免不必要的组件抽象 {#avoid-unnecessary-component-abstractions}
 
-有些时候我们会去创建[无渲染组件](/guide/components/slots#renderless-components)或高阶组件 (用来渲染具有额外 props 的其他组件) 来实现更好的抽象或代码组织。虽然这并没有什么问题，但请记住，组件实例比普通 DOM 节点要昂贵得多，而且为了逻辑抽象创建太多组件实例将会导致性能损失。
+有时会用[无渲染组件](/guide/components/slots#renderless-components)或高阶组件做抽象，这没问题，但组件实例比 DOM 节点贵，抽象过多会拖慢性能。
 
-需要提醒的是，只减少几个组件实例对于性能不会有明显的改善，所以如果一个用于抽象的组件在应用中只会渲染几次，就不用操心去优化它了。考虑这种优化的最佳场景还是在大型列表中。想象一下一个有 100 项的列表，每项的组件都包含许多子组件。在这里去掉一个不必要的组件抽象，可能会减少数百个组件实例的无谓性能消耗。
+少删几个实例通常看不出差别；若抽象组件只渲染几次，不必纠结。最值得优化的是大列表：100 项、每项很多子组件时，去掉一层多余抽象，可能少几百个实例。

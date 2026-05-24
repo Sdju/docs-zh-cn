@@ -4,9 +4,9 @@ outline: deep
 
 # 渲染函数 & JSX {#render-functions-jsx}
 
-在绝大多数情况下，Vue 推荐使用模板语法来创建应用。然而在某些使用场景下，我们真的需要用到 JavaScript 完全的编程能力。这时**渲染函数**就派上用场了。
+多数情况下 Vue 推荐用模板写应用。但有些场景需要 JavaScript 的全部表达能力，这时用**渲染函数**。
 
-> 如果你还不熟悉虚拟 DOM 和渲染函数的概念的话，请确保先阅读[渲染机制](/guide/extras/rendering-mechanism)章节。
+> 还不熟悉虚拟 DOM 和渲染函数？请先读[渲染机制](/guide/extras/rendering-mechanism)。
 
 ## 基本用法 {#basic-usage}
 
@@ -26,9 +26,9 @@ const vnode = h(
 )
 ```
 
-`h()` 是 **hyperscript** 的简称——意思是“能生成 HTML (超文本标记语言) 的 JavaScript”。这个名字来源于许多虚拟 DOM 实现默认形成的约定。一个更准确的名称应该是 `createVNode()`，但当你需要多次使用渲染函数时，一个简短的名字会更省力。
+`h()` 即 **hyperscript**（能生成 HTML 的 JavaScript）的缩写，来自很多虚拟 DOM 实现的惯例。更准确的名字也许是 `createVNode()`，但写渲染函数时短名字更省事。
 
-`h()` 函数的使用方式非常的灵活：
+`h()` 用法很灵活：
 
 ```js
 // 除了类型必填以外，其他的参数都是可选的
@@ -73,14 +73,14 @@ vnode.key // null
 ```
 
 ::: warning 注意事项
-完整的 `VNode` 接口包含其他内部属性，但是强烈建议避免使用这些没有在这里列举出的属性。这样能够避免因内部属性变更而导致的不兼容性问题。
+完整 `VNode` 接口还有其它内部字段，建议不要用本文未列出的那些，以免内部变更导致不兼容。
 :::
 
 ### 声明渲染函数 {#declaring-render-function}
 
 <div class="composition-api">
 
-当组合式 API 与模板一起使用时，`setup()` 钩子的返回值是用于暴露数据给模板。然而当我们使用渲染函数时，可以直接把渲染函数返回：
+组合式 API 配模板时，`setup()` 返回值给模板用。用渲染函数时，可直接 `return` 渲染函数：
 
 ```js
 import { ref, h } from 'vue'
@@ -98,9 +98,9 @@ export default {
 }
 ```
 
-在 `setup()` 内部声明的渲染函数天生能够访问在同一范围内声明的 props 和许多响应式状态。
+在 `setup()` 里写的渲染函数，天然能访问同作用域的 props 和响应式状态。
 
-除了返回一个 vnode，你还可以返回字符串或数组：
+除 vnode 外，也可返回字符串或数组：
 
 ```js
 export default {
@@ -126,13 +126,13 @@ export default {
 ```
 
 ::: tip
-请确保返回的是一个函数而不是一个值！`setup()` 函数在每个组件中只会被调用一次，而返回的渲染函数将会被调用多次。
+务必返回**函数**，不要返回值。`setup()` 每个组件只跑一次，返回的渲染函数会跑多次。
 :::
 
 </div>
 <div class="options-api">
 
-我们可以使用 `render` 选项来声明渲染函数：
+选项式 API 用 `render` 选项声明渲染函数：
 
 ```js
 import { h } from 'vue'
@@ -149,9 +149,9 @@ export default {
 }
 ```
 
-`render()` 函数可以访问同一个 `this` 组件实例。
+`render()` 里可访问 `this`。
 
-除了返回一个单独的 vnode 之外，你还可以返回字符串或是数组：
+也可返回字符串或数组：
 
 ```js
 export default {
@@ -178,7 +178,7 @@ export default {
 
 </div>
 
-如果一个渲染函数组件不需要任何实例状态，为了简洁起见，它们也可以直接被声明为一个函数：
+不需要实例状态的渲染组件，可直接写成函数：
 
 ```js
 function Hello() {
@@ -186,7 +186,7 @@ function Hello() {
 }
 ```
 
-没错，这就是一个合法的 Vue 组件！参阅[函数式组件](#functional-components)来了解更多语法细节。
+这就是合法的 Vue 组件。详见[函数式组件](#functional-components)。
 
 ### Vnodes 必须唯一 {#vnodes-must-be-unique}
 
@@ -203,7 +203,7 @@ function render() {
 }
 ```
 
-如果你真的非常想在页面上渲染多个重复的元素或者组件，你可以使用一个工厂函数来做这件事。比如下面的这个渲染函数就可以完美渲染出 20 个相同的段落：
+若要渲染多个相同节点，用工厂函数每次新建 vnode，例如渲染 20 个相同段落：
 
 ```js
 function render() {
@@ -235,42 +235,40 @@ const vnode = h('button', ['Hello'])
 </template>
 ```
 
-由于 vnode 对象已经在 `setup()` 中定义，你可以像普通组件那样直接渲染它。
+vnode 在 `setup()` 里定义好后，可像普通组件一样渲染。
 
 :::warning
-一个 vnode 表示的是一个静态的渲染输出，而不是一个组件定义。在 `<template>` 中使用 vnode 并不会创建一个新的组件实例，vnode 将按它原样渲染。
-
-这种用法需要特别注意，它不是组件的替代品。
+vnode 是静态渲染结果，不是组件定义。在 `<template>` 里用它不会新建组件实例，只按原样渲染。不能当组件替代品。
 :::
 
 ## JSX / TSX {#jsx-tsx}
 
-[JSX](https://facebook.github.io/jsx/) 是 JavaScript 的一个类似 XML 的扩展，有了它，我们可以用以下的方式来书写代码：
+[JSX](https://facebook.github.io/jsx/) 是 JavaScript 的类 XML 扩展，可以这样写：
 
 ```jsx
 const vnode = <div>hello</div>
 ```
 
-在 JSX 表达式中，使用大括号来嵌入动态值：
+JSX 里用大括号嵌入动态值：
 
 ```jsx
 const vnode = <div id={dynamicId}>hello, {userName}</div>
 ```
 
-`create-vue` 和 Vue CLI 都有预置的 JSX 语法支持。如果你想手动配置 JSX，请参阅 [`@vue/babel-plugin-jsx`](https://github.com/vuejs/jsx-next) 文档获取更多细节。
+`create-vue` 和 Vue CLI 内置 JSX 支持。手动配置见 [`@vue/babel-plugin-jsx`](https://github.com/vuejs/jsx-next)。
 
-虽然最早是由 React 引入，但实际上 JSX 语法并没有定义运行时语义，并且能被编译成各种不同的输出形式。如果你之前使用过 JSX 语法，那么请注意 **Vue 的 JSX 转换方式与 React 中 JSX 的转换方式不同**，因此你不能在 Vue 应用中使用 React 的 JSX 转换。与 React JSX 语法的一些明显区别包括：
+JSX 最早由 React 推广，但语法本身没有固定运行时语义，可编译成不同输出。若用过 React JSX，注意 **Vue 的 JSX 转换与 React 不同**，不能在 Vue 里直接用 React 的 JSX 编译。和 React 的一些明显区别：
 
 - 可以使用 HTML attributes 比如 `class` 和 `for` 作为 props - 不需要使用 `className` 或 `htmlFor`。
-- 传递子元素给组件 (比如 slots) 的[方式不同](#passing-slots)。
+- 向组件传子内容（如 slots）的[方式不同](#passing-slots)。
 
-Vue 的类型定义也提供了 TSX 语法的类型推导支持。当使用 TSX 语法时，确保在 `tsconfig.json` 中配置了 `"jsx": "preserve"`，这样的 TypeScript 就能保证 Vue JSX 语法转换过程中的完整性。
+Vue 类型定义也支持 TSX。用 TSX 时在 `tsconfig.json` 设 `"jsx": "preserve"`，保证 Vue JSX 转换完整。
 
 ### JSX 类型推断 {#jsx-type-inference}
 
-与转换类似，Vue 的 JSX 也需要不同的类型定义。
+类型方面，Vue JSX 也需要单独配置。
 
-从 Vue 3.4 开始，Vue 不再隐式注册全局 `JSX` 命名空间。要指示 TypeScript 使用 Vue 的 JSX 类型定义，请确保在你的 `tsconfig.json` 中包含以下内容：
+Vue 3.4 起不再隐式注册全局 `JSX` 命名空间。要让 TypeScript 用 Vue 的 JSX 类型，在 `tsconfig.json` 加上：
 
 ```json
 {
@@ -282,13 +280,13 @@ Vue 的类型定义也提供了 TSX 语法的类型推导支持。当使用 TSX 
 }
 ```
 
-你也可以通过在文件的顶部加入 `/* @jsxImportSource vue */` 注释来选择性地开启。
+也可在文件顶部加 `/* @jsxImportSource vue */` 单独开启。
 
-如果仍有代码依赖于全局存在的 `JSX` 命名空间，你可以在项目中通过显式导入或引用 `vue/jsx` 来保留 3.4 之前的全局行为，它注册了全局 `JSX` 命名空间。
+若仍依赖全局 `JSX`，可导入或引用 `vue/jsx` 恢复 3.4 前的全局行为。
 
 ## 渲染函数案例 {#render-function-recipes}
 
-下面我们提供了几个常见的用等价的渲染函数 / JSX 语法，实现模板功能的案例：
+下面是用渲染函数 / JSX 实现常见模板功能的例子：
 
 ### `v-if` {#v-if}
 
@@ -301,7 +299,7 @@ Vue 的类型定义也提供了 TSX 语法的类型推导支持。当使用 TSX 
 </div>
 ```
 
-等价于使用如下渲染函数 / JSX 语法：
+等价渲染函数 / JSX：
 
 <div class="composition-api">
 
@@ -338,7 +336,7 @@ h('div', [this.ok ? h('div', 'yes') : h('span', 'no')])
 </ul>
 ```
 
-等价于使用如下渲染函数 / JSX 语法：
+等价渲染函数 / JSX：
 
 <div class="composition-api">
 
@@ -384,7 +382,7 @@ h(
 
 ### `v-on` {#v-on}
 
-以 `on` 开头，并跟着大写字母的 props 会被当作事件监听器。比如，`onClick` 与模板中的 `@click` 等价。
+以 `on` 加大写字母开头的 prop 当作事件监听，如 `onClick` 对应模板 `@click`。
 
 ```js
 h(
@@ -410,7 +408,7 @@ h(
 
 ### 事件修饰符 {#event-modifiers}
 
-对于 `.passive`、`.capture` 和 `.once` 事件修饰符，可以使用驼峰写法将他们拼接在事件名后面：
+`.passive`、`.capture`、`.once` 可用驼峰拼在事件名后：
 
 实例：
 
@@ -452,7 +450,7 @@ h('div', {
 
 ### 组件 {#components}
 
-在给组件创建 vnode 时，传递给 `h()` 函数的第一个参数应当是组件的定义。这意味着使用渲染函数时不再需要注册组件了 —— 可以直接使用导入的组件：
+给组件创建 vnode 时，`h()` 第一个参数应是组件定义。渲染函数里不必再注册组件，直接导入即可：
 
 ```js
 import Foo from './Foo.vue'
@@ -474,9 +472,9 @@ function render() {
 }
 ```
 
-不管是什么类型的文件，只要从中导入的是有效的 Vue 组件，`h` 就能正常运作。
+只要导入的是有效 Vue 组件，不论文件类型，`h` 都能用。
 
-动态组件在渲染函数中也可直接使用：
+动态组件在渲染函数里也可直接写：
 
 ```js
 import Foo from './Foo.vue'
@@ -493,13 +491,13 @@ function render() {
 }
 ```
 
-如果一个组件是用名字注册的，不能直接导入 (例如，由一个库全局注册)，可以使用 [`resolveComponent()`](/api/render-function#resolvecomponent) 来解决这个问题。
+组件只按名字注册、无法直接导入时（如库全局注册），用 [`resolveComponent()`](/api/render-function#resolvecomponent)。
 
 ### 渲染插槽 {#rendering-slots}
 
 <div class="composition-api">
 
-在渲染函数中，插槽可以通过 `setup()` 的上下文来访问。每个 `slots` 对象中的插槽都是一个**返回 vnodes 数组的函数**：
+渲染函数里通过 `setup()` 上下文访问插槽。`slots` 里每个插槽都是**返回 vnode 数组的函数**：
 
 ```js
 export default {
@@ -536,7 +534,7 @@ export default {
 </div>
 <div class="options-api">
 
-在渲染函数中，可以通过 [this.$slots](/api/component-instance#slots) 来访问插槽：
+渲染函数里用 [this.$slots](/api/component-instance#slots) 访问插槽：
 
 ```js
 export default {
@@ -572,7 +570,7 @@ export default {
 
 ### 传递插槽 {#passing-slots}
 
-向组件传递子元素的方式与向元素传递子元素的方式有些许不同。我们需要传递一个插槽函数或者是一个包含插槽函数的对象而非是数组，插槽函数的返回值同一个正常的渲染函数的返回值一样——并且在子组件中被访问时总是会被转化为一个 vnodes 数组。
+向组件传子内容与向元素传子内容略有不同：要传插槽函数或插槽函数对象，而不是数组。插槽函数返回值同渲染函数，子组件访问时会变成 vnode 数组。
 
 ```js
 // 单个默认插槽
@@ -602,11 +600,11 @@ h(MyComponent, null, {
 }}</MyComponent>
 ```
 
-插槽以函数的形式传递使得它们可以被子组件懒调用。这能确保它被注册为子组件的依赖关系，而不是父组件。这使得更新更加准确及有效。
+插槽以函数传递，子组件可懒调用，依赖会挂在子组件而不是父组件上，更新更准、更高效。
 
 ### 作用域插槽 {#scoped-slots}
 
-为了在父组件中渲染作用域插槽，需要给子组件传递一个插槽。注意该插槽现在拥有一个 `text` 参数。该插槽将在子组件中被调用，同时子组件中的数据将向上传递给父组件。
+父组件渲染作用域插槽时，要给子组件传一个带参数的插槽函数（如 `text`）。子组件调用它，把数据传给父组件。
 
 ```js
 // 父组件
@@ -619,7 +617,7 @@ export default {
 }
 ```
 
-记得传递 `null` 以避免插槽被误认为 prop：
+记得传 `null`，避免插槽对象被当成 prop：
 
 ```js
 // 子组件
@@ -641,7 +639,7 @@ export default {
 
 ### 内置组件 {#built-in-components}
 
-诸如 `<KeepAlive>`、`<Transition>`、`<TransitionGroup>`、`<Teleport>` 和 `<Suspense>` 等[内置组件](/api/built-in-components)在渲染函数中必须导入才能使用：
+`<KeepAlive>`、`<Transition>`、`<TransitionGroup>`、`<Teleport>`、`<Suspense>` 等[内置组件](/api/built-in-components)在渲染函数里要先导入：
 
 <div class="composition-api">
 
@@ -672,7 +670,7 @@ export default {
 
 ### `v-model` {#v-model}
 
-`v-model` 指令扩展为 `modelValue` 和 `onUpdate:modelValue` 在模板编译过程中，我们必须自己提供这些 props：
+模板里 `v-model` 会编译成 `modelValue` 和 `onUpdate:modelValue`；渲染函数里需自己传这两个 prop：
 
 <div class="composition-api">
 
@@ -710,7 +708,7 @@ export default {
 
 ### 自定义指令 {#custom-directives}
 
-可以使用 [`withDirectives`](/api/render-function#withdirectives) 将自定义指令应用于 vnode：
+用 [`withDirectives`](/api/render-function#withdirectives) 把自定义指令绑到 vnode：
 
 ```js
 import { h, withDirectives } from 'vue'
@@ -727,13 +725,13 @@ const vnode = withDirectives(h('div'), [
 ])
 ```
 
-当一个指令是以名称注册并且不能被直接导入时，可以使用 [`resolveDirective`](/api/render-function#resolvedirective) 函数来解决这个问题。
+指令按名字注册、无法直接导入时，用 [`resolveDirective`](/api/render-function#resolvedirective)。
 
 ### 模板引用 {#template-refs}
 
 <div class="composition-api">
 
-在组合式 API 中使用 [`useTemplateRef()`](/api/composition-api-helpers#usetemplateref) <sup class="vt-badge" data-text="3.5+" /> 时，模板引用是通过将字符串值作为 prop 传递给 vnode 创建的：
+组合式 API 用 [`useTemplateRef()`](/api/composition-api-helpers#usetemplateref) <sup class="vt-badge" data-text="3.5+" /> 时，把字符串 `ref` 作为 prop 传给 vnode：
 
 ```js
 import { h, useTemplateRef } from 'vue'
@@ -751,7 +749,7 @@ export default {
 <details>
 <summary>3.5 之前的用法</summary>
 
-在 3.5 版本之前 useTemplateRef() 暂未引入，模板引用是通过将 ref() 本身作为 prop 传递给 vnode 创建的：
+3.5 前没有 `useTemplateRef()`，把 `ref()` 本身作为 prop 传给 vnode：
 
 ```js
 import { h, ref } from 'vue'
@@ -769,7 +767,7 @@ export default {
 </div>
 <div class="options-api">
 
-在选项式 API 中，模板引用通过在 vnode 参数中传递字符串类型的引用名称来创建：
+选项式 API 在 vnode 的 `ref` prop 里传字符串引用名：
 
 ```js
 export default {
@@ -784,9 +782,9 @@ export default {
 
 ## 函数式组件 {#functional-components}
 
-函数式组件是一种定义自身没有任何状态的组件的方式。它们很像纯函数：接收 props，返回 vnodes。函数式组件在渲染过程中不会创建组件实例 (也就是说，没有 `this`)，也不会触发常规的组件生命周期钩子。
+函数式组件自身无状态，像纯函数：收 props，返回 vnodes。渲染时不创建组件实例（没有 `this`），也不走常规生命周期。
 
-我们用一个普通的函数而不是一个选项对象来创建函数式组件。该函数实际上就是该组件的渲染函数。
+用普通函数（不是选项对象）定义，该函数就是渲染函数。
 
 <div class="composition-api">
 
@@ -801,7 +799,7 @@ function MyComponent(props, { slots, emit, attrs }) {
 </div>
 <div class="options-api">
 
-而因为函数式组件里没有 `this` 引用，Vue 会把 `props` 当作第一个参数传入：
+函数式组件没有 `this`，Vue 把 `props` 作为第一个参数：
 
 ```js
 function MyComponent(props, context) {
@@ -809,30 +807,30 @@ function MyComponent(props, context) {
 }
 ```
 
-第二个参数 `context` 包含三个属性：`attrs`、`emit` 和 `slots`。它们分别相当于组件实例的 [`$attrs`](/api/component-instance#attrs)、[`$emit`](/api/component-instance#emit) 和 [`$slots`](/api/component-instance#slots) 这几个属性。
+第二个参数 `context` 含 `attrs`、`emit`、`slots`，对应实例的 [`$attrs`](/api/component-instance#attrs)、[`$emit`](/api/component-instance#emit)、[`$slots`](/api/component-instance#slots)。
 
 </div>
 
-大多数常规组件的配置选项在函数式组件中都不可用，除了 [`props`](/api/options-state#props) 和 [`emits`](/api/options-state#emits)。我们可以给函数式组件添加对应的属性来声明它们：
+函数式组件大多不能用普通组件的那些选项，除了 [`props`](/api/options-state#props) 和 [`emits`](/api/options-state#emits)。可通过对应属性声明它们：
 
 ```js
 MyComponent.props = ['value']
 MyComponent.emits = ['click']
 ```
 
-如果这个 `props` 选项没有被定义，那么被传入函数的 `props` 对象就会像 `attrs` 一样会包含所有 attribute。除非指定了 `props` 选项，否则每个 prop 的名字将不会基于驼峰命名法被一般化处理。
+未定义 `props` 时，传入函数的 `props` 会像 `attrs` 一样包含所有 attribute；未声明 `props` 时，prop 名不会做驼峰转换。
 
-对于有明确 `props` 的函数式组件，[attribute 透传](/guide/components/attrs)的原理与普通组件基本相同。然而，对于没有明确指定 `props` 的函数式组件，只有 `class`、`style` 和 `onXxx` 事件监听器将默认从 `attrs` 中继承。在这两种情况下，可以将 `inheritAttrs` 设置为 `false` 来禁用属性继承：
+有明确 `props` 时，[attribute 透传](/guide/components/attrs) 与普通组件类似。未声明 `props` 时，默认只有 `class`、`style` 和 `onXxx` 从 `attrs` 继承。两种情况下都可设 `inheritAttrs: false` 关闭透传：
 
 ```js
 MyComponent.inheritAttrs = false
 ```
 
-函数式组件可以像普通组件一样被注册和使用。如果你将一个函数作为第一个参数传入 `h`，它将会被当作一个函数式组件来对待。
+函数式组件可像普通组件一样注册、使用。把函数作为 `h` 的第一个参数传入时，会当作函数式组件。
 
 ### 为函数式组件标注类型<sup class="vt-badge ts" /> {#typing-functional-components}
 
-函数式组件可以根据它们是否有命名来标注类型。在单文件组件模板中，[Vue - Official 扩展](https://github.com/vuejs/language-tools)还支持对正确类型化的函数式组件进行类型检查。
+函数式组件可按是否具名来标注类型。单文件组件模板里，[Vue - Official 扩展](https://github.com/vuejs/language-tools) 也支持类型检查。
 
 **具名函数式组件**
 

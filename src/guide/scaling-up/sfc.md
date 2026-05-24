@@ -2,7 +2,7 @@
 
 ## 介绍 {#introduction}
 
-Vue 的单文件组件 (即 `*.vue` 文件，英文 Single-File Component，简称 **SFC**) 是一种特殊的文件格式，使我们能够将一个 Vue 组件的模板、逻辑与样式封装在单个文件中。下面是一个单文件组件的示例：
+Vue 的单文件组件（`*.vue` 文件，英文 Single-File Component，简称 **SFC**）是一种特殊文件格式，可以把一个 Vue 组件的模板、逻辑和样式放在同一个文件里。下面是一个例子：
 
 <div class="options-api">
 
@@ -53,32 +53,32 @@ const greeting = ref('Hello World!')
 
 </div>
 
-如你所见，Vue 的单文件组件是网页开发中 HTML、CSS 和 JavaScript 三种语言经典组合的自然延伸。`<template>`、`<script>` 和 `<style>` 三个块在同一个文件中封装、组合了组件的视图、逻辑和样式。完整的语法定义可以查阅[单文件组件语法说明](/api/sfc-spec)。
+可以看到，单文件组件延续了网页开发里 HTML、CSS 和 JavaScript 的组合方式。`<template>`、`<script>` 和 `<style>` 三个块放在同一文件里，分别对应组件的视图、逻辑和样式。完整语法见[单文件组件语法说明](/api/sfc-spec)。
 
 ## 为什么要使用单文件组件 {#why-sfc}
 
-使用单文件组件必须使用构建工具，但作为回报带来了以下优点：
+使用单文件组件需要构建工具，但你能得到这些好处：
 
-- 使用熟悉的 HTML、CSS 和 JavaScript 语法编写模块化的组件
-- [让本来就强相关的关注点自然内聚](#what-about-separation-of-concerns)
-- 预编译模板，避免运行时的编译开销
+- 用熟悉的 HTML、CSS 和 JavaScript 语法写模块化组件
+- [把本来就相关的内容放在一起](#what-about-separation-of-concerns)
+- 模板在构建时编译，减少运行时的编译开销
 - [组件作用域的 CSS](/api/sfc-css-features)
-- [在使用组合式 API 时语法更简单](/api/sfc-script-setup)
-- 通过交叉分析模板和逻辑代码能进行更多编译时优化
-- [更好的 IDE 支持](/guide/scaling-up/tooling#ide-support)，提供自动补全和对模板中表达式的类型检查
-- 开箱即用的模块热更新 (HMR) 支持
+- [配合组合式 API 时语法更简单](/api/sfc-script-setup)
+- 编译器可以同时分析模板和逻辑，做更多编译时优化
+- [更好的 IDE 支持](/guide/scaling-up/tooling#ide-support)：自动补全、模板表达式类型检查
+- 开箱即用的模块热更新 (HMR)
 
-单文件组件是 Vue 框架提供的一个功能，并且在下列场景中都是官方推荐的项目组织方式：
+单文件组件是 Vue 自带的能力，也是官方推荐的项目组织方式，适用于：
 
 - 单页面应用 (SPA)
 - 静态站点生成 (SSG)
-- 任何值得引入构建步骤以获得更好的开发体验 (DX) 的项目
+- 任何愿意加构建步骤、换取更好开发体验 (DX) 的项目
 
-当然，在一些轻量级场景下使用单文件组件会显得有些杀鸡用牛刀。因此 Vue 同样也可以在无构建步骤的情况下以纯 JavaScript 方式使用。如果你的用例只需要给静态 HTML 添加一些简单的交互，你可以看看 [petite-vue](https://github.com/vuejs/petite-vue)，它是一个 6 kB 左右、预优化过的 Vue 子集，更适合渐进式增强的需求。
+在很轻量的场景里，单文件组件可能有点“过重”。Vue 也可以不用构建步骤，直接用 JavaScript。如果你只想给静态 HTML 加一点交互，可以看 [petite-vue](https://github.com/vuejs/petite-vue)：大约 6 kB 的 Vue 子集，更适合渐进式增强。
 
 ## 单文件组件是如何工作的 {#how-it-works}
 
-Vue 单文件组件是一个框架指定的文件格式，因此必须交由 [@vue/compiler-sfc](https://github.com/vuejs/core/tree/main/packages/compiler-sfc) 编译为标准的 JavaScript 和 CSS，一个编译后的单文件组件是一个标准的 JavaScript(ES) 模块，这也意味着在构建配置正确的前提下，你可以像导入其他 ES 模块一样导入单文件组件：
+单文件组件是 Vue 规定的格式，必须用 [@vue/compiler-sfc](https://github.com/vuejs/core/tree/main/packages/compiler-sfc) 编译成普通的 JavaScript 和 CSS。编译结果是标准的 ES 模块；构建配置正确时，可以像导入其他 ES 模块一样导入 `.vue` 文件：
 
 ```js
 import MyComponent from './MyComponent.vue'
@@ -90,18 +90,18 @@ export default {
 }
 ```
 
-单文件组件中的 `<style>` 标签一般会在开发时注入成原生的 `<style>` 标签以支持热更新，而生产环境下它们会被抽取、合并成单独的 CSS 文件。
+开发时，`<style>` 通常会注入成页面里的 `<style>` 标签，以支持热更新；生产环境会把样式抽成单独的 CSS 文件。
 
-你可以在 [Vue 单文件组件演练场](https://play.vuejs.org/)中实际使用一下单文件组件，同时可以看到它们最终被编译后的样子。
+你可以在 [Vue 单文件组件演练场](https://play.vuejs.org/)里试用，并查看编译后的结果。
 
-在实际项目中，我们一般会使用集成了单文件组件编译器的构建工具，比如 [Vite](https://cn.vitejs.dev/) 或者 [Vue CLI](https://cli.vuejs.org/zh/) (基于 [webpack](https://webpack.js.org/))，Vue 官方也提供了脚手架工具来帮助你尽可能快速地上手开发单文件组件。更多细节请查看[单文件组件工具链](/guide/scaling-up/tooling)章节。
+实际项目里，一般用带 SFC 编译器的构建工具，例如 [Vite](https://cn.vitejs.dev/) 或基于 [webpack](https://webpack.js.org/) 的 [Vue CLI](https://cli.vuejs.org/zh/)。Vue 也提供脚手架，帮你快速上手。更多内容见[单文件组件工具链](/guide/scaling-up/tooling)。
 
 ## 如何看待关注点分离？ {#what-about-separation-of-concerns}
 
-一些有着传统 Web 开发背景的用户可能会因为单文件组件将不同的关注点集合在一处而有所顾虑，觉得 HTML/CSS/JS 应当是分离开的！
+有些传统 Web 开发者会担心：单文件组件把 HTML、CSS、JS 放在一起，是不是违背了“分离”？
 
-要回答这个问题，我们必须对这一点达成共识：**前端开发的关注点不是完全基于文件类型分离的**。前端工程化的最终目的都是为了能够更好地维护代码。关注点分离不应该是教条式地将其视为文件类型的区别和分离，仅仅这样并不够帮我们在日益复杂的前端应用的背景下提高开发效率。
+需要先明确一点：**前端的“关注点”并不只是按文件类型分开**。工程化的目标，是更好维护代码。只按 HTML / CSS / JS 拆文件，并不能自动让复杂应用更好维护。
 
-在现代的 UI 开发中，我们发现与其将代码库划分为三个巨大的层，相互交织在一起，不如将它们划分为松散耦合的组件，再按需组合起来。在一个组件中，其模板、逻辑和样式本就是有内在联系的、是耦合的，将它们放在一起，实际上使组件更有内聚性和可维护性。
+在现代 UI 开发里，与其把整站拆成三层、再互相穿插，不如拆成松耦合的组件，按需组合。在一个组件里，模板、逻辑、样式本来就相关，放在一起反而更内聚、更好维护。
 
-即使你不喜欢单文件组件这样的形式而仍然选择拆分单独的 JavaScript 和 CSS 文件，也没关系，你还是可以通过[资源导入](/api/sfc-spec#src-imports)功能获得热更新和预编译等功能的支持。
+如果你仍想把 JS 和 CSS 拆成独立文件，也可以通过[资源导入](/api/sfc-spec#src-imports)获得热更新和预编译等能力。

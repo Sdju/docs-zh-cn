@@ -2,7 +2,7 @@
 
 ## version {#version}
 
-暴露当前所使用的 Vue 版本。
+返回当前使用的 Vue 版本。
 
 - **类型** `string`
 
@@ -16,7 +16,7 @@
 
 ## nextTick() {#nexttick}
 
-等待下一次 DOM 更新刷新的工具方法。
+等待下一次 DOM 更新完成。
 
 - **类型**
 
@@ -26,9 +26,9 @@
 
 - **详细信息**
 
-  当你在 Vue 中更改响应式状态时，最终的 DOM 更新并不是同步生效的，而是由 Vue 将它们缓存在一个队列中，直到下一个“tick”才一起执行。这样是为了确保每个组件无论发生多少状态改变，都仅执行一次更新。
+  在 Vue 里修改响应式状态后，DOM 不会马上更新，而是先放进队列，等到下一个「tick」再一起更新。这样每个组件无论改了多少次状态，都只更新一次 DOM。
 
-  `nextTick()` 可以在状态改变后立即使用，以等待 DOM 更新完成。你可以传递一个回调函数作为参数，或者 await 返回的 Promise。
+  状态改完后可以马上调用 `nextTick()`，等 DOM 更新完成。可以传回调，也可以 `await` 返回的 Promise。
 
 - **示例**
 
@@ -96,7 +96,7 @@
 
 ## defineComponent() {#definecomponent}
 
-在定义 Vue 组件时提供类型推导的辅助函数。
+定义 Vue 组件时用于 TypeScript 类型推导的辅助函数。
 
 - **类型**
 
@@ -113,15 +113,15 @@
   ): () => any
   ```
 
-  > 为了便于阅读，对类型进行了简化。
+  > 为便于阅读，类型已简化。
 
 - **详细信息**
 
-  第一个参数是一个组件选项对象。返回值将是该选项对象本身，因为该函数实际上在运行时没有任何操作，仅用于提供类型推导。
+  第一个参数是组件选项对象。返回值就是该选项对象本身——运行时不会做额外处理，只用于类型推导。
 
-  注意返回值的类型有一点特别：它会是一个构造函数类型，它的实例类型是根据选项推断出的组件实例类型。这是为了能让该返回值在 TSX 中用作标签时提供类型推导支持。
+  返回值的类型较特殊：是构造函数类型，实例类型由选项推断。这样在 TSX 里当标签用时也能获得类型推导。
 
-  你可以像这样从 `defineComponent()` 的返回类型中提取出一个组件的实例类型 (与其选项中的 `this` 的类型等价)：
+  可以从 `defineComponent()` 的返回类型提取组件实例类型（与选项里 `this` 的类型相同）：
 
   ```ts
   const Foo = defineComponent(/* ... */)
@@ -133,9 +133,9 @@
 
   - 仅在 3.3+ 中支持
 
-  `defineComponent()` 还有一种备用签名，旨在与组合式 API 和[渲染函数或 JSX](/guide/extras/render-function.html) 一起使用。
+  `defineComponent()` 还有另一种签名，适合配合组合式 API 和[渲染函数或 JSX](/guide/extras/render-function.html) 使用。
 
-  与传递选项对象不同的是，它需要传入一个函数。这个函数的工作方式与组合式 API 的 [`setup()`](/api/composition-api-setup.html#composition-api-setup) 函数相同：它接收 props 和 setup 上下文。返回值应该是一个渲染函数——支持 `h()` 和 JSX：
+  这时不传选项对象，而是传一个函数。用法与组合式 API 的 [`setup()`](/api/composition-api-setup.html#composition-api-setup) 相同：接收 props 和 setup 上下文，返回渲染函数（可用 `h()` 或 JSX）：
 
   ```js
   import { ref, h } from 'vue'
@@ -159,7 +159,7 @@
   )
   ```
 
-  此签名的主要用例是使用 TypeScript (特别是使用 TSX)，因为它支持泛型：
+  这种签名主要用于 TypeScript（尤其是 TSX），因为支持泛型：
 
   ```tsx
   const Comp = defineComponent(
@@ -179,25 +179,25 @@
   )
   ```
 
-  在将来，我们计划提供一个 Babel 插件，自动推断并注入运行时 props (就像在单文件组件中的 `defineProps` 一样)，以便省略运行时 props 的声明。
+  未来计划提供 Babel 插件，自动推断并注入运行时 props（类似单文件组件里的 `defineProps`），这样就不必手写运行时 props 声明。
 
   ### webpack Treeshaking 的注意事项 {#note-on-webpack-treeshaking}
 
-  因为 `defineComponent()` 是一个函数调用，所以它可能被某些构建工具认为会产生副作用，如 webpack。即使一个组件从未被使用，也有可能不被 tree-shake。
+  `defineComponent()` 是函数调用，部分构建工具（如 webpack）可能认为它有副作用，导致未使用的组件无法被 tree-shake。
 
-  为了告诉 webpack 这个函数调用可以被安全地 tree-shake，我们可以在函数调用之前添加一个 `/*#__PURE__*/` 形式的注释：
+  可在调用前加 `/*#__PURE__*/` 注释，告诉 webpack 可以安全 tree-shake：
 
   ```js
   export default /*#__PURE__*/ defineComponent(/* ... */)
   ```
 
-  请注意，如果你的项目中使用的是 Vite，就不需要这么做，因为 Rollup (Vite 底层使用的生产环境打包工具) 可以智能地确定 `defineComponent()` 实际上并没有副作用，所以无需手动注释。
+  若使用 Vite，一般不必加注释：底层 Rollup 能判断 `defineComponent()` 无副作用。
 
 - **参考**[指南 - 配合 TypeScript 使用 Vue](/guide/typescript/overview#general-usage-notes)
 
 ## defineAsyncComponent() {#defineasynccomponent}
 
-定义一个异步组件，它在运行时是懒加载的。参数可以是一个异步加载函数，或是对加载行为进行更具体定制的一个选项对象。
+定义异步组件，运行时再懒加载。参数可以是异步加载函数，或带更多选项的配置对象。
 
 - **类型**
 

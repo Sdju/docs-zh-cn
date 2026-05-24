@@ -2,11 +2,11 @@
 
 ## 客户端 vs. 服务端路由 {#client-side-vs-server-side-routing}
 
-服务端路由指的是服务器根据用户访问的 URL 路径返回不同的响应结果。当我们在一个传统的服务端渲染的 web 应用中点击一个链接时，浏览器会从服务端获得全新的 HTML，然后重新加载整个页面。
+**服务端路由**：服务器根据 URL 返回不同页面。在传统服务端渲染的网站里，你点链接后，浏览器会向服务器要一整页新的 HTML，并整页刷新。
 
-然而，在[单页面应用](https://developer.mozilla.org/en-US/docs/Glossary/SPA)中，客户端的 JavaScript 可以拦截页面的跳转请求，动态获取新的数据，然后在无需重新加载的情况下更新当前页面。这样通常可以带来更顺滑的用户体验，尤其是在更偏向“应用”的场景下，因为这类场景下用户通常会在很长的一段时间中做出多次交互。
+**客户端路由**：在[单页面应用](https://developer.mozilla.org/en-US/docs/Glossary/SPA) (SPA) 里，JavaScript 可以拦截跳转、拉取数据，并在不整页刷新的情况下更新页面。体验通常更顺滑，尤其在“应用型”产品里——用户会在一段时间内反复操作。
 
-在这类单页应用中，“路由”是在客户端执行的。一个客户端路由器的职责就是利用诸如 [History API](https://developer.mozilla.org/en-US/docs/Web/API/History) 或是 [`hashchange` 事件](https://developer.mozilla.org/en-US/docs/Web/API/Window/hashchange_event)这样的浏览器 API 来管理应用当前应该渲染的视图。
+这时，“路由”在浏览器里完成。客户端路由器用 [History API](https://developer.mozilla.org/en-US/docs/Web/API/History) 或 [`hashchange` 事件](https://developer.mozilla.org/en-US/docs/Web/API/Window/hashchange_event) 等 API，决定当前该显示哪个视图。
 
 ## 官方路由 {#official-router}
 
@@ -17,13 +17,17 @@
   </VueSchoolLink>
 </div>
 
-Vue 很适合用来构建单页面应用。对于大多数此类应用，都推荐使用官方支持的[路由库](https://github.com/vuejs/router)。要了解更多细节，请查看 [Vue Router 的文档](https://router.vuejs.org/zh/)。
+Vue 很适合做 SPA。大多数项目建议使用官方[路由库](https://github.com/vuejs/router)。详见 [Vue Router 文档](https://router.vuejs.org/zh/)。
 
 ## 从头开始实现一个简单的路由 {#simple-routing-from-scratch}
 
-如果你只需要一个简单的页面路由，而不想为此引入一整个路由库，你可以通过[动态组件](/guide/essentials/component-basics#dynamic-components)的方式，监听浏览器 [`hashchange` 事件](https://developer.mozilla.org/en-US/docs/Web/API/Window/hashchange_event)或使用 [History API](https://developer.mozilla.org/en-US/docs/Web/API/History) 来更新当前组件。
+如果只需要很简单的页面切换，不想引入完整路由库，可以：
 
-下面是一个简单的例子：
+- 用[动态组件](/guide/essentials/component-basics#dynamic-components)
+- 监听 [`hashchange` 事件](https://developer.mozilla.org/en-US/docs/Web/API/Window/hashchange_event)，或使用 [History API](https://developer.mozilla.org/en-US/docs/Web/API/History)
+- 根据 URL 切换当前组件
+
+示例：
 
 <div class="composition-api">
 

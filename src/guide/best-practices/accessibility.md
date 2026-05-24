@@ -1,16 +1,16 @@
 # 无障碍访问 {#accessibility}
 
-Web 无障碍访问 (也称为 a11y) 是指创建可供任何人使用的网站的做法——无论是身患某种障碍、通过慢速的网络连接访问、使用老旧或损坏的硬件，还是仅处于某种不方便的环境。例如，在视频中添加字幕可以帮助失聪、有听力障碍或身处嘈杂环境而听不到手机的用户。同样地，确保文字样式没有处于太低的对比度，可以对低视力用户和在明亮的强光下使用手机的用户都有所帮助。
+Web 无障碍（也叫 a11y）是让网站人人都能用：有障碍的用户、网速慢、旧设备，或环境不便时也一样。例如视频加字幕，能帮听障用户或在嘈杂环境里用手机的人；文字对比度够高，对低视力和强光下看手机的人也有帮助。
 
-你是否已经准备开始却又无从下手？
+想开始但不知从何入手？
 
-请先阅读由[万维网联盟 (W3C)](https://www.w3.org/) 提供的 [Web 无障碍访问的规划和管理](https://www.w3.org/WAI/planning-and-managing/)。
+可先读 [W3C 的 Web 无障碍规划与管理](https://www.w3.org/WAI/planning-and-managing/)。
 
 ## 跳过链接 {#skip-link}
 
-你应该在每个页面的顶部添加一个直接指向主内容区域的链接，这样用户就可以跳过在多个网页上重复的内容。
+每个页面顶部应加「跳到主内容」的链接，方便跳过重复的导航等内容。
 
-通常这个链接会放在 `App.vue` 的顶部，这样它就会是所有页面上的第一个可聚焦元素：
+通常放在 `App.vue` 顶部，作为全站第一个可聚焦元素：
 
 ```vue-html
 <span ref="backToTop" tabindex="-1" />
@@ -21,7 +21,7 @@ Web 无障碍访问 (也称为 a11y) 是指创建可供任何人使用的网站�
 </ul>
 ```
 
-若想在非聚焦状态下隐藏该链接，可以添加以下样式：
+未聚焦时想隐藏该链接，可加：
 
 ```css
 .skip-links {
@@ -44,7 +44,7 @@ Web 无障碍访问 (也称为 a11y) 是指创建可供任何人使用的网站�
 }
 ```
 
-一旦用户改变路由，就应将焦点置回页面最开始，即跳过链接之前。这可以通过调用 `backToTop` 模板引用的 focus 实现 (假设使用了 `vue-router`)：
+路由变化后，应把焦点回到页面开头（跳过链接之前）。用 `vue-router` 时，可对 `backToTop` 模板引用调用 `focus()`：
 
 <div class="options-api">
 
@@ -86,15 +86,15 @@ watch(
 
 ## 内容结构 {#content-structure}
 
-确保设计可以支持易于访问的实现是无障碍访问最重要的部分之一。设计不仅要考虑颜色对比度、字体选择、文本大小和语言，还要考虑应用中的内容是如何组织的。
+无障碍很重要的一环是设计要便于实现。除颜色对比、字体、字号、语言外，还要想清楚内容怎么组织。
 
 ### 标题 {#headings}
 
-用户可以通过标题在应用中进行导航。为应用的每个部分设置描述性标题，这可以让用户更容易地预测每个部分的内容。说到标题，有几个推荐的无障碍访问实践：
+用户常靠标题在页面里跳转。每个区块用清楚的标题，方便猜内容。标题方面建议：
 
 - 按级别顺序嵌套标题：`<h1>` - `<h6>`
-- 不要在一个章节内跳跃标题的级别
-- 使用实际的标题标记，而不是通过对文本设置样式以提供视觉上的标题
+- 同一章节内不要跳级（例如从 h2 直接到 h4）
+- 用真正的标题标签，不要只靠样式把普通文字做成「看起来像标题」
 
 [阅读更多有关标题的信息](https://www.w3.org/TR/UNDERSTANDING-WCAG20/navigation-mechanisms-descriptive.html)
 
@@ -118,26 +118,26 @@ watch(
 
 ### Landmarks {#landmarks}
 
-[Landmark](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/landmark_role) 会为应用中的章节提供访问规划。依赖辅助技术的用户可以跳过内容直接导航到应用的每个部分。你可以使用 [ARIA role](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles) 帮助你实现这个目标。
+[Landmark](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/landmark_role) 标出页面主要区域，用辅助技术的用户可快速跳到各块。可用 [ARIA role](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles) 实现。
 
 | HTML    | ARIA Role            | 地标的目的 |
 |---------| -------------------- | --------- |
-| header  | role="banner"        | 主标题：页面的标题 |
-| nav     | role="navigation"    | 适合用作文档或相关文档导航的链接集合 |
-| main    | role="main"          | 文档的主体或中心内容 |
-| footer  | role="contentinfo"   | 关于父级文档的信息：脚注/版权/隐私声明链接 |
-| aside   | role="complementary" | 用来支持主内容，同时其自身的内容是相对独立且有意义的 |
-| search  | role="search"        | 该章节包含整个应用的搜索功能 |
-| form    | role="form"          | 表单相关元素的集合 |
-| section | role="region"        | 相关的且用户可能会导航至此的内容。必须为该元素提供 label |
+| header  | role="banner"        | 页头 / 站点标题 |
+| nav     | role="navigation"    | 导航链接区 |
+| main    | role="main"          | 主内容 |
+| footer  | role="contentinfo"   | 页脚：版权、隐私链接等 |
+| aside   | role="complementary" | 辅助主内容的侧边信息 |
+| search  | role="search"        | 搜索区域 |
+| form    | role="form"          | 表单区域 |
+| section | role="region"        | 可单独导航的区块，需提供 label |
 
 [阅读更多有关标题的细节](https://www.w3.org/TR/wai-aria-1.2/#landmark_roles)
 
 ## 语义化表单 {#semantic-forms}
 
-当创建一个表单，你可能使用到以下几个元素：`<form>`、`<label>`、`<input>`、`<textarea>` 和 `<button>`。
+做表单常用：`<form>`、`<label>`、`<input>`、`<textarea>`、`<button>`。
 
-标签通常放置在表格字段的顶部或左侧：
+标签一般放在字段上方或左侧：
 
 ```vue-html
 <form action="/dataCollectionLocation" method="post" autocomplete="on">
@@ -154,18 +154,18 @@ watch(
 </form>
 ```
 
-请注意这里我们是如何在表单元素中引入 `autocomplete='on'` 的，它将应用于表单中的所有 input 框。你也可以为每个 input 框都设置不同的 [autocomplete attribute 的值](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/autocomplete)。
+上面在表单上设了 `autocomplete='on'`，会作用于所有 input。也可给每个 input 单独设 [autocomplete](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/autocomplete)。
 
 ### 标签 {#labels}
 
-提供标签来描述所有表单控件的用途；使 `for` 和 `id` 链接起来：
+用 `<label>` 说明每个控件的用途，`for` 与 `id` 对应：
 
 ```vue-html
 <label for="name">Name: </label>
 <input type="text" name="name" id="name" v-model="name" />
 ```
 
-如果你在 Chrome 开发者工具中检查这个元素，并打开 Elements 选项卡中的 Accessibility 选项卡，你将看到输入是如何从标签中获取其名称的：
+在 Chrome 开发者工具里打开 Elements → Accessibility，可看到 input 的名称来自 label：
 
 ![Chrome 开发者工具正在通过标签展示无障碍访问的 input 框的名字](./images/AccessibleLabelChromeDevTools.png)
 
@@ -179,12 +179,12 @@ watch(
 </label>
 ```
 
-但我们仍建议你显式地为 input 元素设置 id 相匹配的标签，以更好地实现无障碍访问。
+仍建议显式用 `for`/`id` 配对，无障碍效果更好。
 :::
 
 #### `aria-label` {#aria-label}
 
-你也可以为 input 框配置一个带有 [`aria-label`](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-label) 的无障碍访问名。
+也可用 [`aria-label`](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-label) 提供无障碍名称。
 
 ```vue-html
 <label for="name">Name: </label>
@@ -197,13 +197,13 @@ watch(
 />
 ```
 
-在 Chrome DevTools 中审查此元素，查看无障碍名称是如何更改的：
+在 Chrome DevTools 里查看，无障碍名称会随之变化：
 
 ![Chrome 开发者工具正在通过 aria-label 展示无障碍访问的 input 框名字](./images/AccessibleARIAlabelDevTools.png)
 
 #### `aria-labelledby` {#aria-labelledby}
 
-使用 [`aria-labelledby`](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-labelledby) 类似于 `aria-label`，除非标签文本在屏幕上可见。它通过 `id` 与其他元素配对，你可以链接多个 `id`：
+[`aria-labelledby`](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-labelledby) 类似 `aria-label`，但标签要在屏幕上可见。通过 `id` 关联，可链多个 `id`：
 
 ```vue-html
 <form
@@ -231,7 +231,7 @@ watch(
 
 #### `aria-describedby` {#aria-describedby}
 
-[aria-describedby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-describedby) 的用法与 `aria-labelledby` 相同，它提供了一条用户可能需要的附加描述信息。这可用于描述任何输入的标准：
+[`aria-describedby`](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-describedby) 用法类似，用于补充说明，例如输入格式要求：
 
 ```vue-html
 <form
@@ -257,15 +257,15 @@ watch(
 </form>
 ```
 
-你可以通过使用 Chrome 开发者工具来查看说明：
+可在 Chrome 开发者工具里查看效果：
 
 ![Chrome 开发者工具正在根据 aria-labelledby 和 aria-describedby 展示 input 的无障碍访问名和无障碍访问描述信息](./images/AccessibleARIAdescribedby.png)
 
 ### 占位符 {#placeholder}
 
-避免使用占位符，因为它们可能会使许多用户感到困惑。
+尽量避免用占位符（placeholder），容易让用户困惑。
 
-占位符的缺陷之一是默认情况下它们不符合[颜色对比度标准](https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html)；应当修改其颜色，让它看起来像是预先填入 input 框中的数据一样。查看以下示例，可以看到满足颜色对比度条件的姓氏占位符看起来像预填充的数据：
+占位符默认往往达不到[颜色对比度](https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html)要求；若要用，应改颜色，并避免让人误以为是已填好的值。下面示例里，对比度合格的占位符仍可能被当成预填内容：
 
 ![可访问的占位文本](./images/AccessiblePlaceholder.png)
 
@@ -310,12 +310,12 @@ watch(
 }
 ```
 
-最好在表单外提供所有用户需要填写输入的信息。
+填写说明最好放在表单字段外面，不要只靠占位符。
 
 ### 用法说明 {#instructions}
 
-添加用法说明时，请确保将其正确链接到目标 input 框。
-你可以提供附加用法说明并在 [`aria-labelledby`](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-labelledby) 内绑定多个 id。这可以使设计更加灵活。
+加填写说明时，要正确关联到对应 input。
+可在 [`aria-labelledby`](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-labelledby) 里绑多个 id，布局更灵活。
 
 ```vue-html
 <fieldset>
@@ -331,7 +331,7 @@ watch(
 </fieldset>
 ```
 
-或者，你可以通过 [`aria-describedby`](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-labelledby) 将用法说明附加到 input 框上。
+也可用 [`aria-describedby`](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-describedby) 把说明挂到 input 上。
 
 ```vue-html
 <fieldset>
@@ -344,9 +344,9 @@ watch(
 
 ### 隐藏内容 {#hiding-content}
 
-通常，即使 input 框具有无障碍的名称，也不建议在视觉上隐藏标签。但是，如果可以借助周围的内容来理解输入的功能，那么我们也可以隐藏视觉标签。
+即使有无障碍名称，一般也不建议把 label 在视觉上藏起来。若周围文字已能说明用途，可以隐藏视觉 label。
 
-让我们看看这个搜索框：
+例如搜索框：
 
 ```vue-html
 <form role="search">
@@ -356,9 +356,9 @@ watch(
 </form>
 ```
 
-现在，只要视力情况良好，用户可以就能通过按钮的内容识别出该 input 框的目的。
+视力正常的用户能从按钮文字看出这是搜索。
 
-此时我们可以使用 CSS 从视觉上隐藏元素，同时也不会影响到无障碍访问：
+这时可用 CSS 视觉隐藏 label，但不影响读屏：
 
 ```css
 .hidden-visually {
@@ -376,7 +376,7 @@ watch(
 
 #### `aria-hidden="true"` {#aria-hidden-true}
 
-添加 `aria-hidden="true"` 在无障碍访问时被隐藏，但对其他可视用户仍然是可见的。不要在可聚焦的元素上使用它，请只在装饰性的、重复的或屏幕外的内容上使用它。
+`aria-hidden="true"` 对读屏隐藏，视觉上仍可见。不要用在可聚焦元素上，只用于装饰、重复或屏外内容。
 
 ```vue-html
 <p>This is not hidden from screen readers.</p>
@@ -385,8 +385,8 @@ watch(
 
 ### 按钮 {#buttons}
 
-在表单中使用按钮时，必须设置类型以防止提交表单。
-你也可以使用一个 input 元素来创建按钮：
+表单里的 `<button>` 要设 `type`，避免误提交。
+也可用 `<input type="button">` / `<input type="submit">`：
 
 ```vue-html
 <form action="/dataCollectionLocation" method="post" autocomplete="on">
@@ -402,11 +402,11 @@ watch(
 
 ### 功能图片 {#functional-images}
 
-你可以使用这种方式来创建一个带有功能的图片。
+功能型图片可以这样写：
 
-- input 框
+- input
 
-  - 这些图片会像一个类型为 submit 的表单按钮一样
+  - 类似 `type="submit"` 的表单按钮
 
   ```vue-html
   <form role="search">
@@ -436,7 +436,7 @@ watch(
 
 ## 规范 {#standards}
 
-万维网联盟 (W3C) Web 无障碍访问倡议 (WAI) 为不同的组件制定了 Web 无障碍性标准：
+W3C 的 Web 无障碍倡议 (WAI) 制定了相关标准：
 
 - [用户代理无障碍访问指南 (UAAG)](https://www.w3.org/WAI/standards-guidelines/uaag/)
   - 浏览器和媒体查询，包括一些其他方面的辅助技术
@@ -447,22 +447,18 @@ watch(
 
 ### 网络内容无障碍指南 (WCAG) {#web-content-accessibility-guidelines-wcag}
 
-[WCAG 2.1](https://www.w3.org/TR/WCAG21/) 继承自 [WCAG 2.0](https://www.w3.org/TR/WCAG20/)，接纳 Web 演进过程中的新技术。W3C 鼓励在开发或更新 Web 无障碍访问策略时使用 WCAG 的最新版本。
+[WCAG 2.1](https://www.w3.org/TR/WCAG21/) 在 [WCAG 2.0](https://www.w3.org/TR/WCAG20/) 基础上更新，覆盖新技术。W3C 建议策略采用最新 WCAG 版本。
 
 #### WCAG 2.1 四大指导原则 (缩写 POUR)：{#wcag-2-1-four-main-guiding-principles-abbreviated-as-pour}
 
-- [可感知性](https://www.w3.org/TR/WCAG21/#perceivable)
-  - 用户必须能够感知所渲染的信息
-- [可操作性](https://www.w3.org/TR/WCAG21/#operable)
-  - 表单界面，控件和导航是可操作的
-- [可理解性](https://www.w3.org/TR/WCAG21/#understandable)
-  - 信息和用户界面的操作必须为所有用户所理解
-- [健壮性](https://www.w3.org/TR/WCAG21/#robust)
-  - 随着技术的进步，用户必须能够访问内容
+- [可感知](https://www.w3.org/TR/WCAG21/#perceivable)：用户能感知呈现的信息
+- [可操作](https://www.w3.org/TR/WCAG21/#operable)：界面、控件、导航可操作
+- [可理解](https://www.w3.org/TR/WCAG21/#understandable)：信息和操作对所有用户可理解
+- [健壮](https://www.w3.org/TR/WCAG21/#robust)：技术演进后内容仍可访问
 
 #### Web 无障碍倡议 – 无障碍访问丰富的互联网应用 (WAI-ARIA) {#web-accessibility-initiative-–-accessible-rich-internet-applications-wai-aria}
 
-W3C 的 WAI-ARIA 为如何构建动态内容和高阶用户界面控件提供了指导。
+W3C 的 WAI-ARIA 说明如何构建动态内容和高阶 UI 控件。
 
 - [可便捷访问的丰富互联网应用 (WAI-ARIA) 1.2](https://www.w3.org/TR/wai-aria-1.2/)
 - [WAI-ARIA 实践 1.2](https://www.w3.org/TR/wai-aria-practices-1.2/)
@@ -506,16 +502,16 @@ W3C 的 WAI-ARIA 为如何构建动态内容和高阶用户界面控件提供了
 
 ### 用户 {#users}
 
-世界卫生组织估计，全世界 15% 的人口患有某种形式的残疾，其中约 2 - 4% 的人严重残疾。估计全世界有 10 亿残障人士，他们是世界上最大的少数群体。
+世卫组织估计全球约 15% 人口有某种残疾，其中约 2–4% 为重度。残障人士约 10 亿，是最大的少数群体之一。
 
-残疾的种类繁多，大致可分为以下四类：
+残疾类型很多，大致分四类：
 
-- _[视觉](https://webaim.org/articles/visual/)_ - 可以为这些用户提供屏幕助读器、屏幕缩放、控制屏幕对比度或盲文显示等帮助。
-- _[听觉](https://webaim.org/articles/auditory/)_ - 可以为这些用户提供视频字幕、文字记录或手语视频。
-- _[运动能力](https://webaim.org/articles/motor/)_ - 可以为这些用户提供一系列[运动障碍辅助技术](https://webaim.org/articles/motor/assistive)：比如语音识别软件、眼球跟踪、单刀式开关、超大轨迹球鼠标、自适应键盘等等。
-- _[认知能力](https://webaim.org/articles/cognitive/)_ - 可以为这些用户提供补充媒体、更清晰和简单、更结构化的内容。
+- _[视觉](https://webaim.org/articles/visual/)_：屏幕阅读器、放大、对比度、盲文等
+- _[听觉](https://webaim.org/articles/auditory/)_：字幕、文字稿、手语视频等
+- _[运动](https://webaim.org/articles/motor/)_：[辅助技术](https://webaim.org/articles/motor/assistive) 如语音输入、眼动、单键开关、大轨迹球、自适应键盘等
+- _[认知](https://webaim.org/articles/cognitive/)_：补充说明、更简单清晰、更有结构的内容
 
-你可以查看以下来自 WebAim 的链接，更深入地了解这些用户的需求：
+更多需求说明见 WebAIM：
 
 - [Web 无障碍愿景：探索改变 & 人人受益](https://www.w3.org/WAI/perspective-videos/)
 - [Web 用户的故事](https://www.w3.org/WAI/people-use-web/user-stories/)

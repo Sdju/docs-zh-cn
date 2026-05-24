@@ -2,7 +2,7 @@
 
 ## provide() {#provide}
 
-提供一个值，可以被后代组件注入。
+提供一个值，供后代组件 inject 使用。
 
 - **类型**
 
@@ -12,11 +12,11 @@
 
 - **详细信息**
 
-  `provide()` 接受两个参数：第一个参数是要注入的 key，可以是一个字符串或者一个 symbol，第二个参数是要注入的值。
+  `provide()` 接收两个参数：注入 key（字符串或 symbol）和要提供的值。
 
-  当使用 TypeScript 时，key 可以是一个被类型断言为 `InjectionKey` 的 symbol。`InjectionKey` 是一个 Vue 提供的工具类型，继承自 `Symbol`，可以用来同步 `provide()` 和 `inject()` 之间值的类型。
+  使用 TypeScript 时，key 可以是断言为 `InjectionKey` 的 symbol。`InjectionKey` 是 Vue 提供的工具类型，继承自 `Symbol`，用来同步 `provide()` 和 `inject()` 的类型。
 
-  与注册生命周期钩子的 API 类似，`provide()` 必须在组件的 `setup()` 阶段同步调用。
+  与注册生命周期钩子的 API 一样，`provide()` 必须在组件 `setup()` 阶段同步调用。
 
 - **示例**
 
@@ -43,7 +43,7 @@
 
 ## inject() {#inject}
 
-注入一个由祖先组件或整个应用 (通过 `app.provide()`) 提供的值。
+注入祖先组件或整个应用（通过 `app.provide()`）提供的值。
 
 - **类型**
 
@@ -64,19 +64,19 @@
 
 - **详细信息**
 
-  第一个参数是注入的 key。Vue 会遍历父组件链，通过匹配 key 来确定所提供的值。如果父组件链上多个组件对同一个 key 提供了值，则会应用离得更近的组件所提供的值，链上更远的组件所提供的值将会被“覆盖”。如果没有能通过 key 匹配到值，`inject()` 将返回 `undefined`，除非提供了一个默认值。
+  第一个参数是 key。Vue 会沿父组件链查找匹配 key 的值。多个组件提供同一 key 时，离得更近的会覆盖更远的。找不到匹配值时 `inject()` 返回 `undefined`，除非提供了默认值。
 
-  第二个参数是可选的，即在没有匹配到 key 时使用的默认值。
+  第二个参数可选，是找不到 key 时的默认值。
 
-  第二个参数也可以是一个工厂函数，用来返回某些创建起来比较复杂的值。在这种情况下，你必须将 `true` 作为第三个参数传入，表明这个函数将作为工厂函数使用，而非值本身。
+  第二个参数也可以是工厂函数，用于创建复杂默认值。此时须把第三个参数设为 `true`，表示这是工厂函数而非值本身。
 
-  与注册生命周期钩子的 API 类似，`inject()` 必须在组件的 `setup()` 阶段同步调用。
+  与注册生命周期钩子类似，`inject()` 必须在组件 `setup()` 阶段同步调用。
 
-  当使用 TypeScript 时，key 可以是一个类型为 `InjectionKey` 的 symbol。`InjectionKey` 是一个 Vue 提供的工具类型，继承自 `Symbol`，可以用来同步 `provide()` 和 `inject()` 之间值的类型。
+  TypeScript 中，key 可以是 `InjectionKey` 类型的 symbol，用来同步 `provide()` 和 `inject()` 的类型。
 
 - **示例**
 
-  假设有一个父组件已经提供了一些值，如前面 `provide()` 的例子中所示：
+  假设父组件已 provide 一些值，如前面 `provide()` 示例：
 
   ```vue
   <script setup>
@@ -111,7 +111,7 @@
 
 - 仅在 3.3+ 中支持
 
-如果 [inject()](#inject) 可以在错误的地方 (例如 `setup()` 之外) 被调用而不触发警告，则返回 `true`。此方法适用于希望在内部使用 `inject()` 而不向用户发出警告的库。
+若 [inject()](#inject) 在错误位置（如 `setup()` 外）调用也不会触发警告，则返回 `true`。适合库内部使用 `inject()` 而不打扰用户。
 
 - **类型**
 

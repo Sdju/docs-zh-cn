@@ -16,9 +16,9 @@
 
 - **详细信息**
 
-  和 `ref()` 不同，浅层 ref 的内部值将会原样存储和暴露，并且不会被深层递归地转为响应式。只有对 `.value` 的访问是响应式的。
+  和 `ref()` 不同，浅层 ref 会原样存储和暴露内部值，不会深层转为响应式。只有访问 `.value` 才是响应式的。
 
-  `shallowRef()` 常常用于对大型数据结构的性能优化或是与外部的状态管理系统集成。
+  `shallowRef()` 常用于优化大型数据结构，或与外部状态管理系统集成。
 
 - **示例**
 
@@ -38,7 +38,7 @@
 
 ## triggerRef() {#triggerref}
 
-强制触发依赖于一个[浅层 ref](#shallowref) 的副作用，这通常在对浅引用的内部值进行深度变更后使用。
+强制触发依赖浅层 ref 的副作用，通常在深度修改浅 ref 内部值后使用。
 
 - **类型**
 
@@ -67,7 +67,7 @@
 
 ## customRef() {#customref}
 
-创建一个自定义的 ref，显式声明对其依赖追踪和更新触发的控制方式。
+创建自定义 ref，显式控制依赖追踪和更新触发。
 
 - **类型**
 
@@ -85,13 +85,13 @@
 
 - **详细信息**
 
-  `customRef()` 预期接收一个工厂函数作为参数，这个工厂函数接受 `track` 和 `trigger` 两个函数作为参数，并返回一个带有 `get` 和 `set` 方法的对象。
+  `customRef()` 接收工厂函数，参数是 `track` 和 `trigger`，返回带 `get` 和 `set` 的对象。
 
-  一般来说，`track()` 应该在 `get()` 方法中调用，而 `trigger()` 应该在 `set()` 中调用。然而事实上，你对何时调用、是否应该调用他们有完全的控制权。
+  一般 `track()` 在 `get()` 里调用，`trigger()` 在 `set()` 里调用。但何时调用、是否调用，由你决定。
 
 - **示例**
 
-  创建一个防抖 ref，即只在最近一次 set 调用后的一段固定间隔后再调用：
+  创建防抖 ref：只在最后一次 `set` 后等待固定时间再更新：
 
   ```js
   import { customRef } from 'vue'
@@ -132,9 +132,9 @@
   [在演练场中尝试一下](https://play.vuejs.org/#eNplUkFugzAQ/MqKC1SiIekxIpEq9QVV1BMXCguhBdsyaxqE/PcuGAhNfYGd3Z0ZDwzeq1K7zqB39OI205UiaJGMOieiapTUBAOYFt/wUxqRYf6OBVgotGzA30X5Bt59tX4iMilaAsIbwelxMfCvWNfSD+Gw3++fEhFHTpLFuCBsVJ0ScgUQjw6Az+VatY5PiroHo3IeaeHANlkrh7Qg1NBL43cILUmlMAfqVSXK40QUOSYmHAZHZO0KVkIZgu65kTnWp8Qb+4kHEXfjaDXkhd7DTTmuNZ7MsGyzDYbz5CgSgbdppOBFqqT4l0eX1gZDYOm057heOBQYRl81coZVg9LQWGr+IlrchYKAdJp9h0C6KkvUT3A6u8V1dq4ASqRgZnVnWg04/QWYNyYzC2rD5Y3/hkDgz8fY/cOT1ZjqizMZzGY3rDPC12KGZYyd3J26M8ny1KKx7c3X25q1c1wrZN3L9LCMWs/+AmeG6xI=)
 
   :::warning 谨慎使用
-  当使用 customRef 时，我们应该谨慎对待其 getter 的返回值，尤其是在每次运行 getter 时都生成新对象数据类型的情况下。当这样的 customRef 作为 prop 传递时，将影响父组件和子组件之间的关系。
+  使用 customRef 时要小心 getter 的返回值，尤其是每次 getter 都返回新对象时。若这样的 customRef 作为 prop 传递，会影响父子组件关系。
 
-  父组件的渲染函数可能会被其他的响应式状态变化触发。在重新渲染过程中，我们会重新评估 customRef 的值，并返回一个新的对象数据类型作为子组件的 prop。这个 prop 会与其上一个值进行比较，由于两者不同，子组件中 customRef 的响应式依赖将被触发。与此同时，因为没有调用 customRef 的 setter，父组件中的响应式依赖不会运行。
+  父组件可能因其他响应式状态变化而重新渲染。重新渲染时会重新求值 customRef 并返回新对象作为子组件 prop。新旧 prop 不同，会触发子组件里 customRef 的响应式依赖；但 customRef 的 setter 没被调用，父组件的响应式依赖不会更新。
 
   [在演练场中尝试一下](https://play.vuejs.org/#eNqFVEtP3DAQ/itTS9Vm1ZCt1J6WBZUiDvTQIsoNcwiOkzU4tmU7+9Aq/71jO1mCWuhlN/PyfPP45kAujCk2HSdLsnLMCuPBcd+Zc6pEa7T1cADWOa/bW17nYMPPtvRsDT3UVrcww+DZ0flStybpKSkWQQqPU0IVVUwr58FYvdvDWXgpu6ek1pqSHL0fS0vJw/z0xbN1jUPHY/Ys87Zkzzl4K5qG2zmcnUN2oAqg4T6bQ/wENKNXNk+CxWKsSlmLTSk7XlhedYxnWclYDiK+MkQCoK4wnVtnIiBJuuEJNA2qPof7hzkEoc8DXgg9yzYTBBFgNr4xyY4FbaK2p6qfI0iqFgtgulOe27HyQRy69Dk1JXY9C03JIeQ6wg4xWvJCqFpnlNytOcyC2wzYulQNr0Ao+Mhw0KnTTEttl/CIaIJiMz8NGBHFtYetVrPwa58/IL48Zag4N0ssquNYLYBoW16J0vOkC3VQtVqk7cG9QcHz1kj0QAlgVYkNMFk6d0bJ1pbGYKUkmtD42HmvFfi94WhOEiXwjUnBnlEz9OLTJwy5qCo44D4O7en71SIFjI/F9VuG4jEy/GHQKq5hQrJAKOc4uNVighBF5/cygS0GgOMoK+HQb7+EWvLdMM7weVIJy5kXWi0Rj+xaNRhLKRp1IvB9hxYegA6WJ1xkUe9PcF4e9a+suA3YwYiC5MQ79KlFUzw5rZCZEUtoRWuE5PaXCXmxtuWIkpJSSr39EXXHQcWYNWfP/9A/uV3QUXJjueN2E1ZhtPnSIqGS+er3T77D76Ox1VUn0fsd4y3HfewCxuT2vVMVwp74RbTX8WQI1dy5qx12xI1Fpa1K5AreeEHCCN8q/QXul+LrSC3s4nh93jltkVPDIYt5KJkcIKStCReo4rVQ/CZI6dyEzToCCJu7hAtry/1QH/qXncQB400KJwqPxZHxEyona0xS/E3rt1m9Ld1rZl+uhaxecRtP3EjtgddCyimtXyj9H/Ii3eId7uOGTkyk/wOEbQ9h)
 
@@ -152,10 +152,10 @@
 
 - **详细信息**
 
-  和 `reactive()` 不同，这里没有深层级的转换：一个浅层响应式对象里只有根级别的属性是响应式的。属性的值会被原样存储和暴露，这也意味着值为 ref 的属性**不会**被自动解包了。
+  和 `reactive()` 不同，这里不做深层转换：只有根级属性是响应式的。属性值原样存储和暴露，值为 ref 的属性**不会**自动解包。
 
   :::warning 谨慎使用
-  浅层数据结构应该只用于组件中的根级状态。请避免将其嵌套在深层次的响应式对象中，因为它创建的树具有不一致的响应行为，这可能很难理解和调试。
+  浅层响应式对象只适合作为组件根级状态。不要嵌套在深层响应式对象里，否则响应行为不一致，难以理解和调试。
   :::
 
 - **示例**
@@ -190,10 +190,10 @@
 
 - **详细信息**
 
-  和 `readonly()` 不同，这里没有深层级的转换：只有根层级的属性变为了只读。属性的值都会被原样存储和暴露，这也意味着值为 ref 的属性**不会**被自动解包了。
+  和 `readonly()` 不同，这里不做深层转换：只有根级属性是只读。属性值原样存储和暴露，值为 ref 的属性**不会**自动解包。
 
   :::warning 谨慎使用
-  浅层数据结构应该只用于组件中的根级状态。请避免将其嵌套在深层次的响应式对象中，因为它创建的树具有不一致的响应行为，这可能很难理解和调试。
+  浅层只读对象只适合作为组件根级状态。不要嵌套在深层响应式对象里，否则响应行为不一致，难以理解和调试。
   :::
 
 - **示例**
@@ -218,7 +218,7 @@
 
 ## toRaw() {#toraw}
 
-根据一个 Vue 创建的代理返回其原始对象。
+根据 Vue 创建的代理，返回其原始对象。
 
 - **类型**
 
@@ -228,9 +228,9 @@
 
 - **详细信息**
 
-  `toRaw()` 可以返回由 [`reactive()`](./reactivity-core#reactive)、[`readonly()`](./reactivity-core#readonly)、[`shallowReactive()`](#shallowreactive) 或者 [`shallowReadonly()`](#shallowreadonly) 创建的代理对应的原始对象。
+  `toRaw()` 可返回由 [`reactive()`](./reactivity-core#reactive)、[`readonly()`](./reactivity-core#readonly)、[`shallowReactive()`](#shallowreactive) 或 [`shallowReadonly()`](#shallowreadonly) 创建的代理对应的原始对象。
 
-  这是一个可以用于临时读取而不引起代理访问/跟踪开销，或是写入而不触发更改的特殊方法。不建议保存对原始对象的持久引用，请谨慎使用。
+  可用于临时读取而不触发代理追踪，或写入而不触发更新。不建议长期保存原始对象引用，请谨慎使用。
 
 - **示例**
 
@@ -243,7 +243,7 @@
 
 ## markRaw() {#markraw}
 
-将一个对象标记为不可被转为代理。返回该对象本身。
+把对象标记为不可转为代理，并返回该对象本身。
 
 - **类型**
 
@@ -263,13 +263,13 @@
   ```
 
   :::warning 谨慎使用
-  `markRaw()` 和类似 `shallowReactive()` 这样的浅层式 API 使你可以有选择地避开默认的深度响应/只读转换，并在状态关系谱中嵌入原始的、非代理的对象。它们可能出于各种各样的原因被使用：
+  `markRaw()` 和 `shallowReactive()` 等浅层 API 让你可以跳过默认的深层响应/只读转换，在状态树里嵌入原始、非代理对象。常见用途：
 
-  - 有些值不应该是响应式的，例如复杂的第三方类实例或 Vue 组件对象。
+  - 某些值不应响应式，例如复杂的第三方类实例或 Vue 组件对象。
 
-  - 当呈现带有不可变数据源的大型列表时，跳过代理转换可以提高性能。
+  - 渲染大型不可变列表时，跳过代理转换可提升性能。
 
-  这应该是一种进阶需求，因为只在根层能访问到原始值，所以如果把一个嵌套的、没有标记的原始对象设置成一个响应式对象，然后再次访问它，你获取到的是代理的版本。这可能会导致**对象身份风险**，即执行一个依赖于对象身份的操作，但却同时使用了同一对象的原始版本和代理版本：
+  这是进阶用法。因为只有根层能访问原始值，若把未标记的嵌套原始对象放进响应式对象再访问，拿到的是代理版本。这可能引发**对象身份问题**：同一对象的原始版和代理版同时参与依赖对象身份的操作：
 
   ```js
   const foo = markRaw({
@@ -284,13 +284,12 @@
   console.log(foo.nested === bar.nested) // false
   ```
 
-  识别风险一般是很罕见的。然而，要正确使用这些 API，同时安全地避免这样的风险，需要你对响应性系统的工作方式有充分的了解。
-
+  这类风险不常见，但要安全使用这些 API，需要充分理解响应式系统。
   :::
 
 ## effectScope() {#effectscope}
 
-创建一个 effect 作用域，可以捕获其中所创建的响应式副作用 (即计算属性和侦听器)，这样捕获到的副作用可以一起处理。对于该 API 的使用细节，请查阅对应的 [RFC](https://github.com/vuejs/rfcs/blob/master/active-rfcs/0041-reactivity-effect-scope.md)。
+创建 effect 作用域，可捕获其中创建的响应式副作用（计算属性和侦听器），并一起处理。使用细节见对应 [RFC](https://github.com/vuejs/rfcs/blob/master/active-rfcs/0041-reactivity-effect-scope.md)。
 
 - **类型**
 
@@ -322,7 +321,7 @@
 
 ## getCurrentScope() {#getcurrentscope}
 
-如果有的话，返回当前活跃的 [effect 作用域](#effectscope)。
+若有当前活跃的 [effect 作用域](#effectscope)，则返回它。
 
 - **类型**
 
@@ -332,11 +331,11 @@
 
 ## onScopeDispose() {#onscopedispose}
 
-在当前活跃的 [effect 作用域](#effectscope)上注册一个处理回调函数。当相关的 effect 作用域停止时会调用这个回调函数。
+在当前活跃的 [effect 作用域](#effectscope) 上注册回调，作用域停止时调用。
 
-这个方法可以作为可复用的组合式函数中 `onUnmounted` 的替代品，它并不与组件耦合，因为每一个 Vue 组件的 `setup()` 函数也是在一个 effect 作用域中调用的。
+可作为可复用组合式函数里 `onUnmounted` 的替代，不绑定组件——每个 Vue 组件的 `setup()` 也在 effect 作用域里运行。
 
-如果在没有活跃的 effect 作用域的情况下调用此函数，将会抛出警告。在 3.5+ 版本中，可以通过将第二个参数设为 `true` 来消除此警告。
+若没有活跃 effect 作用域就调用，会发出警告。3.5+ 可将第二个参数设为 `true` 来消除警告。
 
 - **类型**
 

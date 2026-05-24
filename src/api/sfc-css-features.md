@@ -2,7 +2,7 @@
 
 ## 组件作用域 CSS {#scoped-css}
 
-当 `<style>` 标签带有 `scoped` attribute 的时候，它的 CSS 只会影响当前组件的元素，和 Shadow DOM 中的样式封装类似。使用时有一些注意事项，不过好处是不需要任何的 polyfill。它的实现方式是通过 PostCSS 将以下内容：
+`<style>` 标签带 `scoped` attribute 时，CSS 只影响当前组件元素，类似 Shadow DOM 的样式封装。使用时有一些注意点，但不需要 polyfill。实现方式是通过 PostCSS 将以下内容：
 
 ```vue
 <style scoped>
@@ -32,11 +32,11 @@
 
 ### 子组件的根元素 {#child-component-root-elements}
 
-使用 `scoped` 后，父组件的样式将不会渗透到子组件中。不过，子组件的根节点会同时被父组件的作用域样式和子组件的作用域样式影响。这样设计是为了让父组件可以从布局的角度出发，调整其子组件根元素的样式。
+使用 `scoped` 后，父组件样式不会渗透到子组件。但子组件根节点会同时受父、子组件作用域样式影响。这样父组件可以从布局角度调整子组件根元素样式。
 
 ### 深度选择器 {#deep-selectors}
 
-处于 `scoped` 样式中的选择器如果想要做更“深度”的选择，也即：影响到子组件，可以使用 `:deep()` 这个伪类：
+`scoped` 样式中若要影响子组件，可用 `:deep()` 伪类：
 
 ```vue
 <style scoped>
@@ -55,12 +55,12 @@
 ```
 
 :::tip
-通过 `v-html` 创建的 DOM 内容不会被作用域样式影响，但你仍然可以使用深度选择器来设置其样式。
+通过 `v-html` 创建的 DOM 不受作用域样式影响，但可用深度选择器设置其样式。
 :::
 
 ### 插槽选择器 {#slotted-selectors}
 
-默认情况下，作用域样式不会影响到 `<slot/>` 渲染出来的内容，因为它们被认为是父组件所持有并传递进来的。使用 `:slotted` 伪类以明确地将插槽内容作为选择器的目标：
+默认情况下，作用域样式不影响 `<slot/>` 渲染的内容，因为它们由父组件传入。用 `:slotted` 伪类可将插槽内容作为选择器目标：
 
 ```vue
 <style scoped>
@@ -72,7 +72,7 @@
 
 ### 全局选择器 {#global-selectors}
 
-如果想让其中一个样式规则应用到全局，比起另外创建一个 `<style>`，可以使用 `:global` 伪类来实现 (看下面的代码)：
+若要让某条样式规则全局生效，不必另建 `<style>`，可用 `:global` 伪类：
 
 ```vue
 <style scoped>
@@ -84,7 +84,7 @@
 
 ### 混合使用局部与全局样式 {#mixing-local-and-global-styles}
 
-你也可以在同一个组件中同时包含作用域样式和非作用域样式：
+同一组件可同时包含作用域和非作用域样式：
 
 ```vue
 <style>
@@ -98,13 +98,13 @@
 
 ### 作用域样式须知 {#scoped-style-tips}
 
-- **作用域样式并没有消除对 class 的需求**。由于浏览器渲染各种各样 CSS 选择器的方式，`p { color: red }` 结合作用域样式使用时 (即当与 attribute 选择器组合的时候) 会慢很多倍。如果你使用 class 或者 id 来替代，例如 `.example { color: red }`，那你几乎就可以避免性能的损失。
+- **作用域样式仍需要 class**。浏览器渲染各类 CSS 选择器的方式不同，`p { color: red }` 配合作用域样式（与 attribute 选择器组合）会慢很多。用 class 或 id，如 `.example { color: red }`，几乎可避免性能损失。
 
-- **小心递归组件中的后代选择器**！对于一个使用了 `.a .b` 选择器的样式规则来说，如果匹配到 `.a` 的元素包含了一个递归的子组件，那么所有的在那个子组件中的 `.b` 都会匹配到这条样式规则。
+- **注意递归组件中的后代选择器**。对 `.a .b` 规则，若匹配到 `.a` 的元素包含递归子组件，该子组件中所有 `.b` 都会匹配这条规则。
 
 ## CSS Modules {#css-modules}
 
-一个 `<style module>` 标签会被编译为 [CSS Modules](https://github.com/css-modules/css-modules) 并且将生成的 CSS class 作为 `$style` 对象暴露给组件：
+`<style module>` 标签会编译为 [CSS Modules](https://github.com/css-modules/css-modules)，并将生成的 CSS class 作为 `$style` 对象暴露给组件：
 
 ```vue
 <template>
@@ -118,13 +118,13 @@
 </style>
 ```
 
-得出的 class 将被哈希化以避免冲突，实现了同样的将 CSS 仅作用于当前组件的效果。
+class 会被哈希化以避免冲突，实现 CSS 仅作用于当前组件。
 
-参考 [CSS Modules spec](https://github.com/css-modules/css-modules) 以查看更多详情，例如 [global exceptions](https://github.com/css-modules/css-modules/blob/master/docs/composition.md#exceptions) 和 [composition](https://github.com/css-modules/css-modules/blob/master/docs/composition.md#composition)。
+详见 [CSS Modules spec](https://github.com/css-modules/css-modules)，如 [global exceptions](https://github.com/css-modules/css-modules/blob/master/docs/composition.md#exceptions) 和 [composition](https://github.com/css-modules/css-modules/blob/master/docs/composition.md#composition)。
 
 ### 自定义注入名称 {#custom-inject-name}
 
-你可以通过给 `module` attribute 一个值来自定义注入 class 对象的属性名：
+给 `module` attribute 指定值，可自定义注入 class 对象的属性名：
 
 ```vue
 <template>
@@ -140,7 +140,7 @@
 
 ### 与组合式 API 一同使用 {#usage-with-composition-api}
 
-可以通过 `useCssModule` API 在 `setup()` 和 `<script setup>` 中访问注入的 class。对于使用了自定义注入名称的 `<style module>` 块，`useCssModule` 接收一个匹配的 `module` attribute 值作为第一个参数：
+可通过 `useCssModule` API 在 `setup()` 和 `<script setup>` 中访问注入的 class。对使用自定义注入名称的 `<style module>` 块，`useCssModule` 接收匹配的 `module` attribute 值作为第一个参数：
 
 ```js
 import { useCssModule } from 'vue'
@@ -175,7 +175,7 @@ const classes = useCssModule()
 
 ## CSS 中的 `v-bind()` {#v-bind-in-css}
 
-单文件组件的 `<style>` 标签支持使用 `v-bind` CSS 函数将 CSS 的值链接到动态的组件状态：
+SFC 的 `<style>` 标签支持 `v-bind` CSS 函数，将 CSS 值链接到动态组件状态：
 
 ```vue
 <template>
@@ -199,7 +199,7 @@ export default {
 </style>
 ```
 
-这个语法同样也适用于 [`<script setup>`](./sfc-script-setup)，且支持 JavaScript 表达式 (需要用引号包裹起来)：
+同样适用于 [`<script setup>`](./sfc-script-setup)，并支持 JavaScript 表达式（须用引号包裹）：
 
 ```vue
 <script setup>
@@ -220,4 +220,4 @@ p {
 </style>
 ```
 
-实际的值会被编译成哈希化的 CSS 自定义属性，因此 CSS 本身仍然是静态的。自定义属性会通过内联样式的方式应用到组件的根元素上，并且在源值变更的时候响应式地更新。
+实际值会编译成哈希化的 CSS 自定义属性，CSS 本身仍是静态的。自定义属性通过内联样式应用到组件根元素，源值变更时会响应式更新。

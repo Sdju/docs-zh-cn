@@ -10,7 +10,7 @@
   function isRef<T>(r: Ref<T> | unknown): r is Ref<T>
   ```
 
-  请注意，返回值是一个[类型判定](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates) (type predicate)，这意味着 `isRef` 可以被用作类型守卫：
+  返回值是[类型判定](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates) (type predicate)，`isRef` 可作类型守卫使用：
 
   ```ts
   let foo: unknown
@@ -22,7 +22,7 @@
 
 ## unref() {#unref}
 
-如果参数是 ref，则返回内部值，否则返回参数本身。这是 `val = isRef(val) ? val.value : val` 计算的一个语法糖。
+若参数是 ref，返回内部值；否则返回参数本身。相当于 `val = isRef(val) ? val.value : val` 的语法糖。
 
 - **类型**
 
@@ -41,9 +41,9 @@
 
 ## toRef() {#toref}
 
-可以将值、refs 或 getters 规范化为 refs (3.3+)。
+把值、refs 或 getters 规范化为 ref（3.3+）。
 
-也可以基于响应式对象上的一个属性，创建一个对应的 ref。这样创建的 ref 与其源属性保持同步：改变源属性的值将更新 ref 的值，反之亦然。
+也可以基于响应式对象的某个属性创建 ref，并与源属性保持同步：改源属性会更新 ref，改 ref 也会更新源属性。
 
 - **类型**
 
@@ -103,15 +103,15 @@
   console.log(fooRef.value) // 3
   ```
 
-  请注意，这不同于：
+  注意，这和下面不同：
 
   ```js
   const fooRef = ref(state.foo)
   ```
 
-  上面这个 ref **不会**和 `state.foo` 保持同步，因为这个 `ref()` 接收到的是一个纯数值。
+  上面的 ref **不会**与 `state.foo` 同步，因为 `ref()` 收到的是普通数值。
 
-  `toRef()` 这个函数在你想把一个 prop 的 ref 传递给一个组合式函数时会很有用：
+  要把 prop 的 ref 传给组合式函数时，`toRef()` 很有用：
 
   ```vue
   <script setup>
@@ -128,17 +128,17 @@
   </script>
   ```
 
-  当 `toRef` 与组件 props 结合使用时，关于禁止对 props 做出更改的限制依然有效。尝试将新的值传递给 ref 等效于尝试直接更改 props，这是不允许的。在这种场景下，你可能可以考虑使用带有 `get` 和 `set` 的 [`computed`](./reactivity-core#computed) 替代。详情请见[在组件上使用 `v-model`](/guide/components/v-model) 指南。
+  与组件 props 一起用时，仍不能改 props。给 ref 赋新值等于直接改 props，这是不允许的。这种场景可考虑用带 `get` 和 `set` 的 [`computed`](./reactivity-core#computed)。详见[在组件上使用 `v-model`](/guide/components/v-model)。
 
-  当使用对象属性签名时，即使源属性当前不存在，`toRef()` 也会返回一个可用的 ref。这让它在处理可选 props 的时候格外实用，相比之下 [`toRefs`](#torefs) 就不会为可选 props 创建对应的 refs。
+  用对象属性签名时，即使源属性还不存在，`toRef()` 也会返回可用 ref。处理可选 props 时很有用；相比之下 [`toRefs`](#torefs) 不会为可选 props 创建 ref。
 
 ## toValue() {#tovalue}
 
 - 仅在 3.3+ 中支持
 
-将值、refs 或 getters 规范化为值。这与 [unref()](#unref) 类似，不同的是此函数也会规范化 getter 函数。如果参数是一个 getter，它将会被调用并且返回它的返回值。
+把值、refs 或 getters 规范化为普通值。类似 [unref()](#unref)，但也会处理 getter：参数是 getter 时会调用并返回结果。
 
-这可以在[组合式函数](/guide/reusability/composables.html)中使用，用来规范化一个可以是值、ref 或 getter 的参数。
+可在[组合式函数](/guide/reusability/composables.html)里用来规范化「可以是值、ref 或 getter」的参数。
 
 - **类型**
 
@@ -173,7 +173,7 @@
 
 ## toRefs() {#torefs}
 
-将一个响应式对象转换为一个普通对象，这个普通对象的每个属性都是指向源对象相应属性的 ref。每个单独的 ref 都是使用 [`toRef()`](#toref) 创建的。
+把响应式对象转为普通对象，每个属性都是指向源对象对应属性的 ref。每个 ref 由 [`toRef()`](#toref) 创建。
 
 - **类型**
 
@@ -230,11 +230,11 @@
   const { foo, bar } = useFeatureX()
   ```
 
-  `toRefs` 在调用时只会为源对象上可以枚举的属性创建 ref。如果要为可能还不存在的属性创建 ref，请改用 [`toRef`](#toref)。
+  `toRefs` 只为源对象上可枚举的属性创建 ref。若要为可能还不存在的属性创建 ref，请用 [`toRef`](#toref)。
 
 ## isProxy() {#isproxy}
 
-检查一个对象是否是由 [`reactive()`](./reactivity-core#reactive)、[`readonly()`](./reactivity-core#readonly)、[`shallowReactive()`](./reactivity-advanced#shallowreactive) 或 [`shallowReadonly()`](./reactivity-advanced#shallowreadonly) 创建的代理。
+检查对象是否由 [`reactive()`](./reactivity-core#reactive)、[`readonly()`](./reactivity-core#readonly)、[`shallowReactive()`](./reactivity-advanced#shallowreactive) 或 [`shallowReadonly()`](./reactivity-advanced#shallowreadonly) 创建的代理。
 
 - **类型**
 
@@ -244,7 +244,7 @@
 
 ## isReactive() {#isreactive}
 
-检查一个对象是否是由 [`reactive()`](./reactivity-core#reactive) 或 [`shallowReactive()`](./reactivity-advanced#shallowreactive) 创建的代理。
+检查对象是否由 [`reactive()`](./reactivity-core#reactive) 或 [`shallowReactive()`](./reactivity-advanced#shallowreactive) 创建的代理。
 
 - **类型**
 
@@ -254,9 +254,9 @@
 
 ## isReadonly() {#isreadonly}
 
-检查传入的值是否为只读对象。只读对象的属性可以更改，但它们不能通过传入的对象直接赋值。
+检查值是否为只读对象。只读对象的属性可以改，但不能通过该对象直接赋值。
 
-通过 [`readonly()`](./reactivity-core#readonly) 和 [`shallowReadonly()`](./reactivity-advanced#shallowreadonly) 创建的代理都是只读的，类似于没有 `set` 函数的 [`computed()`](./reactivity-core#computed) ref。
+由 [`readonly()`](./reactivity-core#readonly) 和 [`shallowReadonly()`](./reactivity-advanced#shallowreadonly) 创建的代理都是只读的，类似没有 `set` 的 [`computed()`](./reactivity-core#computed) ref。
 
 - **类型**
 

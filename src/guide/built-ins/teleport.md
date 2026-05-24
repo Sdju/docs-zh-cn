@@ -1,14 +1,14 @@
 # Teleport {#teleport}
 
-`<Teleport>` 是一个内置组件，它可以将一个组件内部的一部分模板“传送”到该组件的 DOM 结构外层的位置去。
+`<Teleport>` 是内置组件，可以把组件里的一部分模板「传送」到当前 DOM 结构之外去渲染。
 
 ## 基本用法 {#basic-usage}
 
-有时我们可能会遇到这样的场景：一个组件模板的一部分在逻辑上从属于该组件，但从整个应用视图的角度来看，它在 DOM 中应该被渲染在其他地方，甚至在整个 Vue 应用外部。
+有时模板在逻辑上属于某个组件，但从整页来看，又应该渲染到别处，甚至 Vue 应用外面。
 
-这类场景最常见的例子就是全屏的模态框。理想情况下，我们希望触发模态框的按钮和模态框本身的代码是在同一个单文件组件中，因为它们都与组件的开关状态有关。但这意味着该模态框将与按钮一起渲染在应用 DOM 结构里很深的地方。这会导致该模态框的 CSS 布局代码很难写。
+最常见的是全屏模态框：按钮和弹层最好写在同一个组件里（都和开关状态有关），但这样会渲染在 DOM 很深的位置，CSS 很难写。
 
-试想下面这样的 HTML 结构：
+例如：
 
 ```vue-html
 <div class="outer">
@@ -19,7 +19,7 @@
 </div>
 ```
 
-接下来我们来看看 `<MyModal>` 的实现：
+下面看 `<MyModal>` 的实现：
 
 <div class="composition-api">
 
@@ -88,15 +88,15 @@ export default {
 
 </div>
 
-这个组件中有一个 `<button>` 按钮来触发打开模态框，和一个 class 名为 `.modal` 的 `<div>`，它包含了模态框的内容和一个用来关闭的按钮。
+组件里有一个 `<button>` 打开模态框，还有一个 class 为 `.modal` 的 `<div>` 放内容和关闭按钮。
 
-当在初始 HTML 结构中使用这个组件时，会有一些潜在的问题：
+直接这样用时，可能遇到这些问题：
 
-- `position: fixed` 能够相对于浏览器窗口放置有一个条件，那就是不能有任何祖先元素设置了 `transform`、`perspective` 或者 `filter` 样式属性。也就是说如果我们想要用 CSS `transform` 为祖先节点 `<div class="outer">` 设置动画，就会不小心破坏模态框的布局！
+- `position: fixed` 要相对窗口定位，要求祖先元素没有 `transform`、`perspective` 或 `filter`。给 `<div class="outer">` 做 `transform` 动画时，可能把模态框布局弄乱。
 
-- 这个模态框的 `z-index` 受限于它的容器元素。如果有其他元素与 `<div class="outer">` 重叠并有更高的 `z-index`，则它会覆盖住我们的模态框。
+- 模态框的 `z-index` 受父容器限制。别的元素如果叠在 `<div class="outer">` 上且层级更高，会盖住模态框。
 
-`<Teleport>` 提供了一个更简单的方式来解决此类问题，让我们不需要再顾虑 DOM 结构的问题。让我们用 `<Teleport>` 改写一下 `<MyModal>`：
+`<Teleport>` 可以避开这些 DOM 结构问题。用 `<Teleport>` 改写 `<MyModal>`：
 
 ```vue-html{3,8}
 <button @click="open = true">Open Modal</button>
@@ -109,9 +109,9 @@ export default {
 </Teleport>
 ```
 
-`<Teleport>` 接收一个 `to` prop 来指定传送的目标。`to` 的值可以是一个 CSS 选择器字符串，也可以是一个 DOM 元素对象。这段代码的作用就是告诉 Vue“把以下模板片段**传送到 `body`** 标签下”。
+`<Teleport>` 用 `to` prop 指定目标。`to` 可以是 CSS 选择器字符串，或 DOM 元素对象。上面代码的意思是：把下面这段模板**挂到 `body` 下**。
 
-你可以点击下面这个按钮，然后通过浏览器的开发者工具，在 `<body>` 标签下找到模态框元素：
+点下面按钮，再在开发者工具的 `<body>` 里可以看到模态框：
 
 <script setup>
 import { ref } from 'vue'
@@ -145,21 +145,21 @@ const open = ref(false)
 }
 </style>
 
-我们也可以将 `<Teleport>` 和 [`<Transition>`](./transition) 结合使用来创建一个带动画的模态框。你可以看看[这个示例](/examples/#modal)。
+`<Teleport>` 也可以和 [`<Transition>`](./transition) 一起用，做带动画的模态框。见[这个示例](/examples/#modal)。
 
 :::tip
-`<Teleport>` 挂载时，传送的 `to` 目标必须已经存在于 DOM 中。理想情况下，这应该是整个 Vue 应用 DOM 树外部的一个元素。如果目标元素也是由 Vue 渲染的，你需要确保在挂载 `<Teleport>` 之前先挂载该元素。
+`<Teleport>` 挂载时，`to` 指向的目标必须已经在 DOM 里。最好放在整个 Vue 应用 DOM 树外面。如果目标也是 Vue 渲染的，要先挂载目标，再挂载 `<Teleport>`。
 :::
 
 ## 搭配组件使用 {#using-with-components}
 
-`<Teleport>` 只改变了渲染的 DOM 结构，它不会影响组件间的逻辑关系。也就是说，如果 `<Teleport>` 包含了一个组件，那么该组件始终和这个使用了 `<Teleport>` 的组件保持逻辑上的父子关系。传入的 props 和触发的事件也会照常工作。
+`<Teleport>` 只改 DOM 渲染位置，不改组件之间的逻辑关系。`<Teleport>` 里包的组件，在逻辑上仍是外层组件的子组件，props 和事件照常工作。
 
-这也意味着来自父组件的注入也会按预期工作，子组件将在 Vue Devtools 中嵌套在父级组件下面，而不是放在实际内容移动到的地方。
+父组件的 provide/inject 也照常。在 Vue Devtools 里，子组件仍显示在父组件下面，而不是显示在 DOM 实际挂载的位置。
 
 ## 禁用 Teleport {#disabling-teleport}
 
-在某些场景下可能需要视情况禁用 `<Teleport>`。举例来说，我们想要在桌面端将一个组件当做浮层来渲染，但在移动端则当作行内组件。我们可以通过对 `<Teleport>` 动态地传入一个 `disabled` prop 来处理这两种不同情况：
+有时需要按情况关掉 `<Teleport>`。例如桌面端当浮层，移动端当行内内容。可以给 `<Teleport>` 动态传 `disabled`：
 
 ```vue-html
 <Teleport :disabled="isMobile">
@@ -167,13 +167,13 @@ const open = ref(false)
 </Teleport>
 ```
 
-然后我们可以动态地更新 `isMobile`。
+再动态更新 `isMobile` 即可。
 
 ## 多个 Teleport 共享目标 {#multiple-teleports-on-the-same-target}
 
-一个可重用的 `<Modal>` 组件可能同时存在多个实例。对于此类场景，多个 `<Teleport>` 组件可以将其内容挂载在同一个目标元素上，而顺序就是简单的顺次追加，后挂载的将排在目标元素下更后面的位置上，但都在目标元素中。
+可复用的 `<Modal>` 可能同时有多个实例。多个 `<Teleport>` 可以挂到同一个目标上，按挂载顺序依次追加，后挂的在后面。
 
-比如下面这样的用例：
+例如：
 
 ```vue-html
 <Teleport to="#modals">
@@ -195,7 +195,7 @@ const open = ref(false)
 
 ## 延迟解析的 Teleport <sup class="vt-badge" data-text="3.5+" /> {#deferred-teleport}
 
-在 Vue 3.5 及更高版本中，我们可以使用 `defer` prop 推迟 Teleport 的目标解析，直到应用的其他部分挂载。这允许 Teleport 将由 Vue 渲染且位于组件树之后部分的容器元素作为目标：
+Vue 3.5+ 可用 `defer` prop，推迟解析 Teleport 目标，等应用其他部分先挂载。这样可以把组件树后面才渲染的容器当作目标：
 
 ```vue-html
 <Teleport defer to="#late-div">...</Teleport>
@@ -204,7 +204,7 @@ const open = ref(false)
 <div id="late-div"></div>
 ```
 
-请注意，目标元素必须与 Teleport 在同一个挂载/更新周期内渲染，即如果 `<div>` 在一秒后才挂载，Teleport 仍然会报错。延迟 Teleport 的原理与 `mounted` 生命周期钩子类似。
+注意：目标必须和 Teleport 在同一轮挂载/更新里出现。如果 `<div>` 晚一秒才挂上，Teleport 仍会报错。`defer` 的思路类似 `mounted` 钩子。
 
 ---
 

@@ -28,11 +28,11 @@
 
 - **详细信息**
 
-  第一个参数既可以是一个字符串 (用于原生元素) 也可以是一个 Vue 组件定义。第二个参数是要传递的 prop，第三个参数是子节点。
+  第一个参数可以是字符串（原生元素）或 Vue 组件定义。第二个参数是 prop，第三个参数是子节点。
 
-  当创建一个组件的 vnode 时，子节点必须以插槽函数进行传递。如果组件只有默认槽，可以使用单个插槽函数进行传递。否则，必须以插槽函数的对象形式来传递。
+  创建组件 vnode 时，子节点须以插槽函数传递。若组件只有默认槽，可传单个插槽函数；否则须以插槽函数对象传递。
 
-  为了方便阅读，当子节点不是插槽对象时，可以省略 prop 参数。
+  为方便阅读，子节点不是插槽对象时可省略 prop 参数。
 
 - **示例**
 
@@ -97,7 +97,7 @@
 
 ## mergeProps() {#mergeprops}
 
-合并多个 props 对象，用于处理含有特定的 props 参数的情况。
+合并多个 props 对象，用于处理含特定 props 参数的情况。
 
 - **类型**
 
@@ -107,13 +107,13 @@
 
 - **详细信息**
 
-  `mergeProps()` 支持以下特定 props 参数的处理，将它们合并成一个对象。
+  `mergeProps()` 会合并以下特定 props 参数：
 
   - `class`
   - `style`
-  - `onXxx` 事件监听器——多个同名的事件监听器将被合并到一个数组。
+  - `onXxx` 事件监听器——多个同名监听器会合并为一个数组。
 
-  如果你不需要合并行为而是简单覆盖，可以使用原生 object spread 语法来代替。
+  若只需覆盖而非合并，可用原生 object spread 语法。
 
 - **示例**
 
@@ -151,11 +151,11 @@
 
 - **详细信息**
 
-  返回一个克隆的 vnode，可在原有基础上添加一些额外的 prop。
+  返回克隆的 vnode，可在原有基础上添加额外 prop。
 
-  Vnode 被认为是一旦创建就不能修改的，你不应该修改已创建的 vnode 的 prop，而应该附带不同的/额外的 prop 来克隆它。
+  Vnode 创建后不可修改，不应直接改已有 vnode 的 prop，而应用不同/额外的 prop 克隆它。
 
-  Vnode 具有特殊的内部属性，因此克隆它并不像 object spread 一样简单。`cloneVNode()` 处理了大部分这样的内部逻辑。
+  Vnode 有特殊内部属性，克隆不像 object spread 那样简单。`cloneVNode()` 处理了大部分内部逻辑。
 
 - **示例**
 
@@ -188,11 +188,11 @@
 
 - **详细信息**
 
-  **备注：如果你可以直接引入组件就不需使用此方法。**
+  **备注：若可以直接引入组件，则无需使用此方法。**
 
-  为了能从正确的组件上下文进行解析，`resolveComponent()` 必须在<span class="composition-api"> `setup()` 或</span>渲染函数内调用。
+  要从正确的组件上下文解析，`resolveComponent()` 须在<span class="composition-api"> `setup()` 或</span>渲染函数内调用。
 
-  如果组件未找到，会抛出一个运行时警告，并返回组件名字符串。
+  若组件未找到，会抛出运行时警告，并返回组件名字符串。
 
 - **示例**
 
@@ -242,17 +242,17 @@
 
 - **详细信息**
 
-  **备注：如果你可以直接引入指令就不需使用此方法。**
+  **备注：若可以直接引入指令，则无需使用此方法。**
 
-  为了能从正确的组件上下文进行解析，`resolveDirective()` 必须在<span class="composition-api"> `setup()` 或</span>渲染函数内调用。
+  要从正确的组件上下文解析，`resolveDirective()` 须在<span class="composition-api"> `setup()` 或</span>渲染函数内调用。
 
-  如果指令没有找到，会抛出一个运行时警告，并返回 `undefined`。
+  若指令未找到，会抛出运行时警告，并返回 `undefined`。
 
 - **参考**[指南 - 渲染函数 - 自定义指令](/guide/extras/render-function#custom-directives)
 
 ## withDirectives() {#withdirectives}
 
-用于给 vnode 增加自定义指令。
+给 vnode 添加自定义指令。
 
 - **类型**
 
@@ -273,7 +273,7 @@
 
 - **详细信息**
 
-  用自定义指令包装一个现有的 vnode。第二个参数是自定义指令数组。每个自定义指令也可以表示为 `[Directive, value, argument, modifiers]` 形式的数组。如果不需要，可以省略数组的尾元素。
+  用自定义指令包装现有 vnode。第二个参数是指令数组。每个指令也可写为 `[Directive, value, argument, modifiers]` 形式。不需要时可省略数组尾部元素。
 
 - **示例**
 
@@ -300,7 +300,7 @@
 
 ## withModifiers() {#withmodifiers}
 
-用于向事件处理函数添加内置 [`v-on` 修饰符](/guide/essentials/event-handling#event-modifiers)。
+向事件处理函数添加内置 [`v-on` 修饰符](/guide/essentials/event-handling#event-modifiers)。
 
 - **类型**
 

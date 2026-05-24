@@ -13,18 +13,18 @@ onMounted(() => {
 
 ## 运行时错误 {#runtime-errors}
 
-在生产环境中，传递给以下错误处理程序 API 的第三个参数是一个短代码，而不是含有完整信息的字符串：
+在生产环境里，传给下面这些错误处理 API 的第三个参数是短代码，而不是带完整说明的字符串：
 
 - [`app.config.errorHandler`](/api/application#app-config-errorhandler)
-- [`onErrorCaptured`](/api/composition-api-lifecycle#onerrorcaptured) (组合式 API)
-- [`errorCaptured`](/api/options-lifecycle#errorcaptured) (选项式 API)
+- [`onErrorCaptured`](/api/composition-api-lifecycle#onerrorcaptured)（组合式 API）
+- [`errorCaptured`](/api/options-lifecycle#errorcaptured)（选项式 API）
 
-下表提供了代码和其原始的完整信息字符串的映射。
+下表列出短代码与原始完整信息字符串的对应关系。
 
 <ErrorsTable kind="runtime" :errors="data.runtime" :highlight="highlight" />
 
 ## 编译错误 {#compiler-errors}
 
-下表提供了生产环境的编译错误代码与其原始消息的映射。
+下表列出生产环境编译错误的短代码与原始消息的对应关系。
 
 <ErrorsTable kind="compiler" :errors="data.compiler" :highlight="highlight" />

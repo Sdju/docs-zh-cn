@@ -7,11 +7,11 @@ import AnimateWatcher from './demos/AnimateWatcher.vue'
 
 # 动画技巧 {#animation-techniques}
 
-Vue 提供了 [`<Transition>`](/guide/built-ins/transition) 和 [`<TransitionGroup>`](/guide/built-ins/transition-group) 组件来处理元素进入、离开和列表顺序变化的过渡效果。但除此之外，还有许多其他制作网页动画的方式在 Vue 应用中也适用。这里我们会探讨一些额外的技巧。
+Vue 的 [`<Transition>`](/guide/built-ins/transition) 和 [`<TransitionGroup>`](/guide/built-ins/transition-group) 负责元素进入、离开和列表顺序变化的过渡。除此之外，还有很多做网页动画的方式也适用于 Vue 应用。下面介绍一些常用技巧。
 
 ## 基于 CSS class 的动画 {#class-based-animations}
 
-对于那些不是正在进入或离开 DOM 的元素，我们可以通过给它们动态添加 CSS class 来触发动画：
+对不会进出 DOM 的元素，可以动态加 CSS class 来触发动画：
 
 <div class="composition-api">
 
@@ -90,7 +90,7 @@ export default {
 
 ## 状态驱动的动画 {#state-driven-animations}
 
-有些过渡效果可以通过动态插值来实现，比如在交互时动态地给元素绑定样式。看下面这个例子：
+有些过渡可以用动态插值实现，比如在交互时给元素绑样式。看下面例子：
 
 <div class="composition-api">
 
@@ -141,13 +141,13 @@ export default {
 
 <Colors />
 
-除了颜色外，你还可以使用样式绑定 CSS transform、宽度或高度。你甚至可以通过运用弹性物理模拟为 SVG 添加动画，毕竟它们也只是 attribute 的数据绑定：
+除了颜色，还可以用样式绑定 `transform`、宽度或高度。甚至可以用弹性物理给 SVG 加动画——它们也只是 attribute 的数据绑定：
 
 <ElasticHeader />
 
 ## 基于侦听器的动画 {#animating-with-watchers}
 
-通过发挥一些创意，我们可以基于一些数字状态，配合侦听器给任何东西加上动画。例如，我们可以将数字本身变成动画：
+发挥创意的话，可以基于数字状态，配合侦听器给任何东西加动画。例如把数字本身做成动画：
 
 <div class="composition-api">
 

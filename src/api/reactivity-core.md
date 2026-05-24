@@ -1,7 +1,7 @@
 # 响应式 API：核心 {#reactivity-api-core}
 
 :::info 参考
-要更好地了解响应式 API，推荐阅读下面几个指南中的章节：
+想更好理解响应式 API，建议先看这些指南章节：
 
 - [响应式基础](/guide/essentials/reactivity-fundamentals) (with the API preference set to Composition API)
 - [深入响应式系统](/guide/extras/reactivity-in-depth)
@@ -9,7 +9,7 @@
 
 ## ref() {#ref}
 
-接受一个内部值，返回一个响应式的、可更改的 ref 对象，此对象只有一个指向其内部值的属性 `.value`。
+接收一个内部值，返回响应式、可修改的 ref 对象。该对象只有一个 `.value` 属性指向内部值。
 
 - **类型**
 
@@ -23,11 +23,11 @@
 
 - **详细信息**
 
-  ref 对象是可更改的，也就是说你可以为 `.value` 赋予新的值。它也是响应式的，即所有对 `.value` 的操作都将被追踪，并且写操作会触发与之相关的副作用。
+  ref 可以修改：给 `.value` 赋新值即可。它也是响应式的：对 `.value` 的读写都会被追踪，写操作会触发相关副作用。
 
-  如果将一个对象赋值给 ref，那么这个对象将通过 [reactive()](#reactive) 转为具有深层次响应式的对象。这也意味着如果对象中包含了嵌套的 ref，它们将被深层地解包。
+  若把对象赋给 ref，对象会通过 [reactive()](#reactive) 转为深层响应式对象，嵌套的 ref 也会被深层解包。
 
-  若要避免这种深层次的转换，请使用 [`shallowRef()`](./reactivity-advanced#shallowref) 来替代。
+  若不想做深层转换，请用 [`shallowRef()`](./reactivity-advanced#shallowref)。
 
 - **示例**
 
@@ -45,7 +45,7 @@
 
 ## computed() {#computed}
 
-接受一个 [getter 函数](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/get#description)，返回一个只读的响应式 [ref](#ref) 对象。该 ref 通过 `.value` 暴露 getter 函数的返回值。它也可以接受一个带有 `get` 和 `set` 函数的对象来创建一个可写的 ref 对象。
+接收 [getter 函数](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/get#description)，返回只读响应式 [ref](#ref)。通过 `.value` 读取 getter 的返回值。也可以传带 `get` 和 `set` 的对象，创建可写 ref。
 
 - **类型**
 
@@ -116,7 +116,7 @@
 
 ## reactive() {#reactive}
 
-返回一个对象的响应式代理。
+返回对象的响应式代理。
 
 - **类型**
 
@@ -126,13 +126,13 @@
 
 - **详细信息**
 
-  响应式转换是“深层”的：它会影响到所有嵌套的属性。一个响应式对象也将深层地解包任何 [ref](#ref) 属性，同时保持响应性。
+  响应式转换是「深层」的：会影响所有嵌套属性。响应式对象也会深层解包其中的 [ref](#ref)，并保持响应性。
 
-  值得注意的是，当访问到某个响应式数组或 `Map` 这样的原生集合类型中的 ref 元素时，不会执行 ref 的解包。
+  访问响应式数组或 `Map` 等原生集合里的 ref 元素时，**不会**解包 ref。
 
-  若要避免深层响应式转换，只想保留对这个对象顶层次访问的响应性，请使用 [shallowReactive()](./reactivity-advanced#shallowreactive) 作替代。
+  若只要顶层响应性、不要深层转换，请用 [shallowReactive()](./reactivity-advanced#shallowreactive)。
 
-  返回的对象以及其中嵌套的对象都会通过 [ES Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) 包裹，因此**不等于**源对象，建议只使用响应式代理，避免使用原始对象。
+  返回的对象及嵌套对象都由 [ES Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) 包裹，**不等于**源对象。建议只用响应式代理，避免直接操作原始对象。
 
 - **示例**
 
@@ -163,7 +163,7 @@
   console.log(count.value) // 3
   ```
 
-	注意当访问到某个响应式数组或 `Map` 这样的原生集合类型中的 ref 元素时，**不会**执行 ref 的解包：
+	注意：访问响应式数组或 `Map` 等原生集合里的 ref 元素时，**不会**解包 ref：
 
   ```js
   const books = reactive([ref('Vue 3 Guide')])
@@ -175,7 +175,7 @@
   console.log(map.get('count').value)
   ```
 
-  将一个 [ref](#ref) 赋值给一个 `reactive` 属性时，该 ref 会被自动解包：
+  把 [ref](#ref) 赋给 `reactive` 对象的属性时，ref 会自动解包：
 
   ```ts
   const count = ref(1)
@@ -193,7 +193,7 @@
 
 ## readonly() {#readonly}
 
-接受一个对象 (不论是响应式还是普通的) 或是一个 [ref](#ref)，返回一个原值的只读代理。
+接收对象（响应式或普通）或 [ref](#ref)，返回原值的只读代理。
 
 - **类型**
 
@@ -205,9 +205,9 @@
 
 - **详细信息**
 
-  只读代理是深层的：对任何嵌套属性的访问都将是只读的。它的 ref 解包行为与 `reactive()` 相同，但解包得到的值是只读的。
+  只读代理是深层的：访问任何嵌套属性都是只读。ref 解包行为与 `reactive()` 相同，但解包后的值是只读的。
 
-  要避免深层级的转换行为，请使用 [shallowReadonly()](./reactivity-advanced#shallowreadonly) 作替代。
+  若不要深层转换，请用 [shallowReadonly()](./reactivity-advanced#shallowreadonly)。
 
 - **示例**
 
@@ -230,7 +230,7 @@
 
 ## watchEffect() {#watcheffect}
 
-立即运行一个函数，同时响应式地追踪其依赖，并在依赖更改时重新执行。
+立即运行函数，并响应式追踪其依赖；依赖变化时重新执行。
 
 - **类型**
 
@@ -258,13 +258,13 @@
 
 - **详细信息**
 
-  第一个参数就是要运行的副作用函数。这个副作用函数的参数也是一个函数，用来注册清理回调。清理回调会在该副作用下一次执行前被调用，可以用来清理无效的副作用，例如等待中的异步请求 (参见下面的示例)。
+  第一个参数是要运行的副作用函数。它还接收一个函数参数，用来注册清理回调。清理回调会在副作用下次执行前调用，可用来清理无效副作用，例如取消进行中的异步请求（见下方示例）。
 
-  第二个参数是一个可选的选项，可以用来调整副作用的刷新时机或调试副作用的依赖。
+  第二个参数是可选配置，可调整副作用刷新时机或调试依赖。
 
-  默认情况下，侦听器将在组件渲染之前执行。设置 `flush: 'post'` 将会使侦听器延迟到组件渲染之后再执行。详见[回调的触发时机](/guide/essentials/watchers#callback-flush-timing)。在某些特殊情况下 (例如要使缓存失效)，可能有必要在响应式依赖发生改变时立即触发侦听器。这可以通过设置 `flush: 'sync'` 来实现。然而，该设置应谨慎使用，因为如果有多个属性同时更新，这将导致一些性能和数据一致性的问题。
+  默认情况下，侦听器在组件渲染前执行。设 `flush: 'post'` 会延迟到组件渲染之后。详见[回调的触发时机](/guide/essentials/watchers#callback-flush-timing)。某些场景（如缓存失效）可能需要在依赖变化时立刻触发，可设 `flush: 'sync'`。但应谨慎使用：多个属性同时更新时，可能影响性能和数据一致性。
 
-  返回值是一个用来停止该副作用的函数。
+  返回值是用来停止该副作用的函数。
 
 - **示例**
 
@@ -356,7 +356,7 @@
 
 ## watch() {#watch}
 
-侦听一个或多个响应式数据源，并在数据源变化时调用所给的回调函数。
+侦听一个或多个响应式数据源，变化时调用回调。
 
 - **类型**
 
@@ -403,36 +403,36 @@
   }
   ```
 
-  > 为了便于阅读，对类型进行了简化。
+  > 为便于阅读，类型已简化。
 
 - **详细信息**
 
-  `watch()` 默认是懒侦听的，即仅在侦听源发生变化时才执行回调函数。
+  `watch()` 默认是懒侦听：只有侦听源变化时才执行回调。
 
-  第一个参数是侦听器的**源**。这个来源可以是以下几种：
+  第一个参数是侦听**源**，可以是：
 
-  - 一个函数，返回一个值
-  - 一个 ref
-  - 一个响应式对象
-  - ...或是由以上类型的值组成的数组
+  - 返回值的函数
+  - ref
+  - 响应式对象
+  - …或由以上类型组成的数组
 
-  第二个参数是在发生变化时要调用的回调函数。这个回调函数接受三个参数：新值、旧值，以及一个用于注册副作用清理的回调函数。该回调函数会在副作用下一次重新执行前调用，可以用来清除无效的副作用，例如等待中的异步请求。
+  第二个参数是变化时的回调，接收三个参数：新值、旧值，以及注册清理副作用的函数。该清理函数会在副作用下次重新执行前调用，可用来清除无效副作用，例如取消进行中的异步请求。
 
-  当侦听多个来源时，回调函数接受两个数组，分别对应来源数组中的新值和旧值。
+  侦听多个来源时，回调接收两个数组，分别对应新值和旧值。
 
-  第三个可选的参数是一个对象，支持以下这些选项：
+  第三个参数是可选配置对象，支持：
 
-  - **`immediate`**：在侦听器创建时立即触发回调。第一次调用时旧值是 `undefined`。
-  - **`deep`**：如果源是对象，强制深度遍历，以便在深层级变更时触发回调。在 3.5+ 中，此参数还可以是指示最大遍历深度的数字。参考[深层侦听器](/guide/essentials/watchers#deep-watchers)。
-  - **`flush`**：调整回调函数的刷新时机。参考[回调的刷新时机](/guide/essentials/watchers#callback-flush-timing)及 [`watchEffect()`](/api/reactivity-core#watcheffect)。
-  - **`onTrack / onTrigger`**：调试侦听器的依赖。参考[调试侦听器](/guide/extras/reactivity-in-depth#watcher-debugging)。
-  - **`once`**：(3.4+) 回调函数只会运行一次。侦听器将在回调函数首次运行后自动停止。
+  - **`immediate`**：创建侦听器时立刻触发回调。第一次调用时旧值是 `undefined`。
+  - **`deep`**：源是对象时，强制深度遍历，深层变更也会触发回调。3.5+ 还可传数字表示最大遍历深度。见[深层侦听器](/guide/essentials/watchers#deep-watchers)。
+  - **`flush`**：调整回调刷新时机。见[回调的刷新时机](/guide/essentials/watchers#callback-flush-timing)和 [`watchEffect()`](/api/reactivity-core#watcheffect)。
+  - **`onTrack / onTrigger`**：调试侦听器依赖。见[调试侦听器](/guide/extras/reactivity-in-depth#watcher-debugging)。
+  - **`once`**：(3.4+) 回调只运行一次，首次运行后自动停止。
 
-  与 [`watchEffect()`](#watcheffect) 相比，`watch()` 使我们可以：
+  相比 [`watchEffect()`](#watcheffect)，`watch()` 可以：
 
   - 懒执行副作用；
-  - 更加明确是应该由哪个状态触发侦听器重新执行；
-  - 可以访问所侦听状态的前一个值和当前值。
+  - 更明确由哪个状态触发重新执行；
+  - 访问前一个值和当前值。
 
 - **示例**
 
@@ -465,7 +465,7 @@
   })
   ```
 
-  当使用 getter 函数作为源时，回调只在此函数的返回值变化时才会触发。如果你想让回调在深层级变更时也能触发，你需要使用 `{ deep: true }` 强制侦听器进入深层级模式。在深层级模式时，如果回调函数由于深层级的变更而被触发，那么新值和旧值将是同一个对象。
+  用 getter 作源时，只有返回值变化才触发回调。若要在深层变更时也触发，需设 `{ deep: true }` 进入深层模式。此时若因深层变更触发，新值和旧值会是同一对象。
 
   ```js
   const state = reactive({ count: 0 })
@@ -478,7 +478,7 @@
   )
   ```
 
-  当直接侦听一个响应式对象时，侦听器会自动启用深层模式：
+  直接侦听响应式对象时，会自动启用深层模式：
 
   ```js
   const state = reactive({ count: 0 })
@@ -556,7 +556,7 @@
 
 ## onWatcherCleanup() <sup class="vt-badge" data-text="3.5+" /> {#onwatchercleanup}
 
-注册一个清理函数，在当前侦听器即将重新运行时执行。只能在 `watchEffect` 作用函数或 `watch` 回调函数的同步执行期间调用 (即不能在异步函数的 `await` 语句之后调用)。
+注册清理函数，在当前侦听器即将重新运行时执行。只能在 `watchEffect` 作用函数或 `watch` 回调的**同步**执行期间调用（不能在异步函数里 `await` 之后调用）。
 
 - **类型**
 

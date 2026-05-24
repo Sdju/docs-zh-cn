@@ -6,27 +6,27 @@ import ListStagger from './transition-demos/ListStagger.vue'
 
 # TransitionGroup {#transitiongroup}
 
-`<TransitionGroup>` 是一个内置组件，用于对 `v-for` 列表中的元素或组件的插入、移除和顺序改变添加动画效果。
+`<TransitionGroup>` 是内置组件，给 `v-for` 列表里元素的插入、移除、排序变化加动画。
 
 ## 和 `<Transition>` 的区别 {#differences-from-transition}
 
-`<TransitionGroup>` 支持和 `<Transition>` 基本相同的 props、CSS 过渡 class 和 JavaScript 钩子监听器，但有以下几点区别：
+`<TransitionGroup>` 的 props、CSS 过渡 class、JavaScript 钩子与 `<Transition>` 大体相同，但有这些区别：
 
-- 默认情况下，它不会渲染一个容器元素。但你可以通过传入 `tag` prop 来指定一个元素作为容器元素来渲染。
+- 默认不渲染外层容器。可用 `tag` prop 指定要渲染的容器标签。
 
-- [过渡模式](./transition#transition-modes)在这里不可用，因为我们不再是在互斥的元素之间进行切换。
+- [过渡模式](./transition#transition-modes)在这里不能用，因为不是「二选一」切换。
 
-- 列表中的每个元素都**必须**有一个独一无二的 `key` attribute。
+- 列表里每个元素都**必须**有唯一的 `key`。
 
-- CSS 过渡 class 会被应用在列表内的元素上，**而不是**容器元素上。
+- CSS 过渡 class 加在列表项上，**不是**容器上。
 
 :::tip
-当在 [DOM 内模板](/guide/essentials/component-basics#in-dom-template-parsing-caveats)中使用时，组件名需要写为 `<transition-group>`。
+在 [DOM 内模板](/guide/essentials/component-basics#in-dom-template-parsing-caveats)里，标签要写成 `<transition-group>`。
 :::
 
 ## 进入 / 离开动画 {#enter-leave-transitions}
 
-这里是 `<TransitionGroup>` 对一个 `v-for` 列表添加进入 / 离开动画的示例：
+下面用 `<TransitionGroup>` 给 `v-for` 列表加进入/离开动画：
 
 ```vue-html
 <TransitionGroup name="list" tag="ul">
@@ -52,7 +52,7 @@ import ListStagger from './transition-demos/ListStagger.vue'
 
 ## 移动动画 {#move-transitions}
 
-上面的示例有一些明显的缺陷：当某一项被插入或移除时，它周围的元素会立即发生“跳跃”而不是平稳地移动。我们可以通过添加一些额外的 CSS 规则来解决这个问题：
+上面的例子有个问题：插入或删除某项时，周围元素会突然「跳」一下，而不是平滑移动。加几条 CSS 可以改善：
 
 ```css{1,13-17}
 .list-move, /* 对移动中的元素应用的过渡 */
@@ -67,14 +67,14 @@ import ListStagger from './transition-demos/ListStagger.vue'
   transform: translateX(30px);
 }
 
-/* 确保将离开的元素从布局流中删除
-  以便能够正确地计算移动的动画。 */
+/* 让离开的元素脱离文档流，
+  移动动画才能算对位置。 */
 .list-leave-active {
   position: absolute;
 }
 ```
 
-现在它看起来好多了，甚至对整个列表执行洗牌的动画也都非常流畅：
+这样就好多了，整表洗牌也会很顺滑：
 
 <ListMove />
 
@@ -82,11 +82,11 @@ import ListStagger from './transition-demos/ListStagger.vue'
 
 ### 自定义过渡组 class {#custom-transitiongroup-classes}
 
-你还可以通过向 `<TransitionGroup>` 传递 `moveClass` prop 为移动元素指定自定义过渡 class，类似于[自定义过渡 class](/guide/built-ins/transition.html#custom-transition-classes)。
+也可以给 `<TransitionGroup>` 传 `moveClass`，为移动中的元素指定自定义过渡 class，用法类似 [Transition 的自定义 class](/guide/built-ins/transition.html#custom-transition-classes)。
 
 ## 渐进延迟列表动画 {#staggering-list-transitions}
 
-通过在 JavaScript 钩子中读取元素的 data attribute，我们可以实现带渐进延迟的列表动画。首先，我们把每一个元素的索引渲染为该元素上的一个 data attribute：
+在 JavaScript 钩子里读取元素的 data 属性，可以做「一项接一项」的延迟动画。先把每项的索引写到 `data-index` 上：
 
 ```vue-html{11}
 <TransitionGroup
@@ -106,7 +106,7 @@ import ListStagger from './transition-demos/ListStagger.vue'
 </TransitionGroup>
 ```
 
-接着，在 JavaScript 钩子中，我们基于当前元素的 data attribute 对该元素的进场动画添加一个延迟。以下是一个基于 [GSAP library](https://gsap.com/) 的动画示例：
+然后在钩子里用 `dataset.index` 给进入动画加延迟。下面用 [GSAP](https://gsap.com/) 举例：
 
 ```js{5}
 function onEnter(el, done) {

@@ -618,6 +618,8 @@ function inlineScript(file: string): HeadConfig {
 export default defineConfigWithTheme<ThemeConfig>({
   extends: baseConfig,
 
+  base: process.env.VP_BASE_URL || '/',
+
   sitemap: {
     hostname: 'https://cn.vuejs.org'
   },

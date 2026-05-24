@@ -5,9 +5,9 @@ pageClass: api
 # 内置组件 {#built-in-components}
 
 :::info 组件注册和使用
-内置组件无需注册便可以直接在模板中使用。它们也支持 tree-shake：仅在使用时才会包含在构建中。
+内置组件可直接在模板中使用，无需注册。也支持 tree-shake：只有用到时才会打进构建。
 
-在[渲染函数](/guide/extras/render-function)中使用它们时，需要显式导入。例如：
+在[渲染函数](/guide/extras/render-function)中使用时，需要先 import 导入。例如：
 
 ```js
 import { h, Transition } from 'vue'
@@ -21,7 +21,7 @@ h(Transition, {
 
 ## `<Transition>` {#transition}
 
-为**单个**元素或组件提供动画过渡效果。
+给**单个**元素或组件添加动画过渡。
 
 - **Props**
 
@@ -102,7 +102,7 @@ h(Transition, {
   </Transition>
   ```
 
-  通过改变 `key` 属性来强制过度执行：
+  通过改变 `key` 强制重新过渡：
 
   ```vue-html
   <Transition>
@@ -110,7 +110,7 @@ h(Transition, {
   </Transition>
   ```
 
-  动态组件，初始渲染时带有过渡模式 + 动画出现：
+  动态组件，初始渲染时使用过渡模式 + appear：
 
   ```vue-html
   <Transition name="fade" mode="out-in" appear>
@@ -130,11 +130,11 @@ h(Transition, {
 
 ## `<TransitionGroup>` {#transitiongroup}
 
-为列表中的**多个**元素或组件提供过渡效果。
+给列表中的**多个**元素或组件添加过渡效果。
 
 - **Props**
 
-  `<TransitionGroup>` 拥有与 `<Transition>` 除了 `mode` 以外所有的 props，并增加了两个额外的 props：
+  `<TransitionGroup>` 拥有 `<Transition>` 除 `mode` 外的全部 props，并多了两个：
 
   ```ts
   interface TransitionGroupProps extends Omit<TransitionProps, 'mode'> {
@@ -156,11 +156,11 @@ h(Transition, {
 
 - **详细信息**
 
-  默认情况下，`<TransitionGroup>` 不会渲染一个容器 DOM 元素，但是可以通过 `tag` prop 启用。
+  默认 `<TransitionGroup>` 不渲染容器 DOM 元素，可通过 `tag` prop 启用。
 
-  注意，每个 `<transition-group>` 的子节点必须有[**独立的 key**](/guide/essentials/list#maintaining-state-with-key)，动画才能正常工作。
+  每个 `<transition-group>` 子节点必须有[**独立的 key**](/guide/essentials/list#maintaining-state-with-key)，动画才能正常工作。
 
-  `<TransitionGroup>` 支持通过 CSS transform 控制移动效果。当一个子节点在屏幕上的位置在更新之后发生变化时，它会被添加一个使其位移的 CSS class (基于 `name` attribute 推导，或使用 `move-class` prop 显式配置)。如果使其位移的 class 被添加时 CSS 的 `transform` 属性是“可过渡的”，那么该元素会基于 [FLIP 技巧](https://aerotwist.com/blog/flip-your-animations/)平滑地到达动画终点。
+  `<TransitionGroup>` 支持用 CSS transform 控制移动。子节点位置更新后，会添加位移 CSS class（由 `name` attribute 推导，或用 `move-class` prop 指定）。若 `transform` 可过渡，元素会基于 [FLIP 技巧](https://aerotwist.com/blog/flip-your-animations/)平滑移动到目标位置。
 
 - **示例**
 
@@ -176,7 +176,7 @@ h(Transition, {
 
 ## `<KeepAlive>` {#keepalive}
 
-缓存包裹在其中的动态切换组件。
+缓存内部动态切换的组件。
 
 - **Props**
 
@@ -203,11 +203,11 @@ h(Transition, {
 
 - **详细信息**
 
-  `<KeepAlive>` 包裹动态组件时，会缓存不活跃的组件实例，而不是销毁它们。
+  `<KeepAlive>` 包裹动态组件时，会缓存不活跃实例，而不是销毁。
 
-  任何时候都只能有一个活跃组件实例作为 `<KeepAlive>` 的直接子节点。
+  `<KeepAlive>` 的直接子节点中，同一时间只能有一个活跃组件。
 
-  当一个组件在 `<KeepAlive>` 中被切换时，它的 `activated` 和 `deactivated` 生命周期钩子将被调用，用来替代 `mounted` 和 `unmounted`。这适用于 `<KeepAlive>` 的直接子节点及其所有子孙节点。
+  组件在 `<KeepAlive>` 中切换时，会调用 `activated` 和 `deactivated` 钩子，替代 `mounted` 和 `unmounted`。适用于 `<KeepAlive>` 的直接子节点及其所有子孙节点。
 
 - **示例**
 
@@ -219,7 +219,7 @@ h(Transition, {
   </KeepAlive>
   ```
 
-  与 `v-if` / `v-else` 分支一起使用时，同一时间只能有一个组件被渲染：
+  与 `v-if` / `v-else` 一起用时，同一时间只能渲染一个组件：
 
   ```vue-html
   <KeepAlive>
@@ -269,7 +269,7 @@ h(Transition, {
 
 ## `<Teleport>` {#teleport}
 
-将其插槽内容渲染到 DOM 中的另一个位置。
+把插槽内容渲染到 DOM 的另一个位置。
 
 - **Props**
 
@@ -326,7 +326,7 @@ h(Transition, {
 
 ## `<Suspense>` <sup class="vt-badge experimental" /> {#suspense}
 
-用于协调对组件树中嵌套的异步依赖的处理。
+协调组件树中嵌套的异步依赖。
 
 - **Props**
 
@@ -345,10 +345,10 @@ h(Transition, {
 
 - **详细信息**
 
-  `<Suspense>` 接受两个插槽：`#default` 和 `#fallback`。它将在内存中渲染默认插槽的同时展示后备插槽内容。
+  `<Suspense>` 有两个插槽：`#default` 和 `#fallback`。会在内存中渲染默认插槽，同时展示后备内容。
 
-  如果在渲染时遇到异步依赖项 ([异步组件](/guide/components/async)和具有 [`async setup()`](/guide/built-ins/suspense#async-setup) 的组件)，它将等到所有异步依赖项解析完成时再显示默认插槽。
+  渲染时遇到异步依赖（[异步组件](/guide/components/async)或带 [`async setup()`](/guide/built-ins/suspense#async-setup) 的组件），会等所有依赖解析完再显示默认插槽。
 
-  通过将 Suspense 设置为 `suspensible`，所有的异步依赖将由父级 Suspense 处理。请参阅[实现细节](https://github.com/vuejs/core/pull/6736)
+  将 Suspense 设为 `suspensible` 后，所有异步依赖由父级 Suspense 处理。详见[实现细节](https://github.com/vuejs/core/pull/6736)
 
 - **参考**[指南 - Suspense](/guide/built-ins/suspense)

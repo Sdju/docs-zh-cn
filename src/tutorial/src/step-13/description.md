@@ -49,9 +49,9 @@ export default {
 
 </div>
 
-<span class="options-api">`this.$emit()`</span><span class="composition-api">`emit()`</span> 的第一个参数是事件的名称。其他所有参数都将传递给事件监听器。
+<span class="options-api">`this.$emit()`</span><span class="composition-api">`emit()`</span> 的第一个参数是事件名称。其他参数都会传给事件监听器。
 
-父组件可以使用 `v-on` 监听子组件触发的事件——这里的处理函数接收了子组件触发事件时的额外参数并将它赋值给了本地状态：
+父组件可以用 `v-on` 监听子组件触发的事件——这里的处理函数接收子组件传来的额外参数，并把它赋值给本地状态：
 
 <div class="sfc">
 
@@ -68,4 +68,4 @@ export default {
 
 </div>
 
-现在在编辑器中自己尝试一下吧。
+现在在编辑器里自己试试吧。

@@ -5,14 +5,14 @@ outline: deep
 # Suspense {#suspense}
 
 :::warning 实验性功能
-`<Suspense>` 是一项实验性功能。它不一定会最终成为稳定功能，并且在稳定之前相关 API 也可能会发生变化。
+`<Suspense>` 仍是实验性功能，将来可能调整，API 在稳定前也可能变。
 :::
 
-`<Suspense>` 是一个内置组件，用来在组件树中协调对异步依赖的处理。它让我们可以在组件树上层等待下层的多个嵌套异步依赖项解析完成，并可以在等待时渲染一个加载状态。
+`<Suspense>` 是内置组件，用来统一处理组件树里的异步依赖。可以在上层等下面多个嵌套异步都完成，等待期间显示加载状态。
 
 ## 异步依赖 {#async-dependencies}
 
-要了解 `<Suspense>` 所解决的问题和它是如何与异步依赖进行交互的，我们需要想象这样一种组件层级结构：
+要理解 `<Suspense>` 解决什么问题，先看这样的组件树：
 
 ```
 <Suspense>
@@ -24,13 +24,13 @@ outline: deep
       └─ <Stats> (异步组件)
 ```
 
-在这个组件树中有多个嵌套组件，要渲染出它们，首先得解析一些异步资源。如果没有 `<Suspense>`，则它们每个都需要处理自己的加载、报错和完成状态。在最坏的情况下，我们可能会在页面上看到三个旋转的加载态，在不同的时间显示出内容。
+这棵树里有多层组件，渲染前要先等异步数据。没有 `<Suspense>` 时，每层都要自己处理加载、报错、完成。最坏时页面上会先后出现好几个转圈加载，内容也分批出来。
 
-有了 `<Suspense>` 组件后，我们就可以在等待整个多层级组件树中的各个异步依赖获取结果时，在顶层展示出加载中或加载失败的状态。
+有了 `<Suspense>`，可以在顶层统一显示「加载中」或失败状态，等整棵子树需要的异步都就绪。
 
-`<Suspense>` 可以等待的异步依赖有两种：
+`<Suspense>` 能等的异步依赖有两类：
 
-1. 带有异步 `setup()` 钩子的组件。这也包含了使用 `<script setup>` 时有顶层 `await` 表达式的组件。
+1. 带异步 `setup()` 的组件（含 `<script setup>` 里顶层 `await` 的组件）。
 
 2. [异步组件](/guide/components/async)。
 
@@ -50,7 +50,7 @@ export default {
 }
 ```
 
-如果使用 `<script setup>`，那么顶层 `await` 表达式会自动让该组件成为一个异步依赖：
+在 `<script setup>` 里写顶层 `await`，组件会自动变成异步依赖：
 
 ```vue
 <script setup>
@@ -65,13 +65,13 @@ const posts = await res.json()
 
 ### 异步组件 {#async-components}
 
-异步组件默认就是<strong>“suspensible”</strong>的。这意味着如果组件关系链上有一个 `<Suspense>`，那么这个异步组件就会被当作这个 `<Suspense>` 的一个异步依赖。在这种情况下，加载状态是由 `<Suspense>` 控制，而该组件自己的加载、报错、延时和超时等选项都将被忽略。
+异步组件默认是<strong>suspensible</strong>的：上层有 `<Suspense>` 时，会由它接管加载状态，组件自己的 loading、error、delay、timeout 等选项会被忽略。
 
-异步组件也可以通过在选项中指定 `suspensible: false` 表明不用 `Suspense` 控制，并让组件始终自己控制其加载状态。
+设 `suspensible: false` 可以不交给 `Suspense`，由组件自己管加载状态。
 
 ## 加载中状态 {#loading-state}
 
-`<Suspense>` 组件有两个插槽：`#default` 和 `#fallback`。两个插槽都只允许**一个**直接子节点。在可能的时候都将显示默认插槽中的节点。否则将显示后备插槽中的节点。
+`<Suspense>` 有两个插槽：`#default` 和 `#fallback`。每个插槽只能有**一个**直接子节点。能显示默认内容时就显示 `#default`，否则显示 `#fallback`。
 
 ```vue-html
 <Suspense>
@@ -85,31 +85,31 @@ const posts = await res.json()
 </Suspense>
 ```
 
-在初始渲染时，`<Suspense>` 将在内存中渲染其默认的插槽内容。如果在这个过程中遇到任何异步依赖，则会进入**挂起**状态。在挂起状态期间，展示的是后备内容。当所有遇到的异步依赖都完成后，`<Suspense>` 会进入**完成**状态，并将展示出默认插槽的内容。
+首次渲染时，`<Suspense>` 先在内存里渲染 `#default` 的内容。若遇到异步依赖，就进入**挂起**，此时显示 `#fallback`。全部异步完成后进入**完成**，显示 `#default`。
 
-如果在初次渲染时没有遇到异步依赖，`<Suspense>` 会直接进入完成状态。
+若首次渲染没有异步依赖，会直接进入完成状态。
 
-进入完成状态后，只有当默认插槽的根节点被替换时，`<Suspense>` 才会回到挂起状态。组件树中新的更深层次的异步依赖**不会**造成 `<Suspense>` 回退到挂起状态。
+进入完成后，只有 `#default` 的根节点被换掉时才会再次挂起。子树里新增的更深层异步**不会**让 `<Suspense>` 重新挂起。
 
-发生回退时，后备内容不会立即展示出来。相反，`<Suspense>` 在等待新内容和异步依赖完成时，会展示之前 `#default` 插槽的内容。这个行为可以通过一个 `timeout` prop 进行配置：在等待渲染新内容耗时超过 `timeout` 毫秒之后，`<Suspense>` 将会切换为展示后备内容。若 `timeout` 值为 `0` 将导致在替换默认内容时立即显示后备内容。
+再次挂起时，不会马上切到 `#fallback`，而是先继续显示旧的 `#default` 内容。可用 `timeout` prop 控制：等待新内容超过 `timeout` 毫秒后，才切到 `#fallback`。`timeout` 为 `0` 时，一换内容就立刻显示 `#fallback`。
 
 ## 事件 {#events}
 
-`<Suspense>` 组件会触发三个事件：`pending`、`resolve` 和 `fallback`。`pending` 事件是在进入挂起状态时触发。`resolve` 事件是在 `default` 插槽完成获取新内容时触发。`fallback` 事件则是在 `fallback` 插槽的内容显示时触发。
+`<Suspense>` 会触发三个事件：`pending`、`resolve`、`fallback`。进入挂起时触发 `pending`；`#default` 拿到新内容时触发 `resolve`；显示 `#fallback` 时触发 `fallback`。
 
-例如，可以使用这些事件在加载新组件时在之前的 DOM 最上层显示一个加载指示器。
+例如，加载新组件时可以在页面上方显示加载指示器。
 
 ## 错误处理 {#error-handling}
 
-`<Suspense>` 组件自身目前还不提供错误处理，不过你可以使用 [`errorCaptured`](/api/options-lifecycle#errorcaptured) 选项或者 [`onErrorCaptured()`](/api/composition-api-lifecycle#onerrorcaptured) 钩子，在使用到 `<Suspense>` 的父组件中捕获和处理异步错误。
+`<Suspense>` 本身还不处理错误。可在父组件里用 [`errorCaptured`](/api/options-lifecycle#errorcaptured) 或 [`onErrorCaptured()`](/api/composition-api-lifecycle#onerrorcaptured) 捕获异步错误。
 
 ## 和其他组件结合 {#combining-with-other-components}
 
-我们常常会将 `<Suspense>` 和 [`<Transition>`](./transition)、[`<KeepAlive>`](./keep-alive) 等组件结合。要保证这些组件都能正常工作，嵌套的顺序非常重要。
+`<Suspense>` 常与 [`<Transition>`](./transition)、[`<KeepAlive>`](./keep-alive) 等一起用，嵌套顺序要对，才能都正常工作。
 
-另外，这些组件都通常与 [Vue Router](https://router.vuejs.org/zh/) 中的 `<RouterView>` 组件结合使用。
+它们也常和 [Vue Router](https://router.vuejs.org/zh/) 的 `<RouterView>` 搭配。
 
-下面的示例展示了如何嵌套这些组件，使它们都能按照预期的方式运行。若想组合得更简单，你也可以删除一些你不需要的组件：
+下面是一种常见嵌套方式；不需要的组件可以删掉：
 
 ```vue-html
 <RouterView v-slot="{ Component }">
@@ -131,13 +131,13 @@ const posts = await res.json()
 </RouterView>
 ```
 
-Vue Router 使用动态导入对[懒加载组件](https://router.vuejs.org/zh/guide/advanced/lazy-loading.html)进行了内置支持。这些与异步组件不同，目前他们不会触发 `<Suspense>`。但是，它们仍然可以有异步组件作为后代，这些组件可以照常触发 `<Suspense>`。
+Vue Router 的[懒加载路由](https://router.vuejs.org/zh/guide/advanced/lazy-loading.html)用动态 import，和异步组件不同，目前不会触发 `<Suspense>`。但路由组件下面仍可以有异步子组件，那些子组件可以触发 `<Suspense>`。
 
 ## 嵌套使用 {#nested-suspense}
 
 - 仅在 3.3+ 支持
 
-当我们有多个类似于下方的异步组件 (常见于嵌套或基于布局的路由) 时：
+有多个嵌套异步组件时（常见于布局路由），例如：
 
 ```vue-html
 <Suspense>
@@ -147,9 +147,9 @@ Vue Router 使用动态导入对[懒加载组件](https://router.vuejs.org/zh/gu
 </Suspense>
 ```
 
-`<Suspense>` 创建了一个边界，它将如预期的那样解析树下的所有异步组件。然而，当我们更改 `DynamicAsyncOuter` 时，`<Suspense>` 会正确地等待它，但当我们更改 `DynamicAsyncInner` 时，嵌套的 `DynamicAsyncInner` 会呈现为一个空节点，直到它被解析为止 (而不是之前的节点或回退插槽)。
+外层 `<Suspense>` 会等子树里所有异步。换 `DynamicAsyncOuter` 时正常等待；但只换 `DynamicAsyncInner` 时，内层会先变成空节点，直到解析完（不会保留旧内容或 `#fallback`）。
 
-为了解决这个问题，我们可以使用嵌套的方法来处理嵌套组件的补丁，就像这样：
+可以嵌套 `<Suspense>` 来解决：
 
 ```vue-html
 <Suspense>
@@ -161,7 +161,9 @@ Vue Router 使用动态导入对[懒加载组件](https://router.vuejs.org/zh/gu
 </Suspense>
 ```
 
-如果你不设置 `suspensible` 属性，内部的 `<Suspense>` 将被父级 `<Suspense>` 视为同步组件。这意味着它将会有自己的回退插槽，如果两个 `Dynamic` 组件同时被修改，则当子 `<Suspense>` 加载其自己的依赖关系树时，可能会出现空节点和多个修补周期，这可能不是理想情况。设置后，所有异步依赖项处理都会交给父级 `<Suspense>` (包括发出的事件)，而内部 `<Suspense>` 仅充当依赖项解析和修补的另一个边界。
+不设 `suspensible` 时，内层 `<Suspense>` 会被外层当成同步组件，有自己的 `#fallback`。两个 `Dynamic` 同时变时，可能出现空节点和多次更新，体验不好。
+
+设 `suspensible` 后，异步处理和事件都交给外层 `<Suspense>`，内层只多一道解析边界。
 
 ---
 

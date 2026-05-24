@@ -4,49 +4,49 @@ outline: deep
 
 # 搭配 TypeScript 使用 Vue {#using-vue-with-typescript}
 
-像 TypeScript 这样的类型系统可以在编译时通过静态分析检测出很多常见错误。这减少了生产环境中的运行时错误，也让我们在重构大型项目的时候更有信心。通过 IDE 中基于类型的自动补全，TypeScript 还改善了开发体验和效率。
+TypeScript 等类型系统能在编译时通过静态分析发现很多常见错误，减少生产环境运行时错误，重构大项目时也更有把握。IDE 里基于类型的自动补全还能提升开发效率。
 
-Vue 本身就是用 TypeScript 编写的，并对 TypeScript 提供了一等公民的支持。所有的 Vue 官方库都自带了类型声明文件，开箱即用。
+Vue 本身用 TypeScript 编写，对 TypeScript 是一等公民支持。所有 Vue 官方库都自带类型声明，开箱即用。
 
 ## 项目配置 {#project-setup}
 
-[`create-vue`](https://github.com/vuejs/create-vue)，即官方的项目脚手架工具，提供了搭建基于 [Vite](https://cn.vitejs.dev/) 且 TypeScript 就绪的 Vue 项目的选项。
+官方脚手架 [`create-vue`](https://github.com/vuejs/create-vue) 可搭建基于 [Vite](https://cn.vitejs.dev/)、开箱即用的 TypeScript Vue 项目。
 
 ### 总览 {#overview}
 
-在基于 Vite 的配置中，开发服务器和打包器将只会对 TypeScript 文件执行语法转译，而不会执行任何类型检查，这保证了 Vite 开发服务器在使用 TypeScript 时也能始终保持飞快的速度。
+在 Vite 配置里，开发服务器和打包器只对 TypeScript 做语法转译，不做类型检查，这样即使用 TypeScript，Vite 开发服务器也能保持很快。
 
-- 在开发阶段，我们推荐你依赖一个好的 [IDE 配置](#ide-support)来获取即时的类型错误反馈。
+- 开发阶段建议依赖良好的 [IDE 配置](#ide-support) 获得即时类型错误反馈。
 
-- 对于单文件组件，你可以使用工具 [`vue-tsc`](https://github.com/vuejs/language-tools/tree/master/packages/tsc) 在命令行检查类型和生成类型声明文件。`vue-tsc` 是对 TypeScript 自身命令行界面 `tsc` 的一个封装。它的工作方式基本和 `tsc` 一致。除了 TypeScript 文件，它还支持 Vue 的单文件组件。你可以在开启 Vite 开发服务器的同时以侦听模式运行 `vue-tsc`，或是使用 [vite-plugin-checker](https://vite-plugin-checker.netlify.app/) 这样在另一个 worker 线程里做静态检查的插件。
+- 单文件组件可用 [`vue-tsc`](https://github.com/vuejs/language-tools/tree/master/packages/tsc) 在命令行做类型检查和生成声明文件。`vue-tsc` 封装了 TypeScript 的 `tsc`，用法基本一致，除 TS 文件外还支持 Vue 单文件组件。可在开 Vite 开发服务器的同时以侦听模式跑 `vue-tsc`，或用 [vite-plugin-checker](https://vite-plugin-checker.netlify.app/) 等在独立 worker 里做静态检查的插件。
 
-- Vue CLI 也提供了对 TypeScript 的支持，但是已经不推荐了。详见[下方的说明](#note-on-vue-cli-and-ts-loader)。
+- Vue CLI 也支持 TypeScript，但已不推荐。详见[下方说明](#note-on-vue-cli-and-ts-loader)。
 
 ### IDE 支持 {#ide-support}
 
-- 强烈推荐 [Visual Studio Code](https://code.visualstudio.com/) (VS Code)，因为它对 TypeScript 有着很好的内置支持。
+- 强烈推荐 [Visual Studio Code](https://code.visualstudio.com/) (VS Code)，内置 TypeScript 支持好。
 
-  - [Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (之前是 Volar) 是官方的 VS Code 扩展，提供了 Vue 单文件组件中的 TypeScript 支持，还伴随着一些其他非常棒的特性。
+  - [Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar)（原 Volar）是官方 VS Code 扩展，为 Vue 单文件组件提供 TypeScript 支持及其他能力。
 
     :::tip
-    Vue - Official 扩展取代了我们之前为 Vue 2 提供的官方 VS Code 扩展 [Vetur](https://marketplace.visualstudio.com/items?itemName=octref.vetur)。如果你之前已经安装了 Vetur，请确保在 Vue 3 的项目中禁用它。
+    Vue - Official 取代了 Vue 2 的 [Vetur](https://marketplace.visualstudio.com/items?itemName=octref.vetur)。若已装 Vetur，请在 Vue 3 项目里禁用它。
     :::
 
-- [WebStorm](https://www.jetbrains.com/webstorm/) 对 TypeScript 和 Vue 也都提供了开箱即用的支持。其他的 JetBrains IDE 也同样可以通过一个[免费插件](https://plugins.jetbrains.com/plugin/9442-vue-js)支持。从 2023.2 版开始，WebStorm 和 Vue 插件内置了对 Vue 语言服务器的支持。你可以在设置 > 语言和框架 > TypeScript > Vue 下将 Vue 服务设置为在所有 TypeScript 版本上使用 Volar 集成。默认情况下，Volar 将用于 TypeScript 5.0 及更高版本。
+- [WebStorm](https://www.jetbrains.com/webstorm/) 对 TypeScript 和 Vue 开箱即用。其他 JetBrains IDE 也可通过[免费插件](https://plugins.jetbrains.com/plugin/9442-vue-js)支持。从 2023.2 起，WebStorm 和 Vue 插件内置 Vue 语言服务器；可在 设置 > 语言和框架 > TypeScript > Vue 下让所有 TypeScript 版本使用 Volar。默认 Volar 用于 TypeScript 5.0 及以上。
 
 ### 配置 `tsconfig.json` {#configuring-tsconfig-json}
 
-通过 `create-vue` 搭建的项目包含了预先配置好的 `tsconfig.json`。其底层配置抽象于 [`@vue/tsconfig`](https://github.com/vuejs/tsconfig) 包中。在项目内我们使用 [Project References](https://www.typescriptlang.org/docs/handbook/project-references.html) 来确保运行在不同环境下的代码的类型正确 (比如应用代码和测试代码应该有不同的全局变量)。
+`create-vue` 项目自带预配置的 `tsconfig.json`，底层配置来自 [`@vue/tsconfig`](https://github.com/vuejs/tsconfig)。项目内用 [Project References](https://www.typescriptlang.org/docs/handbook/project-references.html) 保证不同环境代码类型正确（例如应用代码和测试代码的全局变量不同）。
 
-手动配置 `tsconfig.json` 时，请留意以下选项：
+手动配置 `tsconfig.json` 时注意：
 
-- [`compilerOptions.isolatedModules`](https://www.typescriptlang.org/tsconfig#isolatedModules) 应当设置为 `true`，因为 Vite 使用 [esbuild](https://esbuild.github.io/) 来转译 TypeScript，并受限于单文件转译的限制。[`compilerOptions.verbatimModuleSyntax`](https://www.typescriptlang.org/tsconfig#verbatimModuleSyntax) 是 [`isolatedModules` 的一个超集](https://github.com/microsoft/TypeScript/issues/53601)且也是一个不错的选择——它正是 [`@vue/tsconfig`](https://github.com/vuejs/tsconfig) 所使用的。
+- [`compilerOptions.isolatedModules`](https://www.typescriptlang.org/tsconfig#isolatedModules) 应设为 `true`，因为 Vite 用 [esbuild](https://esbuild.github.io/) 转译 TypeScript，受单文件转译限制。[`compilerOptions.verbatimModuleSyntax`](https://www.typescriptlang.org/tsconfig#verbatimModuleSyntax) 是 `isolatedModules` 的超集，也是好选择——[`@vue/tsconfig`](https://github.com/vuejs/tsconfig) 就用它。
 
-- 如果你正在使用选项式 API，需要将 [`compilerOptions.strict`](https://www.typescriptlang.org/tsconfig#strict) 设置为 `true` (或者至少开启 [`compilerOptions.noImplicitThis`](https://www.typescriptlang.org/tsconfig#noImplicitThis)，它是 `strict` 模式的一部分)，才可以获得对组件选项中 `this` 的类型检查。否则 `this` 会被认为是 `any`。
+- 若用选项式 API，需将 [`compilerOptions.strict`](https://www.typescriptlang.org/tsconfig#strict) 设为 `true`（或至少开启 [`compilerOptions.noImplicitThis`](https://www.typescriptlang.org/tsconfig#noImplicitThis)），才能检查组件选项里 `this` 的类型；否则 `this` 会是 `any`。
 
-- 如果你在构建工具中配置了路径解析别名，例如 `@/*` 这个别名被默认配置在了 `create-vue` 项目中，你需要通过 [`compilerOptions.paths`](https://www.typescriptlang.org/tsconfig#paths) 选项为 TypeScript 再配置一遍。
+- 若在构建工具里配置了路径别名（如 `create-vue` 默认的 `@/*`），需用 [`compilerOptions.paths`](https://www.typescriptlang.org/tsconfig#paths) 为 TypeScript 再配一遍。
 
-- 如果你打算在 Vue 中使用 TSX，请将 [`compilerOptions.jsx`](https://www.typescriptlang.org/tsconfig#jsx) 设置为 `"preserve"`，并将 [`compilerOptions.jsxImportSource`](https://www.typescriptlang.org/tsconfig#jsxImportSource) 设置为 `"vue"`。
+- 若在 Vue 里用 TSX，将 [`compilerOptions.jsx`](https://www.typescriptlang.org/tsconfig#jsx) 设为 `"preserve"`，[`compilerOptions.jsxImportSource`](https://www.typescriptlang.org/tsconfig#jsxImportSource) 设为 `"vue"`。
 
 参考：
 
@@ -55,21 +55,21 @@ Vue 本身就是用 TypeScript 编写的，并对 TypeScript 提供了一等公�
 
 ### 关于 Vue CLI 和 `ts-loader` {#note-on-vue-cli-and-ts-loader}
 
-像 Vue CLI 这样的基于 webpack 搭建的项目，通常是在模块编译的过程中顺道执行类型检查，例如使用 `ts-loader`。然而这并不是一个理想的解决方案，因为类型系统需要了解整个模块关系才能执行类型检查。loader 中只适合单个模块的编译，并不适合做需要全局信息的工作。这导致了下面的问题：
+像 Vue CLI 这样基于 webpack 的项目，常在模块编译时顺带做类型检查，例如用 `ts-loader`。但这不是理想方案：类型系统需要了解整个模块关系，而 loader 只适合单模块编译，不适合要全局信息的工作。因此会有：
 
-- `ts-loader` 只能对在它之前的 loader 编译转换后的代码执行类型检查，这和我们在 IDE 或 `vue-tsc` 中看到的基于源代码的错误提示并不一致。
+- `ts-loader` 只能检查它之前 loader 转译后的代码，和 IDE 或 `vue-tsc` 基于源码的报错不一致。
 
-- 类型检查可能会很慢。当它和代码转换在相同的线程/进程中执行时，它会显著影响整个应用的构建速度。
+- 类型检查可能很慢。和代码转换在同一线程/进程里会明显拖慢构建。
 
-- 我们已经在 IDE 中通过单独的进程运行着类型检查了，却还要在构建流程中执行类型检查导致降低开发体验，这似乎不太划算。
+- IDE 里已在单独进程做类型检查，构建里再做一遍降低体验，性价比不高。
 
-如果你正通过 Vue CLI 使用 Vue 3 和 TypeScript，我们强烈建议你迁移到 Vite。我们也在为 CLI 开发仅执行 TS 语法转译的选项，以允许你切换至 `vue-tsc` 来执行类型检查。
+若用 Vue CLI 跑 Vue 3 + TypeScript，强烈建议迁到 Vite。我们也在为 CLI 开发只做 TS 语法转译的选项，以便改用 `vue-tsc` 做类型检查。
 
 ## 常见使用说明 {#general-usage-notes}
 
 ### `defineComponent()` {#definecomponent}
 
-为了让 TypeScript 正确地推导出组件选项内的类型，我们需要通过 [`defineComponent()`](/api/general#definecomponent) 这个全局 API 来定义组件：
+要让 TypeScript 正确推导组件选项里的类型，需通过全局 API [`defineComponent()`](/api/general#definecomponent) 定义组件：
 
 ```ts
 import { defineComponent } from 'vue'
@@ -93,7 +93,7 @@ export default defineComponent({
 })
 ```
 
-当没有结合 `<script setup>` 使用组合式 API 时，`defineComponent()` 也支持对传递给 `setup()` 的 prop 的推导：
+未配合 `<script setup>` 使用组合式 API 时，`defineComponent()` 也支持推导传给 `setup()` 的 prop：
 
 ```ts
 import { defineComponent } from 'vue'
@@ -115,12 +115,12 @@ export default defineComponent({
 - [对 `defineComponent` 的类型测试](https://github.com/vuejs/core/blob/main/packages-private/dts-test/defineComponent.test-d.tsx)
 
 :::tip
-`defineComponent()` 也支持对纯 JavaScript 编写的组件进行类型推导。
+`defineComponent()` 也支持对纯 JavaScript 组件做类型推导。
 :::
 
 ### 在单文件组件中的用法 {#usage-in-single-file-components}
 
-要在单文件组件中使用 TypeScript，需要在 `<script>` 标签上加上 `lang="ts"` 的 attribute。当 `lang="ts"` 存在时，所有的模板内表达式都将享受到更严格的类型检查。
+在单文件组件里用 TypeScript，给 `<script>` 加 `lang="ts"`。有 `lang="ts"` 时，模板内表达式会有更严格的类型检查。
 
 ```vue
 <script lang="ts">
@@ -141,7 +141,7 @@ export default defineComponent({
 </template>
 ```
 
-`lang="ts"` 也可以用于 `<script setup>`：
+`lang="ts"` 也可用于 `<script setup>`：
 
 ```vue
 <script setup lang="ts">
@@ -159,9 +159,9 @@ const count = ref(1)
 
 ### 模板中的 TypeScript {#typescript-in-templates}
 
-在使用了 `<script lang="ts">` 或 `<script setup lang="ts">` 后，`<template>` 在绑定表达式中也支持 TypeScript。这对需要在模板表达式中执行类型转换的情况下非常有用。
+使用 `<script lang="ts">` 或 `<script setup lang="ts">` 后，`<template>` 绑定表达式也支持 TypeScript，适合在模板里做类型转换。
 
-这里有一个假想的例子：
+假想例子：
 
 ```vue
 <script setup lang="ts">
@@ -174,7 +174,7 @@ let x: string | number = 1
 </template>
 ```
 
-可以使用内联类型强制转换解决此问题：
+可用内联类型断言：
 
 ```vue{6}
 <script setup lang="ts">
@@ -187,18 +187,18 @@ let x: string | number = 1
 ```
 
 :::tip
-如果正在使用 Vue CLI 或基于 webpack 的配置，支持模板内表达式的 TypeScript 需要 `vue-loader@^16.8.0`。
+若用 Vue CLI 或基于 webpack 的配置，模板内表达式的 TypeScript 需要 `vue-loader@^16.8.0`。
 :::
 
 ### 使用 TSX {#usage-with-tsx}
 
-Vue 也支持使用 JSX / TSX 编写组件。详情请查阅[渲染函数 & JSX](/guide/extras/render-function.html#jsx-tsx)。
+Vue 也支持用 JSX / TSX 写组件。详见[渲染函数 & JSX](/guide/extras/render-function.html#jsx-tsx)。
 
 ## 泛型组件 {#generic-components}
 
-泛型组件支持两种使用方式：
+泛型组件有两种用法：
 
-- 在单文件组件中：[在 `<script setup>` 上使用 `generic` 属性](/api/sfc-script-setup.html#generics)
+- 单文件组件：[在 `<script setup>` 上使用 `generic` 属性](/api/sfc-script-setup.html#generics)
 - 渲染函数 / JSX 组件：[`defineComponent()` 的函数签名](/api/general.html#function-signature)
 
 ## 特定 API 的使用指南 {#api-specific-recipes}

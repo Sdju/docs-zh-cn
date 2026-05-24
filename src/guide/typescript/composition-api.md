@@ -4,13 +4,13 @@
   观看 Scrimba 的互动视频课程
 </ScrimbaLink>
 
-> 这一章假设你已经阅读了[搭配 TypeScript 使用 Vue](./overview) 的概览。
+> 本章假定你已读过[搭配 TypeScript 使用 Vue](./overview) 概览。
 
 ## 为组件的 props 标注类型 {#typing-component-props}
 
 ### 使用 `<script setup>` {#using-script-setup}
 
-当使用 `<script setup>` 时，`defineProps()` 宏函数支持从它的参数中推导类型：
+用 `<script setup>` 时，`defineProps()` 可从参数推导类型：
 
 ```vue
 <script setup lang="ts">
@@ -24,9 +24,9 @@ props.bar // number | undefined
 </script>
 ```
 
-这被称之为“运行时声明”，因为传递给 `defineProps()` 的参数会作为运行时的 `props` 选项使用。
+这叫「运行时声明」：传给 `defineProps()` 的参数会当作运行时 `props` 选项。
 
-然而，通过泛型参数来定义 props 的类型通常更直接：
+更常见的是用泛型直接写 props 类型：
 
 ```vue
 <script setup lang="ts">
@@ -37,11 +37,11 @@ const props = defineProps<{
 </script>
 ```
 
-这被称之为“基于类型的声明”。编译器会尽可能地尝试根据类型参数推导出等价的运行时选项。在这种场景下，我们第二个例子中编译出的运行时选项和第一个是完全一致的。
+这叫「基于类型的声明」。编译器会尽量从类型参数推出等价的运行时选项；上面第二个例子编译出的运行时选项与第一个一致。
 
-基于类型的声明或者运行时声明可以择一使用，但是不能同时使用。
+两种声明二选一，不能混用。
 
-我们也可以将 props 的类型移入一个单独的接口中：
+也可把 props 类型抽到单独 interface：
 
 ```vue
 <script setup lang="ts">
@@ -54,7 +54,7 @@ const props = defineProps<Props>()
 </script>
 ```
 
-这同样适用于 `Props` 从另一个源文件中导入的情况。该功能要求 TypeScript 作为 Vue 的一个 peer dependency。
+`Props` 从别的文件导入也一样，需要把 TypeScript 作为 Vue 的 peer dependency。
 
 ```vue
 <script setup lang="ts">
@@ -66,13 +66,13 @@ const props = defineProps<Props>()
 
 #### 语法限制 {#syntax-limitations}
 
-在 3.2 及以下版本中，`defineProps()` 的泛型类型参数仅限于类型字面量或对本地接口的引用。
+3.2 及以下，`defineProps()` 的泛型只能是类型字面量或本地 interface。
 
-这个限制在 3.3 中得到了解决。最新版本的 Vue 支持在类型参数位置引用导入和有限的复杂类型。但是，由于类型到运行时转换仍然基于 AST，一些需要实际类型分析的复杂类型，例如条件类型，还未支持。你可以使用条件类型来指定单个 prop 的类型，但不能用于整个 props 对象的类型。
+3.3 起支持导入类型和有限复杂类型。但类型到运行时的转换仍基于 AST，条件类型等需要真实类型分析的场景还不支持——可用于单个 prop，不能用于整个 props 对象。
 
 ### Props 解构默认值 {#props-default-values}
 
-当使用基于类型的声明时，我们失去了为 props 声明默认值的能力。可以通过使用[响应式 Props 解构](/guide/components/props#reactive-props-destructure)解决这个问题。 <sup class="vt-badge" data-text="3.5+" />：
+基于类型声明时，不能直接写 prop 默认值。可用[响应式 Props 解构](/guide/components/props#reactive-props-destructure)解决。 <sup class="vt-badge" data-text="3.5+" />：
 
 ```ts
 interface Props {
@@ -83,7 +83,7 @@ interface Props {
 const { msg = 'hello', labels = ['one', 'two'] } = defineProps<Props>()
 ```
 
-在 3.4 及更低版本，响应式 Props 解构不会被默认启用。另一种选择是使用 `withDefaults` 编译器宏：
+3.4 及以下默认不开启响应式 Props 解构。也可用 `withDefaults` 宏：
 
 ```ts
 interface Props {
@@ -97,15 +97,15 @@ const props = withDefaults(defineProps<Props>(), {
 })
 ```
 
-这将被编译为等效的运行时 props `default` 选项。此外，`withDefaults` 帮助程序为默认值提供类型检查，并确保返回的 props 类型删除了已声明默认值的属性的可选标志。
+会编译成等价的运行时 `default`。`withDefaults` 还会检查默认值类型，并从返回的 props 类型里去掉已有默认值的属性的可选标记。
 
 :::info
-请注意，在使用 `withDefaults` 时，默认值的可变引用类型 (如数组或对象) 应该在函数中进行包装，以避免意外修改和外部副作用。这样可以确保每个组件实例都会获得自己默认值的副本。当使用解构时，这**不**是必要的。
+用 `withDefaults` 时，数组、对象等可变默认值应包在函数里，避免被共享或意外修改，让每个实例拿到自己的副本。用解构时**不必**这样包。
 :::
 
 ### 非 `<script setup>` 场景下 {#without-script-setup}
 
-如果没有使用 `<script setup>`，那么为了开启 props 的类型推导，必须使用 `defineComponent()`。传入 `setup()` 的 props 对象类型是从 `props` 选项中推导而来。
+不用 `<script setup>` 时，要用 `defineComponent()` 才能推导 props。传给 `setup()` 的 `props` 类型来自 `props` 选项。
 
 ```ts
 import { defineComponent } from 'vue'
@@ -122,7 +122,7 @@ export default defineComponent({
 
 ### 复杂的 prop 类型 {#complex-prop-types}
 
-通过基于类型的声明，一个 prop 可以像使用其他任何类型一样使用一个复杂类型：
+基于类型声明时，prop 可以像普通类型一样写复杂类型：
 
 ```vue
 <script setup lang="ts">
@@ -138,7 +138,7 @@ const props = defineProps<{
 </script>
 ```
 
-对于运行时声明，我们可以使用 `PropType` 工具类型：
+运行时声明可用 `PropType` 工具类型：
 
 ```ts
 import type { PropType } from 'vue'
@@ -161,11 +161,11 @@ export default defineComponent({
 })
 ```
 
-`props` 选项通常用于 Options API，因此你会在[选项式 API 与 TypeScript](/guide/typescript/options-api#typing-component-props) 指南中找到更详细的例子。这些例子中展示的技术也适用于使用 `defineProps()` 的运行时声明。
+`props` 选项多用于 Options API，更细的示例见[选项式 API 与 TypeScript](/guide/typescript/options-api#typing-component-props)，同样适用于 `defineProps()` 的运行时声明。
 
 ## 为组件的 emits 标注类型 {#typing-component-emits}
 
-在 `<script setup>` 中，`emit` 函数的类型标注也可以通过运行时声明或是类型声明进行：
+`<script setup>` 里 `emit` 可用运行时或类型声明标注：
 
 ```vue
 <script setup lang="ts">
@@ -198,14 +198,14 @@ const emit = defineEmits<{
 </script>
 ```
 
-类型参数可以是以下的一种：
+类型参数两种写法：
 
-1. 一个可调用的函数类型，但是写作一个包含[调用签名](https://www.typescriptlang.org/docs/handbook/2/functions.html#call-signatures)的类型字面量。它将被用作返回的 `emit` 函数的类型。
-2. 一个类型字面量，其中键是事件名称，值是数组或元组类型，表示事件的附加接受参数。上面的示例使用了具名元组，因此每个参数都可以有一个显式的名称。
+1. 可调用类型，写成带[调用签名](https://www.typescriptlang.org/docs/handbook/2/functions.html#call-signatures)的类型字面量，作为返回的 `emit` 类型。
+2. 对象字面量：键为事件名，值为参数数组/元组类型。上面用具名元组，每个参数可有名字。
 
-我们可以看到，基于类型的声明使我们可以对所触发事件的类型进行更细粒度的控制。
+基于类型声明能更细地约束事件参数。
 
-若没有使用 `<script setup>`，`defineComponent()` 也可以根据 `emits` 选项推导暴露在 setup 上下文中的 `emit` 函数的类型：
+不用 `<script setup>` 时，`defineComponent()` 也可从 `emits` 推导 `setup` 里 `emit` 的类型：
 
 ```ts
 import { defineComponent } from 'vue'
@@ -232,7 +232,7 @@ const year = ref(2020)
 year.value = '2020'
 ```
 
-有时我们可能想为 ref 内的值指定一个更复杂的类型，可以通过使用 `Ref` 这个类型：
+有时要给 ref 内的值指定更复杂类型，可用 `Ref`：
 
 ```ts
 import { ref } from 'vue'
@@ -243,7 +243,7 @@ const year: Ref<string | number> = ref('2020')
 year.value = 2020 // 成功！
 ```
 
-或者，在调用 `ref()` 时传入一个泛型参数，来覆盖默认的推导行为：
+或在 `ref()` 上传泛型，覆盖默认推导：
 
 ```ts
 // 得到的类型：Ref<string | number>
@@ -252,7 +252,7 @@ const year = ref<string | number>('2020')
 year.value = 2020 // 成功！
 ```
 
-如果你指定了一个泛型参数但没有给出初始值，那么最后得到的就将是一个包含 `undefined` 的联合类型：
+有泛型但没有初始值时，类型会包含 `undefined`：
 
 ```ts
 // 推导得到的类型：Ref<number | undefined>
@@ -270,7 +270,7 @@ import { reactive } from 'vue'
 const book = reactive({ title: 'Vue 3 指引' })
 ```
 
-要显式地标注一个 `reactive` 变量的类型，我们可以使用接口：
+要给 `reactive` 变量显式标类型，可用 interface：
 
 ```ts
 import { reactive } from 'vue'
@@ -313,7 +313,7 @@ const double = computed<number>(() => {
 
 ## 为事件处理函数标注类型 {#typing-event-handlers}
 
-在处理原生 DOM 事件时，应该为我们传递给事件处理函数的参数正确地标注类型。让我们看一下这个例子：
+处理原生 DOM 事件时，应给事件处理函数的参数标类型。例如：
 
 ```vue
 <script setup lang="ts">
@@ -328,7 +328,7 @@ function handleChange(event) {
 </template>
 ```
 
-没有类型标注时，这个 `event` 参数会隐式地标注为 `any` 类型。这也会在 `tsconfig.json` 中配置了 `"strict": true` 或 `"noImplicitAny": true` 时报出一个 TS 错误。因此，建议显式地为事件处理函数的参数标注类型。此外，你在访问 `event` 上的属性时可能需要使用类型断言：
+不标注时 `event` 为 `any`；`tsconfig.json` 里 `"strict": true` 或 `"noImplicitAny": true` 时会报错。建议显式标注；访问 `event` 属性时可能还要类型断言：
 
 ```ts
 function handleChange(event: Event) {
@@ -338,7 +338,7 @@ function handleChange(event: Event) {
 
 ## 为 provide / inject 标注类型 {#typing-provide-inject}
 
-provide 和 inject 通常会在不同的组件中运行。要正确地为注入的值标记类型，Vue 提供了一个 `InjectionKey` 接口，它是一个继承自 `Symbol` 的泛型类型，可以用来在提供者和消费者之间同步注入值的类型：
+provide / inject 常在不同组件间使用。要给注入值标类型，可用继承自 `Symbol` 的泛型 `InjectionKey`，在提供方和消费方之间对齐类型：
 
 ```ts
 import { provide, inject } from 'vue'
@@ -351,23 +351,23 @@ provide(key, 'foo') // 若提供的是非字符串值会导致错误
 const foo = inject(key) // foo 的类型：string | undefined
 ```
 
-建议将注入 key 的类型放在一个单独的文件中，这样它就可以被多个组件导入。
+建议把注入 key 的类型放在单独文件，供多组件导入。
 
-当使用字符串注入 key 时，注入值的类型是 `unknown`，需要通过泛型参数显式声明：
+字符串 key 时，注入值类型为 `unknown`，需用泛型显式声明：
 
 ```ts
 const foo = inject<string>('foo') // 类型：string | undefined
 ```
 
-注意注入的值仍然可以是 `undefined`，因为无法保证提供者一定会在运行时 provide 这个值。
+注入值仍可能是 `undefined`——无法保证提供方一定在运行时 provide。
 
-当提供了一个默认值后，这个 `undefined` 类型就可以被移除：
+提供默认值后可去掉 `undefined`：
 
 ```ts
 const foo = inject<string>('foo', 'bar') // 类型：string
 ```
 
-如果你确定该值将始终被提供，则还可以强制转换该值：
+确定一定会提供时，也可断言：
 
 ```ts
 const foo = inject('foo') as string
@@ -375,9 +375,9 @@ const foo = inject('foo') as string
 
 ## 为模板引用标注类型 {#typing-template-refs}
 
-在 Vue 3.5 和 @vue/language-tools 2.1 (为 IDE 语言服务和 vue-tsc 提供支持) 中，在单文件组件中由 `useTemplateRef()` 创建的 ref 类型可以基于匹配的 ref attribute 所在的元素**自动推断**为静态类型。
+Vue 3.5 与 @vue/language-tools 2.1 起，单文件组件里 `useTemplateRef()` 可根据匹配的 `ref` attribute 所在元素**自动推断**类型。
 
-在无法自动推断的情况下，仍然可以通过泛型参数将模板 ref 转换为显式类型。
+无法自动推断时，可用泛型显式标注：
 
 ```ts
 const el = useTemplateRef<HTMLInputElement>('el')
@@ -386,7 +386,7 @@ const el = useTemplateRef<HTMLInputElement>('el')
 <details>
 <summary>3.5 前的用法</summary>
 
-模板引用需要通过一个显式指定的泛型参数和一个初始值 `null` 来创建：
+需用泛型 + 初始值 `null` 创建模板 ref：
 
 ```vue
 <script setup lang="ts">
@@ -406,17 +406,17 @@ onMounted(() => {
 
 </details>
 
-可以通过类似于 [MDN](https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/input#technical_summary) 的页面来获取正确的 DOM 接口。
+DOM 接口可参考 [MDN](https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/input#technical_summary) 等文档。
 
-注意为了严格的类型安全，有必要在访问 `el.value` 时使用可选链或类型守卫。这是因为直到组件被挂载前，这个 ref 的值都是初始的 `null`，并且在由于 `v-if` 的行为将引用的元素卸载时也可以被设置为 `null`。
+严格类型安全下，访问 `el.value` 应用可选链或类型守卫：挂载前为 `null`，`v-if` 卸载元素时也可能变 `null`。
 
 ## 为组件模板引用标注类型 {#typing-component-template-refs}
 
-在 Vue 3.5 和 @vue/language-tools 2.1 (为 IDE 语言服务和 vue-tsc 提供支持) 中，在单文件组件中由 `useTemplateRef()` 创建的 ref 类型可以基于匹配的 ref attribute 所在的元素**自动推断**为静态类型。
+Vue 3.5 与 @vue/language-tools 2.1 起，单文件组件里 `useTemplateRef()` 也可按匹配的 `ref` attribute **自动推断**类型。
 
-在无法自动推断的情况下 (如非单文件组件使用或动态组件)，仍然可以通过泛型参数将模板 ref 强制转换为显式类型。
+无法自动推断时（非 SFC、动态组件等），可用泛型显式标注。
 
-为了获取导入组件的实例类型，我们需要先通过 `typeof` 获取其类型，然后使用 TypeScript 的内置 `InstanceType` 工具提取其实例类型：
+获取导入组件的实例类型：先用 `typeof` 取组件类型，再用 `InstanceType` 提取实例类型：
 
 ```vue{6,7} [App.vue]
 <script setup lang="ts">
@@ -435,7 +435,7 @@ const compRef = useTemplateRef<FooType | BarType>('comp')
 </template>
 ```
 
-如果组件的具体类型无法获得，或者你并不关心组件的具体类型，那么可以使用 `ComponentPublicInstance`。这只会包含所有组件都共享的属性，比如 `$el`。
+拿不到具体类型或不关心时，可用 `ComponentPublicInstance`，只含各组件共有属性（如 `$el`）。
 
 ```ts
 import { useTemplateRef } from 'vue'
@@ -460,7 +460,7 @@ defineExpose({
 </script>
 ```
 
-则需要使用 [`vue-component-type-helpers`](https://www.npmjs.com/package/vue-component-type-helpers) 库中的 `ComponentExposed` 来引用组件类型，因为 `InstanceType` 在这种场景下不起作用。
+需用 [`vue-component-type-helpers`](https://www.npmjs.com/package/vue-component-type-helpers) 的 `ComponentExposed`，`InstanceType` 对泛型组件无效。
 
 ```vue [App.vue]
 <script setup lang="ts">
@@ -477,11 +477,11 @@ const openModal = () => {
 </script>
 ```
 
-请注意在 `@vue/language-tools` 2.1 以上版本中，静态模板 ref 的类型可以被自动推导，上述这些仅在极端情况下需要。
+`@vue/language-tools` 2.1+ 可自动推导静态模板 ref，上面写法多在特殊场景才需要。
 
 ## 为自定义全局指令添加类型 {#typing-global-custom-directives}
 
-可以通过扩展 `ComponentCustomProperties` 来为使用 `app.directive()` 声明的全局自定义指令获取类型提示和类型检查
+扩展 `ComponentCustomProperties` 可为 `app.directive()` 注册的全局指令提供类型提示和检查：
 
 ```ts [src/directives/highlight.ts]
 import type { Directive } from 'vue'

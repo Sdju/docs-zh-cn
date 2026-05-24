@@ -2,7 +2,7 @@
 
 ## useAttrs() {#useattrs}
 
-从 [Setup 上下文](/api/composition-api-setup#setup-context)中返回 `attrs` 对象，其中包含当前组件的[透传 attributes](/guide/components/attrs#fallthrough-attributes)。这是用于 `<script setup>` 中的，因为在 `<script setup>` 中无法获取 setup 上下文对象。
+从 [Setup 上下文](/api/composition-api-setup#setup-context) 返回 `attrs` 对象，包含当前组件的[透传 attributes](/guide/components/attrs#fallthrough-attributes)。用于 `<script setup>`，因为其中无法直接拿到 setup 上下文。
 
 - **类型**
 
@@ -12,9 +12,9 @@
 
 ## useSlots() {#useslots}
 
-从 [Setup 上下文](/api/composition-api-setup#setup-context)中返回 `slots` 对象，其中包含父组件传递的插槽。这些插槽为可调用的函数，返回虚拟 DOM 节点。这是用于 `<script setup>` 中的，因为在 `<script setup>` 中无法获取 setup 上下文对象。
+从 [Setup 上下文](/api/composition-api-setup#setup-context) 返回 `slots` 对象，包含父组件传入的插槽。插槽是可调用函数，返回虚拟 DOM 节点。用于 `<script setup>`，因为其中无法直接拿到 setup 上下文。
 
-如果使用 TypeScript，建议优先使用 [`defineSlots()`](/api/sfc-script-setup#defineslots)。
+TypeScript 中建议优先用 [`defineSlots()`](/api/sfc-script-setup#defineslots)。
 
 - **类型**
 
@@ -24,7 +24,7 @@
 
 ## useModel() {#usemodel}
 
-这是驱动 [`defineModel()`](/api/sfc-script-setup#definemodel) 的底层辅助函数。如果使用 `<script setup>`，应当优先使用 `defineModel()`。
+[`defineModel()`](/api/sfc-script-setup#definemodel) 的底层辅助函数。用 `<script setup>` 时优先用 `defineModel()`。
 
 - 仅在 3.4+ 版本中可用
 
@@ -63,11 +63,11 @@
 
 - **详细信息**
 
-  `useModel()` 可以用于非单文件组件，例如在使用原始的 `setup()` 函数时。它预期的第一个参数是 `props` 对象，第二个参数是 model 名称。可选的第三个参数可以用于为生成的 model ref 声明自定义的 getter 和 setter。请注意，与 `defineModel()` 不同，你需要自己声明 props 和 emits。
+  `useModel()` 可用于非单文件组件，例如原始 `setup()`。第一个参数是 `props`，第二个是 model 名称。第三个参数可选，用于声明 model ref 的自定义 getter/setter。与 `defineModel()` 不同，props 和 emits 需自己声明。
 
 ## useTemplateRef() <sup class="vt-badge" data-text="3.5+" /> {#usetemplateref}
 
-返回一个浅层 ref，其值将与模板中的具有匹配 ref attribute 的元素或组件同步。
+返回浅层 ref，值与模板中匹配 ref attribute 的元素或组件同步。
 
 - **类型**
 
@@ -100,7 +100,7 @@
 
 ## useId() <sup class="vt-badge" data-text="3.5+" /> {#useid}
 
-用于为无障碍属性或表单元素生成每个应用内唯一的 ID。
+为无障碍属性或表单元素生成应用内唯一 ID。
 
 - **类型**
 
@@ -127,12 +127,12 @@
 
 - **详细信息**
 
-  `useId()` 生成的每个 ID 在每个应用内都是唯一的。它可以用于为表单元素和无障碍属性生成 ID。在同一个组件中多次调用会生成不同的 ID；同一个组件的多个实例调用 `useId()` 也会生成不同的 ID。
+  `useId()` 生成的 ID 在应用内唯一，可用于表单元素和无障碍属性。同一组件多次调用会生成不同 ID；同一组件的不同实例也会生成不同 ID。
 
-  `useId()` 生成的 ID 在服务器端和客户端渲染之间是稳定的，因此可以安全地在 SSR 应用中使用，不会导致激活不匹配。
+  `useId()` 在 SSR 前后稳定，可安全用于 SSR，不会导致激活不匹配。
 
-  如果同一页面上有多个 Vue 应用实例，可以通过 [`app.config.idPrefix`](/api/application#app-config-idprefix) 为每个应用提供一个 ID 前缀，以避免 ID 冲突。
+  同一页面有多个 Vue 应用时，可通过 [`app.config.idPrefix`](/api/application#app-config-idprefix) 设置 ID 前缀，避免冲突。
 
-  :::warning Caution
-  `useId()` 不应在 `computed()` 属性内部调用，因为这可能导致实例冲突。相反，应在 `computed()` 外部声明 ID，并在计算函数内部引用它。
+  :::warning 注意
+  不要在 `computed()` 内部调用 `useId()`，可能导致实例冲突。应在 `computed()` 外部声明 ID，在计算函数内引用。
   :::

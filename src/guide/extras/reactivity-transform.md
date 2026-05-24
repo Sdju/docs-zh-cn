@@ -1,20 +1,20 @@
 # 响应性语法糖 {#reactivity-transform}
 
 :::danger 已移除的实验性功能
-响应性语法糖曾经是一个实验性功能，且已在最新的 3.4 版本中被移除，请阅读[废弃原因](https://github.com/vuejs/rfcs/discussions/369#discussioncomment-5059028)。
+响应性语法糖曾是实验功能，已在 Vue 3.4 移除。原因见[讨论](https://github.com/vuejs/rfcs/discussions/369#discussioncomment-5059028)。
 
-如果仍然打算使用它，你现在可以使用 [Vue Macros](https://vue-macros.sxzz.moe/features/reactivity-transform.html) 插件。
+若仍要使用，可改用 [Vue Macros](https://vue-macros.sxzz.moe/features/reactivity-transform.html) 插件。
 :::
 
 :::tip 组合式 API 特有
-响应性语法糖是组合式 API 特有的功能，且必须通过构建步骤使用。
+响应性语法糖只适用于组合式 API，且需要构建步骤。
 :::
 
 ## ref vs. 响应式变量 {#refs-vs-reactive-variables}
 
-自从引入组合式 API 的概念以来，一个主要的未解决的问题就是 ref 和响应式对象到底用哪个。响应式对象存在解构丢失响应性的问题，而 ref 需要到处使用 `.value` 则感觉很繁琐，并且在没有类型系统的帮助时很容易漏掉 `.value`。
+组合式 API 里常纠结：用 `ref` 还是 `reactive`？`reactive` 解构会丢响应性；`ref` 要到处写 `.value`，没类型提示时还容易漏。
 
-[Vue 的响应性语法糖](https://github.com/vuejs/core/tree/main/packages/reactivity-transform)是一个编译时的转换步骤，让我们可以像这样书写代码：
+[响应性语法糖](https://github.com/vuejs/core/tree/main/packages/reactivity-transform) 是编译时转换，可以这样写：
 
 ```vue
 <script setup>
@@ -32,9 +32,9 @@ function increment() {
 </template>
 ```
 
-这里的这个 `$ref()` 方法是一个**编译时的宏命令**：它不是一个真实的、在运行时会调用的方法。而是用作 Vue 编译器的标记，表明最终的 `count` 变量需要是一个**响应式变量**。
+`$ref()` 是**编译期宏**，运行时不会调用。它告诉编译器：`count` 应是**响应式变量**。
 
-响应式的变量可以像普通变量那样被访问和重新赋值，但这些操作在编译后都会变为带 `.value` 的 ref。比如上面例子中 `<script>` 部分的代码就被编译成了下面这样：
+写法像普通变量，编译后会变成带 `.value` 的 ref。上面 `<script>` 会编译成：
 
 ```js{5,8}
 import { ref } from 'vue'
@@ -48,7 +48,7 @@ function increment() {
 }
 ```
 
-每一个会返回 ref 的响应式 API 都有一个相对应的、以 `$` 为前缀的宏函数。包括以下这些 API：
+每个返回 ref 的响应式 API 都有对应的 `$` 前缀宏：
 
 - [`ref`](/api/reactivity-core#ref) -> `$ref`
 - [`computed`](/api/reactivity-core#computed) -> `$computed`
@@ -56,7 +56,7 @@ function increment() {
 - [`customRef`](/api/reactivity-advanced#customref) -> `$customRef`
 - [`toRef`](/api/reactivity-utilities#toref) -> `$toRef`
 
-当启用响应性语法糖时，这些宏函数都是全局可用的、无需手动导入。但如果你想让它更明显，你也可以选择从 `vue/macros` 中引入它们：
+启用后这些宏全局可用，不必手动导入。也可从 `vue/macros` 显式引入：
 
 ```js
 import { $ref } from 'vue/macros'
@@ -66,7 +66,7 @@ let count = $ref(0)
 
 ## 通过 `$()` 解构 {#destructuring-with}
 
-我们常常会让一个组合函数返回一个含数个 ref 的对象，然后解构得到这些 ref。对于这种场景，响应性语法糖提供了一个 **`$()`** 宏：
+组合函数常返回多个 ref 的对象，解构后要用 **`$()`** 宏保持响应性：
 
 ```js
 import { useMouse } from '@vueuse/core'
@@ -76,7 +76,7 @@ const { x, y } = $(useMouse())
 console.log(x, y)
 ```
 
-编译输出为：
+编译为：
 
 ```js
 import { toRef } from 'vue'
@@ -89,13 +89,13 @@ const __temp = useMouse(),
 console.log(x.value, y.value)
 ```
 
-请注意如果 `x` 已经是一个 ref，`toRef(__temp, 'x')` 则会简单地返回它本身，而不会再创建新的 ref。如果一个被解构的值不是 ref (例如是一个函数)，也仍然可以使用，这个值会被包装进一个 ref，因此其他代码都会正常工作。
+若 `x` 已是 ref，`toRef(__temp, 'x')` 会直接返回它。解构出的非 ref 值（如函数）也会被包成 ref，其它代码照常工作。
 
-对 `$()` 的解构在响应式对象**和**包含数个 ref 的对象都可用。
+`$()` 解构对响应式对象和「多个 ref 的对象」都适用。
 
 ## 用 `$()` 将现存的 ref 转换为响应式对象 {#convert-existing-refs-to-reactive-variables-with}
 
-在某些场景中我们可能已经有了会返回 ref 的函数。然而，Vue 编译器并不能够提前知道该函数会返回一个 ref。那么此时可以使用 `$()` 宏来将现存的 ref 转换为响应式变量。
+已有返回 ref 的函数时，编译器无法提前知道。可用 `$()` 把现有 ref 转成响应式变量写法：
 
 ```js
 function myCreateRef() {
@@ -107,13 +107,13 @@ let count = $(myCreateRef())
 
 ## 响应式 props 解构 {#reactive-props-destructure}
 
-现在的 `<script setup>` 中对 `defineProps` 宏的使用有两个痛点：
+`<script setup>` 里 `defineProps` 有两个常见痛点：
 
-1. 和 `.value` 类似，为了保持响应性，你始终需要以 `props.x` 的方式访问这些 prop。这意味着你不能够解构 `defineProps` 的返回值，因为得到的变量将不是响应式的、也不会更新。
+1. 为保持响应性，通常要写 `props.x`，不能直接解构——解构得到的变量不是响应式的。
 
-2. 当使用[基于类型的 props 的声明](https://v3.vuejs.org/api/sfc-script-setup#type-only-props-emit-declarations)时，无法很方便地声明这些 prop 的默认值。为此我们提供了 `withDefaults()` 这个 API，但使用起来仍然很笨拙。
+2. [基于类型的 props](https://v3.vuejs.org/api/sfc-script-setup#type-only-props-emit-declarations) 声明默认值不方便，要用 `withDefaults()`，仍偏繁琐。
 
-当 `defineProps` 与解构一起使用时，我们可以通过应用编译时转换来解决这些问题，类似于我们之前看到的 `$()`：
+配合解构时，编译器可做转换（类似 `$()`）：
 
 ```html
 <script setup lang="ts">
@@ -139,7 +139,7 @@ let count = $(myCreateRef())
 </script>
 ```
 
-上面的代码将被编译成下面这样的运行时声明：
+上面会编译成类似下面的运行时声明：
 
 ```js
 export default {
@@ -158,11 +158,11 @@ export default {
 
 ## 保持在函数间传递时的响应性 {#retaining-reactivity-across-function-boundaries}
 
-虽然响应式变量使我们可以不再受 `.value` 的困扰，但它也使得我们在函数间传递响应式变量时可能造成“响应性丢失”的问题。这可能在以下两种场景中出现：
+响应式变量省掉了 `.value`，但在函数间传递时可能「丢响应性」。常见两种场景：
 
 ### 以参数形式传入函数 {#passing-into-function-as-argument}
 
-假设有一个期望接收一个 ref 对象为参数的函数：
+假设函数要接收 ref：
 
 ```ts
 function trackChange(x: Ref<number>) {
@@ -175,14 +175,14 @@ let count = $ref(0)
 trackChange(count) // 无效！
 ```
 
-上面的例子不会正常工作，因为代码被编译成了这样：
+因为会编译成：
 
 ```ts
 let count = ref(0)
 trackChange(count.value)
 ```
 
-这里的 `count.value` 是以一个 number 类型值的形式传入，然而 `trackChange` 期望接收的是一个真正的 ref。要解决这个问题，可以在将 `count` 作为参数传入之前，用 `$$()` 包装：
+`count.value` 是 number，不是 ref。传入前用 `$$()` 包装：
 
 ```diff
 let count = $ref(0)
@@ -190,7 +190,7 @@ let count = $ref(0)
 + trackChange($$(count))
 ```
 
-上面的代码将被编译成：
+编译为：
 
 ```js
 import { ref } from 'vue'
@@ -199,11 +199,11 @@ let count = ref(0)
 trackChange(count)
 ```
 
-我们可以看到，`$$()` 的效果就像是一个**转义标识**：`$$()` 中的响应式变量不会追加上 `.value`。
+`$$()` 像**转义**：其中的响应式变量不会自动加 `.value`。
 
 ### 作为函数返回值 {#returning-inside-function-scope}
 
-如果将响应式变量直接放在返回值表达式中会丢失掉响应性：
+在 return 表达式里直接用响应式变量会丢响应性：
 
 ```ts
 function useMouse() {
@@ -220,7 +220,7 @@ function useMouse() {
 }
 ```
 
-上面的语句将被翻译为：
+会编译为：
 
 ```ts
 return {
@@ -229,9 +229,7 @@ return {
 }
 ```
 
-为了保持响应性，我们需要返回的是真正的 ref，而不是返回时 ref 内的值。
-
-我们还是可以使用 `$$()` 来解决这个问题。在这个例子中，`$$()` 可以直接用在要返回的对象上，`$$()` 调用时任何对响应式变量的引用都会保留为对相应 ref 的引用：
+要返回真正的 ref，而不是当时的值。可对返回对象用 `$$()`：
 
 ```ts
 function useMouse() {
@@ -250,7 +248,7 @@ function useMouse() {
 
 ### 在已解构的 props 上使用 `$$()` {#using-on-destructured-props}
 
-`$$()` 也适用于已解构的 props，因为它们也是响应式的变量。编译器会高效地通过 `toRef` 来做转换：
+`$$()` 也适用于已解构的 props。编译器会用 `toRef` 转换：
 
 ```ts
 const { count } = defineProps<{ count: number }>()
@@ -258,7 +256,7 @@ const { count } = defineProps<{ count: number }>()
 passAsRef($$(count))
 ```
 
-编译结果为：
+编译为：
 
 ```js
 setup(props) {
@@ -269,29 +267,29 @@ setup(props) {
 
 ## TypeScript 集成 <sup class="vt-badge ts" /> {#typescript-integration}
 
-Vue 为这些宏函数都提供了类型声明 (全局可用)，因此类型推导都会符合预期。它与标准的 TypeScript 语义没有不兼容之处，因此它的语法可以与所有现有的工具兼容。
+Vue 为这些宏提供了类型声明（全局可用），推导符合预期，与标准 TypeScript 语义兼容，现有工具都能用。
 
-这也意味着这些宏函数在任何 JS / TS 文件中都是合法的，不是仅能在 Vue 单文件组件中使用。
+宏在任意 JS/TS 文件里合法，不限于单文件组件。
 
-因为这些宏函数都是全局可用的，它们的类型需要被显式地引用 (例如，在 `env.d.ts` 文件中)：
+因宏全局可用，需在类型里显式引用（例如在 `env.d.ts`）：
 
 ```ts
 /// <reference types="vue/macros-global" />
 ```
 
-若你是从 `vue/macros` 中显式引入宏函数时，则不需要像这样全局声明。
+若从 `vue/macros` 显式引入宏，则不必全局声明。
 
 ## 显式启用 {#explicit-opt-in}
 
 :::danger Core 不再支持
-以下内容仅适用于 Vue 3.3 及以下版本。Vue core 3.4 及以上版本和 `@vitejs/plugin-vue` 5.0 及以上版本已经将其移除。如需继续使用，请迁移至 [Vue Macros](https://vue-macros.sxzz.moe/features/reactivity-transform.html)。
+以下内容仅适用于 Vue 3.3 及以下。Vue core 3.4+ 和 `@vitejs/plugin-vue` 5.0+ 已移除，请迁到 [Vue Macros](https://vue-macros.sxzz.moe/features/reactivity-transform.html)。
 :::
 
 ### Vite {#vite}
 
 - 需要 `@vitejs/plugin-vue@>=2.0.0`
-- 应用于单文件组件和 js(x)/ts(x) 文件。在执行转换之前，会对文件进行快速的使用检查，因此不使用宏的文件不会有性能损失。
-- 注意 `reactivityTransform` 现在是一个插件的顶层选项，而不再是位于 `script.refSugar` 之中了，因为它不仅仅只对单文件组件起效。
+- 作用于单文件组件和 js(x)/ts(x) 文件。会先快速检查是否用到宏，未用的文件无额外开销。
+- `reactivityTransform` 现为插件顶层选项（不再在 `script.refSugar` 下），因为对非 SFC 也生效。
 
 ```js [vite.config.js]
 export default {
@@ -305,7 +303,7 @@ export default {
 
 ### `vue-cli` {#vue-cli}
 
-- 目前仅对单文件组件起效
+- 目前仅单文件组件
 - 需要 `vue-loader@>=17.0.0`
 
 ```js [vue.config.js]
@@ -326,7 +324,7 @@ module.exports = {
 
 ### 仅用 `webpack` + `vue-loader` {#plain-webpack-vue-loader}
 
-- 目前仅对单文件组件起效
+- 目前仅单文件组件
 - 需要 `vue-loader@>=17.0.0`
 
 ```js [webpack.config.js]

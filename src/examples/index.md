@@ -1,6 +1,6 @@
 ---
 page: true
-title: Examples
+title: 示例
 aside: false
 footer: false
 outline: false

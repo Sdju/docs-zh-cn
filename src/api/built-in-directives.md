@@ -8,7 +8,7 @@
 
 - **详细信息**
 
-  `v-text` 通过设置元素的 [textContent](https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent) 属性来工作，因此它将覆盖元素中所有现有的内容。如果你需要更新 `textContent` 的部分，应该使用 [mustache interpolations](/guide/essentials/template-syntax#text-interpolation) 代替。
+  `v-text` 通过设置元素的 [textContent](https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent) 工作，会覆盖元素里所有现有内容。如果只改部分内容，用 [mustache interpolations](/guide/essentials/template-syntax#text-interpolation)。
 
 - **示例**
 
@@ -28,13 +28,13 @@
 
 - **详细信息**
 
- `v-html` 的内容直接作为普通 HTML 插入—— Vue 模板语法是不会被解析的。如果你发现自己正打算用 `v-html` 来编写模板，不如重新想想怎么使用组件来代替。
+  `v-html` 的内容会作为普通 HTML 插入，Vue 模板语法不会解析。如果想用 `v-html` 写模板，不如改用组件。
 
- ::: warning 安全说明
- 在你的站点上动态渲染任意的 HTML 是非常危险的，因为它很容易导致 [XSS 攻击](https://en.wikipedia.org/wiki/Cross-site_scripting)。请只对可信内容使用 HTML 插值，**绝不要**将用户提供的内容作为插值
+  ::: warning 安全说明
+  动态渲染任意 HTML 很危险，容易导致 [XSS 攻击](https://en.wikipedia.org/wiki/Cross-site_scripting)。只对可信内容使用 HTML 插值，**绝不要**用用户提供的内容作为插值。
   :::
 
- 在[单文件组件](/guide/scaling-up/sfc)，`scoped` 样式将不会作用于 `v-html` 里的内容，因为 HTML 内容不会被 Vue 的模板编译器解析。如果你想让 `v-html` 的内容也支持 scoped CSS，你可以使用 [CSS modules](./sfc-css-features#css-modules) 或使用一个额外的全局 `<style>` 元素，手动设置类似 BEM 的作用域策略。
+  在[单文件组件](/guide/scaling-up/sfc)中，`scoped` 样式不会作用于 `v-html` 内容，因为 HTML 不会被模板编译器解析。要让 `v-html` 内容也支持 scoped CSS，可用 [CSS modules](./sfc-css-features#css-modules)，或额外加全局 `<style>`，手动做类似 BEM 的作用域。
 
 - **示例**
 
@@ -46,45 +46,44 @@
 
 ## v-show {#v-show}
 
-基于表达式值的真假性，来改变元素的可见性。
+根据表达式真假控制元素是否可见。
 
 - **期望的绑定值类型：**`any`
 
 - **详细信息**
 
-  `v-show` 通过设置内联样式的 `display` CSS 属性来工作，当元素可见时将使用初始 `display` 值。当条件改变时，也会触发过渡效果。
+  `v-show` 通过内联样式的 `display` 控制可见性；显示时恢复初始 `display`。条件变化时会触发过渡。
 
 - **参考**[条件渲染 - v-show](/guide/essentials/conditional#v-show)
 
 ## v-if {#v-if}
 
-基于表达式值的真假性，来条件性地渲染元素或者模板片段。
+根据表达式真假条件渲染元素或模板片段。
 
 - **期望的绑定值类型：**`any`
 
 - **详细信息**
 
-  当 `v-if` 元素被触发，元素及其所包含的指令/组件都会销毁和重构。如果初始条件是假，那么其内部的内容根本都不会被渲染。
+  条件变化时，元素及其指令/组件会销毁并重建。初始为假时，内部内容不会渲染。
 
-  可用于 `<template>` 表示仅包含文本或多个元素的条件块。
+  可用于 `<template>` 包裹纯文本或多元素的条件块。
 
-  当条件改变时会触发过渡效果。
+  条件变化时会触发过渡。
 
-  当同时使用时，`v-if` 比 `v-for` 优先级更高。我们并不推荐在一元素上同时使用这两个指令 — 查看[列表渲染指南](/guide/essentials/list#v-for-with-v-if)详情。
+  同时使用时，`v-if` 优先级高于 `v-for`。不推荐在同一元素上同时用这两个指令，详见[列表渲染指南](/guide/essentials/list#v-for-with-v-if)。
 
 - **参考**[条件渲染 - v-if](/guide/essentials/conditional#v-if)
 
 ## v-else {#v-else}
 
-表示 `v-if` 或 `v-if` / `v-else-if` 链式调用的“else 块”。
+表示 `v-if` 或 `v-if` / `v-else-if` 链的 else 块。
 
 - **无需传入表达式**
 
 - **详细信息**
 
-  - 限定：上一个兄弟元素必须有 `v-if` 或 `v-else-if`。
-
-  - 可用于 `<template>` 表示仅包含文本或多个元素的条件块。
+  - 要求：上一个兄弟元素必须有 `v-if` 或 `v-else-if`。
+  - 可用于 `<template>` 包裹纯文本或多元素的条件块。
 
 - **示例**
 
@@ -101,15 +100,14 @@
 
 ## v-else-if {#v-else-if}
 
-表示 `v-if` 的“else if 块”。可以进行链式调用。
+表示 `v-if` 的 else if 块，可链式调用。
 
 - **期望的绑定值类型：**`any`
 
 - **详细信息**
 
-  - 限定：上一个兄弟元素必须有 `v-if` 或 `v-else-if`。
-
-  - 可用于 `<template>` 表示仅包含文本或多个元素的条件块。
+  - 要求：上一个兄弟元素必须有 `v-if` 或 `v-else-if`。
+  - 可用于 `<template>` 包裹纯文本或多元素的条件块。
 
 - **示例**
 
@@ -132,13 +130,13 @@
 
 ## v-for {#v-for}
 
-基于原始数据多次渲染元素或模板块。
+根据数据多次渲染元素或模板块。
 
 - **期望的绑定值类型：**`Array | Object | number | string | Iterable`
 
 - **详细信息**
 
-  指令值必须使用特殊语法 `alias in expression` 为正在迭代的元素提供一个别名：
+  指令值要用 `alias in expression` 语法给迭代项起别名：
 
   ```vue-html
   <div v-for="item in items">
@@ -146,7 +144,7 @@
   </div>
   ```
 
-  或者，你也可以为索引指定别名 (如果用在对象，则是键值)：
+  也可以为索引指定别名（对象迭代时是键名）：
 
   ```vue-html
   <div v-for="(item, index) in items"></div>
@@ -154,7 +152,7 @@
   <div v-for="(value, name, index) in object"></div>
   ```
 
-  `v-for` 的默认方式是尝试就地更新元素而不移动它们。要强制其重新排序元素，你需要用特殊 attribute `key` 来提供一个排序提示：
+  `v-for` 默认就地更新元素，不移动它们。要强制重排，用 `key` attribute 提供排序提示：
 
   ```vue-html
   <div v-for="item in items" :key="item.id">
@@ -162,7 +160,7 @@
   </div>
   ```
 
-  `v-for` 也可以用于 [Iterable Protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#The_iterable_protocol) 的实现，包括原生 `Map` 和 `Set`。
+  `v-for` 也支持 [Iterable Protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#The_iterable_protocol)，包括原生 `Map` 和 `Set`。
 
 - **参考**
   - [列表渲染](/guide/essentials/list)
@@ -192,13 +190,13 @@
 
 - **详细信息**
 
-  事件类型由参数来指定。表达式可以是一个方法名，一个内联声明，如果有修饰符则可省略。
+  事件类型由参数指定。表达式可以是方法名、内联语句；有修饰符时可省略表达式。
 
-  当用于普通元素，只监听[**原生 DOM 事件**](https://developer.mozilla.org/en-US/docs/Web/Events)。当用于自定义元素组件，则监听子组件触发的**自定义事件**。
+  用于普通元素时，只监听[**原生 DOM 事件**](https://developer.mozilla.org/en-US/docs/Web/Events)。用于自定义组件时，监听子组件触发的**自定义事件**。
 
-  当监听原生 DOM 事件时，方法接收原生事件作为唯一参数。如果使用内联声明，声明可以访问一个特殊的 `$event` 变量：`v-on:click="handle('ok', $event)"`。
+  监听原生 DOM 事件时，方法接收原生事件作为唯一参数。内联语句可用特殊变量 `$event`：`v-on:click="handle('ok', $event)"`。
 
-  `v-on` 还支持绑定不带参数的事件/监听器对的对象。请注意，当使用对象语法时，不支持任何修饰符。
+  `v-on` 也支持绑定事件/监听器对象（不带参数）。对象语法不支持修饰符。
 
 - **示例**
 
@@ -240,7 +238,7 @@
   <button v-on="{ mousedown: doThis, mouseup: doThat }"></button>
   ```
 
-  监听子组件的自定义事件 (当子组件的“my-event”事件被触发，处理函数将被调用)：
+  监听子组件自定义事件（子组件触发 `my-event` 时调用处理函数）：
 
   ```vue-html
   <MyComponent @my-event="handleThis" />
@@ -255,7 +253,7 @@
 
 ## v-bind {#v-bind}
 
-动态的绑定一个或多个 attribute，也可以是组件的 prop。
+动态绑定一个或多个 attribute，或组件 prop。
 
 - **缩写：**
   - `:` 或者 `.` (当使用 `.prop` 修饰符)
@@ -273,13 +271,13 @@
 
 - **用途**
 
-  当用于绑定 `class` 或 `style` attribute，`v-bind` 支持额外的值类型如数组或对象。详见下方的指南链接。
+  绑定 `class` 或 `style` 时，`v-bind` 支持数组或对象等额外类型。详见下方指南链接。
 
-  在处理绑定时，Vue 默认会利用 `in` 操作符来检查该元素上是否定义了和绑定的 key 同名的 DOM property。如果存在同名的 property，则 Vue 会将它作为 DOM property 赋值，而不是作为 attribute 设置。这个行为在大多数情况都符合期望的绑定值类型，但是你也可以显式用 `.prop` 和 `.attr` 修饰符来强制绑定方式。有时这是必要的，特别是在和[自定义元素](/guide/extras/web-components#passing-dom-properties)打交道时。
+  绑定时，Vue 默认用 `in` 检查元素是否有同名 DOM property。有同名 property 时，会赋给 property 而不是 attribute。多数情况符合预期，也可用 `.prop` 和 `.attr` 强制绑定方式，和[自定义元素](/guide/extras/web-components#passing-dom-properties)配合时有时需要。
 
-  当用于组件 props 绑定时，所绑定的 props 必须在子组件中已被正确声明。
+  绑定组件 props 时，props 必须在子组件中已声明。
 
-  当不带参数使用时，可以用于绑定一个包含了多个 attribute 名称-绑定值对的对象。
+  不带参数时，可绑定包含多个 attribute 名-值对的对象。
 
 - **示例**
 
@@ -333,13 +331,13 @@
   <div .someProperty="someObject"></div>
   ```
 
-  当在 DOM 内模板使用 `.camel` 修饰符，可以驼峰化 `v-bind` attribute 的名称，例如 SVG `viewBox` attribute：
+  在 DOM 内模板中用 `.camel`，可把 `v-bind` attribute 名转为驼峰，例如 SVG 的 `viewBox`：
 
   ```vue-html
   <svg :view-box.camel="viewBox"></svg>
   ```
 
-  如果使用字符串模板或使用构建步骤预编译模板，则不需要 `.camel`。
+  如果用字符串模板或构建工具预编译模板，不需要 `.camel`。
 
 - **参考**
   - [Class 与 Style 绑定](/guide/essentials/class-and-style)
@@ -371,11 +369,11 @@
 
 ## v-slot {#v-slot}
 
-用于声明具名插槽或是期望接收 props 的作用域插槽。
+声明具名插槽，或接收 props 的作用域插槽。
 
 - **缩写：**`#`
 
-- **期望的绑定值类型**：能够合法在函数参数位置使用的 JavaScript 表达式。支持解构语法。绑定值是可选的——只有在给作用域插槽传递 props 才需要。
+- **期望的绑定值类型**：合法用于函数参数的 JavaScript 表达式，支持解构。绑定值可选——只有给作用域插槽传 props 时才需要。
 
 - **参数**：插槽名 (可选，默认是 `default`)
 
@@ -428,7 +426,7 @@
 
 - **详细信息**
 
-  元素内具有 `v-pre`，所有 Vue 模板语法都会被保留并按原样渲染。最常见的用例就是显示原始双大括号标签及内容。
+  有 `v-pre` 的元素内，Vue 模板语法会原样保留、不编译。常见用途是显示原始双大括号标签和内容。
 
 - **示例**
 
@@ -444,7 +442,7 @@
 
 - **详细信息**
 
-  在随后的重新渲染，元素/组件及其所有子项将被当作静态内容并跳过渲染。这可以用来优化更新时的性能。
+  后续重新渲染时，元素/组件及其子项当作静态内容，跳过渲染。可用于优化更新性能。
 
   ```vue-html
   <!-- 单个元素 -->
@@ -462,7 +460,7 @@
   </ul>
   ```
 
-  从 3.2 起，你也可以搭配 [`v-memo`](#v-memo) 的无效条件来缓存部分模板。
+  从 3.2 起，也可配合 [`v-memo`](#v-memo) 的无效条件缓存部分模板。
 
 - **参考**
   - [数据绑定语法 - 插值](/guide/essentials/template-syntax#text-interpolation)
@@ -476,7 +474,7 @@
 
 - **详细信息**
 
-  缓存一个模板的子树。在元素和组件上都可以使用。为了实现缓存，该指令需要传入一个固定长度的依赖值数组进行比较。如果数组里的每个值都与最后一次的渲染相同，那么整个子树的更新将被跳过。举例来说：
+  缓存模板子树，可用于元素和组件。需传入固定长度的依赖数组；若每个值都和上次渲染相同，整个子树更新会被跳过。例如：
 
   ```vue-html
   <div v-memo="[valueA, valueB]">
@@ -484,13 +482,13 @@
   </div>
   ```
 
-  当组件重新渲染，如果 `valueA` 和 `valueB` 都保持不变，这个 `<div>` 及其子项的所有更新都将被跳过。实际上，甚至虚拟 DOM 的 vnode 创建也将被跳过，因为缓存的子树副本可以被重新使用。
+  重新渲染时，若 `valueA` 和 `valueB` 都不变，这个 `<div>` 及其子项的所有更新都会跳过。虚拟 DOM 的 vnode 创建也会跳过，因为可复用缓存的子树。
 
-  正确指定缓存数组很重要，否则应该生效的更新可能被跳过。`v-memo` 传入空依赖数组 (`v-memo="[]"`) 将与 `v-once` 效果相同。
+  依赖数组要指定正确，否则该更新的可能被跳过。空依赖数组 (`v-memo="[]"`) 效果和 `v-once` 相同。
 
   **与 `v-for` 一起使用**
 
-  `v-memo` 仅用于性能至上场景中的微小优化，应该很少需要。最常见的情况可能是有助于渲染海量 `v-for` 列表 (长度超过 1000 的情况)：
+  `v-memo` 只用于性能优化，一般很少需要。常见场景是渲染超长 `v-for` 列表（超过 1000 项）：
 
   ```vue-html
   <div v-for="item in list" :key="item.id" v-memo="[item.id === selected]">
@@ -499,13 +497,13 @@
   </div>
   ```
 
-  当组件的 `selected` 状态改变，默认会重新创建大量的 vnode，尽管绝大部分都跟之前是一模一样的。`v-memo` 用在这里本质上是在说“只有当该项的被选中状态改变时才需要更新”。这使得每个选中状态没有变的项能完全重用之前的 vnode 并跳过差异比较。注意这里 memo 依赖数组中并不需要包含 `item.id`，因为 Vue 也会根据 item 的 `:key` 进行判断。
+  `selected` 变化时，默认会重建大量 vnode，尽管多数和之前一样。`v-memo` 在这里表示「只有该项选中状态变时才更新」。选中状态未变的项可复用 vnode、跳过 diff。memo 依赖数组不必包含 `item.id`，Vue 也会根据 `:key` 判断。
 
   :::warning 警告
-  当搭配 `v-for` 使用 `v-memo`，确保两者都绑定在同一个元素上。**`v-memo` 不能用在 `v-for` 内部。**
+  搭配 `v-for` 使用 `v-memo` 时，两者须绑定在同一元素上。**`v-memo` 不能用在 `v-for` 内部。**
   :::
 
-  `v-memo` 也能被用于在一些默认优化失败的边际情况下，手动避免子组件出现不需要的更新。但是一样的，开发者需要负责指定正确的依赖数组以免跳过必要的更新。
+  `v-memo` 也可在默认优化不够时，手动避免子组件不必要的更新。但要自己指定正确的依赖数组，以免跳过必要更新。
 
 - **参考**
   - [v-once](#v-once)
@@ -518,11 +516,11 @@
 
 - **详细信息**
 
-  **该指令只在没有构建步骤的环境下需要使用。**
+  **只在没有构建步骤的环境下需要。**
 
-  当使用直接在 DOM 中书写的模板时，可能会出现一种叫做“未编译模板闪现”的情况：用户可能先看到的是还没编译完成的双大括号标签，直到挂载的组件将它们替换为实际渲染的内容。
+  直接在 DOM 中写模板时，可能出现「未编译模板闪现」：用户先看到未编译的双大括号，直到组件挂载后才替换为实际内容。
 
-  `v-cloak` 会保留在所绑定的元素上，直到相关组件实例被挂载后才移除。配合像 `[v-cloak] { display: none }` 这样的 CSS 规则，它可以在组件编译完毕前隐藏原始模板。
+  `v-cloak` 会保留在元素上，直到组件实例挂载后移除。配合 `[v-cloak] { display: none }` 等 CSS，可在编译完成前隐藏原始模板。
 
 - **示例**
 
@@ -538,4 +536,4 @@
   </div>
   ```
 
-  直到编译完成前，`<div>` 将不可见。
+  编译完成前，`<div>` 不可见。

@@ -12,7 +12,7 @@
 
 - **详细信息**
 
-  第一个参数是根组件。第二个参数可选，它是要传递给根组件的 props。
+  第一个参数是根组件。第二个参数可选，用来传给根组件 props。
 
 - **示例**
 
@@ -55,13 +55,13 @@
 
 - **详细信息**
 
-  参数可以是一个实际的 DOM 元素或一个 CSS 选择器 (使用第一个匹配到的元素)。返回根组件的实例。
+  参数可以是 DOM 元素，或 CSS 选择器（会用匹配到的第一个元素）。返回根组件实例。
 
-  如果该组件有模板或定义了渲染函数，它将替换容器内所有现存的 DOM 节点。否则在运行时编译器可用的情况下，容器元素的 `innerHTML` 将被用作模板。
+  如果组件有模板或渲染函数，会替换容器里已有的 DOM 节点。否则，在运行时编译器可用时，会用容器元素的 `innerHTML` 作为模板。
 
-  在 SSR 激活模式下，它将激活容器内现有的 DOM 节点。如果出现了[激活不匹配](/guide/scaling-up/ssr#hydration-mismatch)，那么现有的 DOM 节点将会被修改以匹配客户端的实际渲染结果。
+  在 SSR 激活模式下，会激活容器里已有的 DOM 节点。如果出现[激活不匹配](/guide/scaling-up/ssr#hydration-mismatch)，现有 DOM 会被修改，以匹配客户端实际渲染结果。
 
-  对于每个应用实例，`mount()` 仅能调用一次。
+  每个应用实例只能调用一次 `mount()`。
 
 - **示例**
 
@@ -80,7 +80,7 @@
 
 ## app.unmount() {#app-unmount}
 
-卸载一个已挂载的应用实例。卸载一个应用会触发该应用组件树内所有组件的卸载生命周期钩子。
+卸载已挂载的应用实例。卸载时会触发组件树里所有组件的卸载生命周期钩子。
 
 - **类型**
 
@@ -104,7 +104,7 @@
 
 ## app.component() {#app-component}
 
-如果同时传递一个组件名字符串及其定义，则注册一个全局组件；如果只传递一个名字，则会返回用该名字注册的组件 (如果存在的话)。
+同时传入组件名字符串和定义，会注册全局组件；只传名字，则返回该名字已注册的组件（如果有）。
 
 - **类型**
 
@@ -135,7 +135,7 @@
 
 ## app.directive() {#app-directive}
 
-如果同时传递一个名字和一个指令定义，则注册一个全局指令；如果只传递一个名字，则会返回用该名字注册的指令 (如果存在的话)。
+同时传入名字和指令定义，会注册全局指令；只传名字，则返回该名字已注册的指令（如果有）。
 
 - **类型**
 
@@ -185,11 +185,11 @@
 
 - **详细信息**
 
-  第一个参数应是插件本身，可选的第二个参数是要传递给插件的选项。
+  第一个参数是插件本身，第二个参数可选，用来传给插件选项。
 
-  插件可以是一个带 `install()` 方法的对象，亦或直接是一个将被用作 `install()` 方法的函数。插件选项 (`app.use()` 的第二个参数) 将会传递给插件的 `install()` 方法。
+  插件可以是有 `install()` 方法的对象，也可以直接是一个函数（会当作 `install()` 使用）。`app.use()` 的第二个参数会传给插件的 `install()`。
 
-  若 `app.use()` 对同一个插件多次调用，该插件只会被安装一次。
+  同一个插件即使多次调用 `app.use()`，也只会安装一次。
 
 - **示例**
 
@@ -208,12 +208,12 @@
 
 ## app.mixin() {#app-mixin}
 
-应用一个全局 mixin (适用于该应用的范围)。一个全局的 mixin 会作用于应用中的每个组件实例。
+应用全局 mixin（作用于整个应用）。全局 mixin 会影响应用里每个组件实例。
 
 :::warning 不推荐
-Mixins 在 Vue 3 支持主要是为了向后兼容，因为生态中有许多库使用到。在新的应用中应尽量避免使用 mixin，特别是全局 mixin。
+Vue 3 仍支持 Mixins，主要是为了兼容旧代码和生态里的库。新项目应尽量避免 mixin，尤其是全局 mixin。
 
-若要进行逻辑复用，推荐用[组合式函数](/guide/reusability/composables)来替代。
+要复用逻辑，推荐用[组合式函数](/guide/reusability/composables)。
 :::
 
 - **类型**
@@ -226,7 +226,7 @@ Mixins 在 Vue 3 支持主要是为了向后兼容，因为生态中有许多库
 
 ## app.provide() {#app-provide}
 
-提供一个值，可以在应用中的所有后代组件中注入使用。
+提供一个值，供应用里所有后代组件通过 inject 使用。
 
 - **类型**
 
@@ -238,7 +238,7 @@ Mixins 在 Vue 3 支持主要是为了向后兼容，因为生态中有许多库
 
 - **详细信息**
 
-  第一个参数应当是注入的 key，第二个参数则是提供的值。返回应用实例本身。
+  第一个参数是注入的 key，第二个参数是要提供的值。返回应用实例本身。
 
 - **示例**
 
@@ -287,7 +287,7 @@ Mixins 在 Vue 3 支持主要是为了向后兼容，因为生态中有许多库
 
 - 仅在 3.3+ 中支持
 
-使用当前应用作为注入上下文执行回调函数。
+以当前应用为注入上下文，执行回调函数。
 
 - **类型**
 
@@ -299,7 +299,7 @@ Mixins 在 Vue 3 支持主要是为了向后兼容，因为生态中有许多库
 
 - **详情**
 
-  需要一个回调函数并立即运行该回调。在回调同步调用期间，即使没有当前活动的组件实例，`inject()` 调用也可以从当前应用提供的值中查找注入。回调的返回值也将被返回。
+  接收一个回调并立即执行。在回调同步执行期间，即使没有活跃的组件实例，`inject()` 也能从当前应用提供的值里查找。回调的返回值也会一并返回。
 
 - **示例**
 
@@ -317,7 +317,7 @@ Mixins 在 Vue 3 支持主要是为了向后兼容，因为生态中有许多库
 
 ## app.version {#app-version}
 
-提供当前应用所使用的 Vue 版本号。这在[插件](/guide/reusability/plugins)中很有用，因为可能需要根据不同的 Vue 版本执行不同的逻辑。
+返回当前应用使用的 Vue 版本号。[插件](/guide/reusability/plugins)里常用，可以根据版本执行不同逻辑。
 
 - **类型**
 
@@ -346,7 +346,7 @@ Mixins 在 Vue 3 支持主要是为了向后兼容，因为生态中有许多库
 
 ## app.config {#app-config}
 
-每个应用实例都会暴露一个 `config` 对象，其中包含了对这个应用的配置设定。你可以在挂载应用前更改这些属性 (下面列举了每个属性的对应文档)。
+每个应用实例都有 `config` 对象，用来配置应用。挂载前可以修改这些属性（下面列出各项说明）。
 
 ```js
 import { createApp } from 'vue'
@@ -358,7 +358,7 @@ console.log(app.config)
 
 ## app.config.errorHandler {#app-config-errorhandler}
 
-用于为应用内抛出的未捕获错误指定一个全局处理函数。
+为应用内未捕获的错误指定全局处理函数。
 
 - **类型**
 
@@ -376,9 +376,9 @@ console.log(app.config)
 
 - **详细信息**
 
-  错误处理器接收三个参数：错误对象、触发该错误的组件实例和一个指出错误来源类型信息的字符串。
+  错误处理器接收三个参数：错误对象、触发错误的组件实例，以及说明错误来源的字符串。
 
-  它可以从下面这些来源中捕获错误：
+  它可以捕获以下来源的错误：
 
   - 组件渲染器
   - 事件处理器
@@ -389,7 +389,7 @@ console.log(app.config)
   - 过渡 (Transition) 钩子
 
   :::tip
-  在生产环境中，第三个参数 (`info`) 是一个缩短的代码，而不是含有完整信息的字符串。错误代码和字符串的映射可以参阅[生产环境错误代码参考](/error-reference/#runtime-errors)。
+  生产环境中，第三个参数 (`info`) 是缩短的错误代码，不是完整字符串。代码与说明的对应关系见[生产环境错误代码参考](/error-reference/#runtime-errors)。
   :::
 
 - **示例**
@@ -402,7 +402,7 @@ console.log(app.config)
 
 ## app.config.warnHandler {#app-config-warnhandler}
 
-用于为 Vue 的运行时警告指定一个自定义处理函数。
+为 Vue 运行时警告指定自定义处理函数。
 
 - **类型**
 
@@ -418,12 +418,12 @@ console.log(app.config)
 
 - **详细信息**
 
-  警告处理器将接受警告信息作为其第一个参数，来源组件实例为第二个参数，以及组件追踪字符串作为第三个参数。
+  警告处理器接收三个参数：警告信息、来源组件实例、组件追踪字符串。
 
-  这可以用于过滤筛选特定的警告信息，降低控制台输出的冗余。所有的 Vue 警告都需要在开发阶段得到解决，因此仅建议在调试期间选取部分特定警告，并且应该在调试完成之后立刻移除。
+  可以用来过滤特定警告，减少控制台输出。所有 Vue 警告都应在开发阶段解决，因此建议只在调试时过滤部分警告，调试完就移除。
 
   :::tip
-  警告仅会在开发阶段显示，因此在生产环境中，这条配置将被忽略。
+  警告只在开发环境显示，生产环境会忽略此配置。
   :::
 
 - **示例**
@@ -436,7 +436,7 @@ console.log(app.config)
 
 ## app.config.performance {#app-config-performance}
 
-设置此项为 `true` 可以在浏览器开发工具的“性能/时间线”页中启用对组件初始化、编译、渲染和修补的性能表现追踪。仅在开发模式和支持 [performance.mark](https://developer.mozilla.org/en-US/docs/Web/API/Performance/mark) API 的浏览器中工作。
+设为 `true` 后，可在浏览器开发工具的「性能/时间线」页追踪组件初始化、编译、渲染和 patch 的性能。只在开发模式且浏览器支持 [performance.mark](https://developer.mozilla.org/en-US/docs/Web/API/Performance/mark) 时生效。
 
 - **类型**：`boolean`
 
@@ -444,27 +444,27 @@ console.log(app.config)
 
 ## app.config.compilerOptions {#app-config-compileroptions}
 
-配置运行时编译器的选项。设置在此对象上的值将会在浏览器内进行模板编译时使用，并会影响到所配置应用的所有组件。另外你也可以通过 [`compilerOptions` 选项](/api/options-rendering#compileroptions)在每个组件的基础上覆盖这些选项。
+配置运行时编译器选项。这里的值会在浏览器内编译模板时使用，并影响该应用所有组件。也可以在每个组件上通过 [`compilerOptions` 选项](/api/options-rendering#compileroptions)覆盖。
 
 ::: warning 重要
-此配置项仅在完整构建版本，即可以在浏览器中编译模板的 `vue.js` 文件中可用。如果你用的是带构建的项目配置，且使用的是仅含运行时的 Vue 文件版本，那么编译器选项必须通过构建工具的相关配置传递给 `@vue/compiler-dom`。
+此配置只在完整构建版（浏览器里能编译模板的 `vue.js`）中可用。若使用构建工具且是仅运行时版本，编译器选项需通过构建工具传给 `@vue/compiler-dom`。
 
-- `vue-loader`：[通过 `compilerOptions` loader 的选项传递](https://vue-loader.vuejs.org/zh/options.html#compileroptions)。并请阅读[如何在 `vue-cli` 中配置它](https://cli.vuejs.org/zh/guide/webpack.html#%E4%BF%AE%E6%94%B9-loader-%E9%80%89%E9%A1%B9)。
+- `vue-loader`：[通过 `compilerOptions` loader 选项传递](https://vue-loader.vuejs.org/zh/options.html#compileroptions)。详见[在 `vue-cli` 中如何配置](https://cli.vuejs.org/zh/guide/webpack.html#%E4%BF%AE%E6%94%B9-loader-%E9%80%89%E9%A1%B9)。
 
-- `vite`：[通过 `@vitejs/plugin-vue` 的选项传递](https://github.com/vitejs/vite-plugin-vue/tree/main/packages/plugin-vue#options)。
+- `vite`：[通过 `@vitejs/plugin-vue` 选项传递](https://github.com/vitejs/vite-plugin-vue/tree/main/packages/plugin-vue#options)。
 :::
 
 ### app.config.compilerOptions.isCustomElement {#app-config-compileroptions-iscustomelement}
 
-用于指定一个检查方法来识别原生自定义元素。
+指定检查方法，用来识别原生自定义元素。
 
 - **类型** `(tag: string) => boolean`
 
 - **详细信息**
 
-  如果该标签需要当作原生自定义元素则应返回 `true`。对匹配到的标签，Vue 会将其渲染为原生元素而非将其视为一个 Vue 组件来解析。
+  若标签应视为原生自定义元素，返回 `true`。匹配到的标签会按原生元素渲染，而不是解析为 Vue 组件。
 
-  原生 HTML 和 SVG 标签不需要在此函数中进行匹配，Vue 的解析器会自动识别它们。
+  原生 HTML 和 SVG 标签不必在此函数里匹配，Vue 解析器会自动识别。
 
 - **示例**
 
@@ -479,7 +479,7 @@ console.log(app.config)
 
 ### app.config.compilerOptions.whitespace {#app-config-compileroptions-whitespace}
 
-用于调整模板中空格的处理行为。
+调整模板里空格的处理方式。
 
 - **类型** `'condense' | 'preserve'`
 
@@ -487,13 +487,13 @@ console.log(app.config)
 
 - **详细信息**
 
-  Vue 移除/缩短了模板中的空格以求更高效的模板输出。默认的策略是“缩短”，表现行为如下：
+  Vue 会压缩或去掉模板中的空格，让输出更高效。默认策略是 `'condense'`，行为如下：
 
-  1. 元素中开头和结尾的空格字符将被缩短为一个空格。
-  2. 包含换行的元素之间的空白字符会被删除。
-  3. 文本节点中连续的空白字符被缩短成一个空格。
+  1. 元素开头和结尾的空格会压缩成一个空格。
+  2. 含换行的元素之间的空白会被删除。
+  3. 文本节点里连续空白会压缩成一个空格。
 
-  设置该选项为 `'preserve'` 则会禁用 (2) 和 (3) 两项。
+  设为 `'preserve'` 会禁用 (2) 和 (3)。
 
 - **示例**
 
@@ -503,7 +503,7 @@ console.log(app.config)
 
 ### app.config.compilerOptions.delimiters {#app-config-compileroptions-delimiters}
 
-用于调整模板内文本插值的分隔符。
+调整模板内文本插值的分隔符。
 
 - **类型** `[string, string]`
 
@@ -511,7 +511,7 @@ console.log(app.config)
 
 - **详细信息**
 
-  此项通常是为了避免与同样使用 mustache 语法的服务器端框架发生冲突。
+  常用于避免与同样使用 mustache 语法的服务端框架冲突。
 
 - **示例**
 
@@ -522,7 +522,7 @@ console.log(app.config)
 
 ### app.config.compilerOptions.comments {#app-config-compileroptions-comments}
 
-用于调整模板中 HTML 注释的处理方式。
+调整模板中 HTML 注释的处理方式。
 
 - **类型** `boolean`
 
@@ -530,7 +530,7 @@ console.log(app.config)
 
 - **详细信息**
 
-  默认情况下，Vue 会在生产环境移除所有注释，设置该项为 `true` 会强制 Vue 在生产环境也保留注释。在开发过程中，注释是始终被保留的。这个选项通常在 Vue 与其他依赖 HTML 注释的库一起使用时使用。
+  默认情况下，生产环境会移除所有注释。设为 `true` 会强制生产环境也保留注释。开发环境注释始终保留。通常在与依赖 HTML 注释的其他库一起使用时需要此项。
 
 - **示例**
 
@@ -540,7 +540,7 @@ console.log(app.config)
 
 ## app.config.globalProperties {#app-config-globalproperties}
 
-一个用于注册能够被应用内所有组件实例访问到的全局属性的对象。
+注册全局属性，应用内所有组件实例都能访问。
 
 - **类型**
 
@@ -552,9 +552,9 @@ console.log(app.config)
 
 - **详细信息**
 
-  这是对 Vue 2 中 `Vue.prototype` 使用方式的一种替代，此写法在 Vue 3 已经不存在了。与任何全局的东西一样，应该谨慎使用。
+  这是 Vue 2 里 `Vue.prototype` 的替代写法（Vue 3 已移除 `Vue.prototype`）。全局属性应谨慎使用。
 
-  如果全局属性与组件自己的属性冲突，组件自己的属性将具有更高的优先级。
+  若全局属性与组件自身属性同名，组件自身属性优先。
 
 - **用法**
 
@@ -562,7 +562,7 @@ console.log(app.config)
   app.config.globalProperties.msg = 'hello'
   ```
 
-  这使得 `msg` 在应用的任意组件模板上都可用，并且也可以通过任意组件实例的 `this` 访问到：
+  这样 `msg` 在任意组件模板里可用，也可通过组件实例的 `this` 访问：
 
   ```js
   export default {
@@ -576,7 +576,7 @@ console.log(app.config)
 
 ## app.config.optionMergeStrategies {#app-config-optionmergestrategies}
 
-一个用于定义自定义组件选项的合并策略的对象。
+定义自定义组件选项的合并策略。
 
 - **类型**
 
@@ -590,11 +590,11 @@ console.log(app.config)
 
 - **详细信息**
 
-  一些插件或库对自定义组件选项添加了支持 (通过注入全局 mixin)。这些选项在有多个不同来源时可能需要特殊的合并策略 (例如 mixin 或组件继承)。
+  部分插件或库会通过全局 mixin 注入自定义组件选项。当同一选项来自多个来源（如 mixin 或继承）时，可能需要特殊合并策略。
 
-  可以在 `app.config.optionMergeStrategies` 对象上以选项的名称作为 key，可以为一个自定义选项注册分配一个合并策略函数。
+  可在 `app.config.optionMergeStrategies` 里，以选项名为 key 注册合并函数。
 
-  合并策略函数分别接受在父实例和子实例上定义的该选项的值作为第一和第二个参数。
+  合并函数接收父实例和子实例上该选项的值，作为第一、第二个参数。
 
 - **示例**
 
@@ -627,7 +627,7 @@ console.log(app.config)
 
 ## app.config.idPrefix <sup class="vt-badge" data-text="3.5+" /> {#app-config-idprefix}
 
-配置此应用中通过 [useId()](/api/composition-api-helpers.html#useid) 生成的所有 ID 的前缀。
+配置本应用中 [useId()](/api/composition-api-helpers.html#useid) 生成的所有 ID 的前缀。
 
 - **类型** `string`
 
@@ -655,10 +655,10 @@ console.log(app.config)
 
 - **详情**
 
-  默认情况下，在 Vue 应用中抛出但未显式处理的错误在开发和生产模式下有不同的行为：
+  默认情况下，Vue 应用里抛出但未显式处理的错误，在开发和生产环境行为不同：
 
-  - 在开发模式下，错误会被抛出并可能导致应用崩溃。这是为了使错误更加突出，以便在开发过程中被注意到并修复。
+  - 开发环境：错误会被抛出，应用可能崩溃，方便你在开发时发现并修复。
 
-  - 在生产模式下，错误只会被记录到控制台以尽量减少对最终用户的影响。然而，这可能会导致只在生产中发生的错误无法被错误监控服务捕获。
+  - 生产环境：错误只打印到控制台，减少对用户的影响，但可能让错误监控服务抓不到只在生产出现的错误。
 
-  通过将 `app.config.throwUnhandledErrorInProduction` 设置为 `true`，即使在生产模式下也会抛出未处理的错误。
+  将 `app.config.throwUnhandledErrorInProduction` 设为 `true` 后，生产环境也会抛出未处理的错误。

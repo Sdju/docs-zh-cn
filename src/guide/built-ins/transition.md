@@ -10,24 +10,24 @@ import BetweenComponents from './transition-demos/BetweenComponents.vue'
 
 # Transition {#transition}
 
-Vue 提供了两个内置组件，可以帮助你制作基于状态变化的过渡和动画：
+Vue 有两个内置组件，用来做状态变化时的过渡和动画：
 
-- `<Transition>` 会在一个元素或组件进入和离开 DOM 时应用动画。本章节会介绍如何使用它。
+- `<Transition>`：元素或组件进入、离开 DOM 时加动画。本章讲它。
 
-- `<TransitionGroup>` 会在一个 `v-for` 列表中的元素或组件被插入，移动，或移除时应用动画。我们将在[下一章节](/guide/built-ins/transition-group)中介绍。
+- `<TransitionGroup>`：`v-for` 列表里插入、移动、删除时加动画。见[下一章](/guide/built-ins/transition-group)。
 
-除了这两个组件，我们也可以通过其他技术手段来应用动画，比如切换 CSS class 或用状态绑定样式来驱动动画。这些其他的方法会在[动画技巧](/guide/extras/animation)章节中展开。
+除此之外，也可以用 CSS class、样式绑定等方式做动画，见[动画技巧](/guide/extras/animation)。
 
 ## `<Transition>` 组件 {#the-transition-component}
 
-`<Transition>` 是一个内置组件，这意味着它在任意别的组件中都可以被使用，无需注册。它可以将进入和离开动画应用到通过默认插槽传递给它的元素或组件上。进入或离开可以由以下的条件之一触发：
+`<Transition>` 是内置组件，任何组件里都能直接用，不用注册。它给默认插槽里的元素或子组件加进入/离开动画。常见触发方式：
 
-- 由 `v-if` 所触发的切换
-- 由 `v-show` 所触发的切换
-- 由特殊元素 `<component>` 切换的动态组件
-- 改变特殊的 `key` 属性
+- `v-if` 切换
+- `v-show` 切换
+- `<component>` 动态组件切换
+- 改变 `key`
 
-以下是最基本用法的示例：
+最基本用法：
 
 ```vue-html
 <button @click="show = !show">Toggle</button>
@@ -63,44 +63,44 @@ Vue 提供了两个内置组件，可以帮助你制作基于状态变化的过�
 </div>
 
 :::tip
-`<Transition>` 仅支持单个元素或组件作为其插槽内容。如果内容是一个组件，这个组件必须仅有一个根元素。
+`<Transition>` 插槽里只能有一个根元素或组件。若是组件，必须只有一个根节点。
 :::
 
-当一个 `<Transition>` 组件中的元素被插入或移除时，会发生下面这些事情：
+`<Transition>` 里的元素插入或移除时，Vue 会：
 
-1. Vue 会自动检测目标元素是否应用了 CSS 过渡或动画。如果是，则一些 [CSS 过渡 class](#transition-classes) 会在适当的时机被添加和移除。
+1. 检查元素是否有 CSS 过渡/动画。有则在合适时机加/删 [CSS 过渡 class](#transition-classes)。
 
-2. 如果有作为监听器的 [JavaScript 钩子](#javascript-hooks)，这些钩子函数会在适当时机被调用。
+2. 若配置了 [JavaScript 钩子](#javascript-hooks)，在对应时机调用。
 
-3. 如果没有探测到 CSS 过渡或动画、也没有提供 JavaScript 钩子，那么 DOM 的插入、删除操作将在浏览器的下一个动画帧后执行。
+3. 若既没有 CSS 过渡/动画，也没有 JS 钩子，则在下一帧直接完成 DOM 插入或删除。
 
 ## 基于 CSS 的过渡效果 {#css-based-transitions}
 
 ### CSS 过渡 class {#transition-classes}
 
-一共有 6 个应用于进入与离开过渡效果的 CSS class。
+进入和离开各用 6 个 CSS class：
 
 ![过渡图示](./images/transition-classes.png)
 
 <!-- https://www.figma.com/file/rlOv0ZKJFFNA9hYmzdZv3S/Transition-Classes -->
 
-1. `v-enter-from`：进入动画的起始状态。在元素插入之前添加，在元素插入完成后的下一帧移除。
+1. `v-enter-from`：进入的起始状态。插入前加上，插入完成下一帧移除。
 
-2. `v-enter-active`：进入动画的生效状态。应用于整个进入动画阶段。在元素被插入之前添加，在过渡或动画完成之后移除。这个 class 可以被用来定义进入动画的持续时间、延迟与速度曲线类型。
+2. `v-enter-active`：进入的过渡过程。贯穿整个进入阶段；可设时长、延迟、缓动。插入前加上，动画结束后移除。
 
-3. `v-enter-to`：进入动画的结束状态。在元素插入完成后的下一帧被添加 (也就是 `v-enter-from` 被移除的同时)，在过渡或动画完成之后移除。
+3. `v-enter-to`：进入的结束状态。插入完成下一帧加上（与移除 `v-enter-from` 同时），动画结束后移除。
 
-4. `v-leave-from`：离开动画的起始状态。在离开过渡效果被触发时立即添加，在一帧后被移除。
+4. `v-leave-from`：离开的起始状态。离开触发时加上，一帧后移除。
 
-5. `v-leave-active`：离开动画的生效状态。应用于整个离开动画阶段。在离开过渡效果被触发时立即添加，在过渡或动画完成之后移除。这个 class 可以被用来定义离开动画的持续时间、延迟与速度曲线类型。
+5. `v-leave-active`：离开的过渡过程。贯穿整个离开阶段；可设时长、延迟、缓动。离开触发时加上，结束后移除。
 
-6. `v-leave-to`：离开动画的结束状态。在一个离开动画被触发后的下一帧被添加 (也就是 `v-leave-from` 被移除的同时)，在过渡或动画完成之后移除。
+6. `v-leave-to`：离开的结束状态。离开触发下一帧加上（与移除 `v-leave-from` 同时），结束后移除。
 
-`v-enter-active` 和 `v-leave-active` 给我们提供了为进入和离开动画指定不同速度曲线的能力，我们将在下面的小节中看到一个示例。
+`v-enter-active` 和 `v-leave-active` 可分别设置进入、离开的缓动，下面有示例。
 
 ### 为过渡效果命名 {#named-transitions}
 
-我们可以给 `<Transition>` 组件传一个 `name` prop 来声明一个过渡效果名：
+给 `<Transition>` 传 `name` 可自定义过渡名：
 
 ```vue-html
 <Transition name="fade">
@@ -108,7 +108,7 @@ Vue 提供了两个内置组件，可以帮助你制作基于状态变化的过�
 </Transition>
 ```
 
-对于一个有名字的过渡效果，对它起作用的过渡 class 会以其名字而不是 `v` 作为前缀。比如，上方例子中被应用的 class 将会是 `fade-enter-active` 而不是 `v-enter-active`。这个“fade”过渡的 class 应该是这样：
+有 `name` 时，class 前缀用名字而不是 `v`。上面例子会用 `fade-enter-active` 而不是 `v-enter-active`。对应 CSS：
 
 ```css
 .fade-enter-active,
@@ -124,9 +124,9 @@ Vue 提供了两个内置组件，可以帮助你制作基于状态变化的过�
 
 ### CSS 的 transition {#css-transitions}
 
-`<Transition>` 一般都会搭配[原生 CSS 过渡](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Transitions/Using_CSS_transitions)一起使用，正如你在上面的例子中所看到的那样。这个 `transition` CSS 属性是一个简写形式，使我们可以一次定义一个过渡的各个方面，包括需要执行动画的属性、持续时间和[速度曲线](https://developer.mozilla.org/en-US/docs/Web/CSS/easing-function)。
+`<Transition>` 常配合[原生 CSS transition](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Transitions/Using_CSS_transitions)。`transition` 是简写，可一次写属性、时长和[缓动](https://developer.mozilla.org/en-US/docs/Web/CSS/easing-function)。
 
-下面是一个更高级的例子，它使用了不同的持续时间和速度曲线来过渡多个属性：
+下面给不同属性用不同时长和缓动：
 
 ```vue-html
 <Transition name="slide-fade">
@@ -169,9 +169,9 @@ Vue 提供了两个内置组件，可以帮助你制作基于状态变化的过�
 
 ### CSS 的 animation {#css-animations}
 
-[原生 CSS 动画](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Animations/Using_CSS_animations)和 CSS transition 的应用方式基本上是相同的，只有一点不同，那就是 `*-enter-from` 不是在元素插入后立即移除，而是在一个 `animationend` 事件触发时被移除。
+[CSS animation](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Animations/Using_CSS_animations)用法与 transition 类似，区别是 `*-enter-from` 不在插入后立刻移除，而是等 `animationend`。
 
-对于大多数的 CSS 动画，我们可以简单地在 `*-enter-active` 和 `*-leave-active` class 下声明它们。下面是一个示例：
+多数动画写在 `*-enter-active` 和 `*-leave-active` 里。例如：
 
 ```vue-html
 <Transition name="bounce">
@@ -216,7 +216,7 @@ Vue 提供了两个内置组件，可以帮助你制作基于状态变化的过�
 
 ### 自定义过渡 class {#custom-transition-classes}
 
-你也可以向 `<Transition>` 传递以下的 props 来指定自定义的过渡 class：
+也可通过 props 指定自定义 class，覆盖默认名：
 
 - `enter-from-class`
 - `enter-active-class`
@@ -225,7 +225,7 @@ Vue 提供了两个内置组件，可以帮助你制作基于状态变化的过�
 - `leave-active-class`
 - `leave-to-class`
 
-你传入的这些 class 会覆盖相应阶段的默认 class 名。这个功能在你想要在 Vue 的动画机制下集成其他的第三方 CSS 动画库时非常有用，比如 [Animate.css](https://daneden.github.io/animate.css/)：
+传入的 class 会替换对应阶段的默认名。接第三方动画库（如 [Animate.css](https://daneden.github.io/animate.css/)）时很方便：
 
 ```vue-html
 <!-- 假设你已经在页面中引入了 Animate.css -->
@@ -251,9 +251,9 @@ Vue 提供了两个内置组件，可以帮助你制作基于状态变化的过�
 
 ### 同时使用 transition 和 animation {#using-transitions-and-animations-together}
 
-Vue 需要附加事件监听器，以便知道过渡何时结束。可以是 `transitionend` 或 `animationend`，这取决于你所应用的 CSS 规则。如果你仅仅使用二者的其中之一，Vue 可以自动探测到正确的类型。
+Vue 要监听 `transitionend` 或 `animationend` 才知道动画结束。只用一种时，Vue 会自动判断。
 
-然而在某些场景中，你或许想要在同一个元素上同时使用它们两个。举例来说，Vue 触发了一个 CSS 动画，同时鼠标悬停触发另一个 CSS 过渡。此时你需要显式地传入 `type` prop 来声明，告诉 Vue 需要关心哪种类型，传入的值是 `animation` 或 `transition`：
+若同一元素同时用 transition 和 animation（例如 Vue 播 animation，悬停再触发 transition），需用 `type` 指明关注哪一种，值为 `animation` 或 `transition`：
 
 ```vue-html
 <Transition type="animation">...</Transition>
@@ -261,7 +261,7 @@ Vue 需要附加事件监听器，以便知道过渡何时结束。可以是 `tr
 
 ### 深层级过渡与显式过渡时长 {#nested-transitions-and-explicit-transition-durations}
 
-尽管过渡 class 仅能应用在 `<Transition>` 的直接子元素上，我们还是可以使用深层级的 CSS 选择器，在深层级的元素上触发过渡效果：
+过渡 class 只加在 `<Transition>` 的直接子元素上，但可用深层选择器给内部元素做过渡：
 
 ```vue-html
 <Transition name="nested">
@@ -289,7 +289,7 @@ Vue 需要附加事件监听器，以便知道过渡何时结束。可以是 `tr
 /* ... 省略了其他必要的 CSS */
 ```
 
-我们甚至可以在深层元素上添加一个过渡延迟，从而创建一个带渐进延迟的动画序列：
+还可给内层加 `transition-delay`，做出依次出现的效果：
 
 ```css{3}
 /* 延迟嵌套元素的进入以获得交错效果 */
@@ -298,9 +298,9 @@ Vue 需要附加事件监听器，以便知道过渡何时结束。可以是 `tr
 }
 ```
 
-然而，这会带来一个小问题。默认情况下，`<Transition>` 组件会通过监听过渡根元素上的**第一个** `transitionend` 或者 `animationend` 事件来尝试自动判断过渡何时结束。而在嵌套的过渡中，期望的行为应该是等待所有内部元素的过渡完成。
+嵌套时有个问题：默认 `<Transition>` 在根元素上听到**第一个** `transitionend`/`animationend` 就认为结束，但嵌套时往往要等内层全部完成。
 
-在这种情况下，你可以通过向 `<Transition>` 组件传入 `duration` prop 来显式指定过渡的持续时间 (以毫秒为单位)。总持续时间应该匹配延迟加上内部元素的过渡持续时间：
+可传 `duration`（毫秒）手动指定总时长，应包含延迟加内层过渡时间：
 
 ```vue-html
 <Transition :duration="550">...</Transition>
@@ -310,7 +310,7 @@ Vue 需要附加事件监听器，以便知道过渡何时结束。可以是 `tr
 
 [在演练场中尝试一下](https://play.vuejs.org/#eNqVVd9v0zAQ/leO8LAfrE3HNKSFbgKmSYMHQNAHkPLiOtfEm2NHttN2mvq/c7bTNi1jgFop9t13d9995ziPyfumGc5bTLJkbLkRjQOLrm2uciXqRhsHj2BwBiuYGV3DAUEPcpUrrpUlaKUXcOkBh860eJSrcRqzUDxtHNaNZA5pBzCets5pBe+4FPz+Mk+66Bf+mSdXE12WEsdphMWQiWHKCicoLCtaw/yKIs/PR3kCitVIG4XWYUEJfATFFGIO84GYdRUIyCWzlra6dWg2wA66dgqlts7c+d8tSqk34JTQ6xqb9TjdUiTDOO21TFvrHqRfDkPpExiGKvBITjdl/L40ulVFBi8R8a3P17CiEKrM4GzULIOlFmpQoSgrl8HpKFpX3kFZu2y0BNhJxznvwaJCA1TEYcC4E3MkKp1VIptjZ43E3KajDJiUMBqeWUBmcUBUqJGYOT2GAiV7gJAA9Iy4GyoBKLH2z+N0W3q/CMC2yCCkyajM63Mbc+9z9mfvZD+b071MM23qLC69+j8PvX5HQUDdMC6cL7BOTtQXCJwpas/qHhWIBdYtWGgtDWNttWTmThu701pf1W6+v1Hd8Xbz+k+VQxmv8i7Fv1HZn+g/iv2nRkjzbd6npf/Rkz49DifQ3dLZBBYOJzC4rqgCwsUbmLYlCAUVU4XsCd1NrCeRHcYXb1IJC/RX2hEYCwJTvHYVMZoavbBI09FmU+LiFSzIh0AIXy1mqZiFKaKCmVhiEVJ7GftHZTganUZ56EYLL3FykjhL195MlMM7qxXdmEGDPOG6boRE86UJVPMki+p4H01WLz4Fm78hSdBo5xXy+yfsd3bpbXny1SA1M8c82fgcMyW66L75/hmXtN44a120ktDPOL+h1bL1HCPsA42DaPdwge3HcO/TOCb2ZumQJtA15Yl65Crg84S+BdfPtL6lezY8C3GkZ7L6Bc1zNR0=)
 
-如果有必要的话，你也可以用对象的形式传入，分开指定进入和离开所需的时间：
+也可用对象分别指定进入、离开的时长：
 
 ```vue-html
 <Transition :duration="{ enter: 500, leave: 800 }">...</Transition>
@@ -318,17 +318,17 @@ Vue 需要附加事件监听器，以便知道过渡何时结束。可以是 `tr
 
 ### 性能考量 {#performance-considerations}
 
-你可能注意到我们上面例子中展示的动画所用到的 CSS 属性大多是 `transform` 和 `opacity` 之类的。用这些属性制作动画非常高效，因为：
+上面示例多用 `transform`、`opacity`，因为：
 
-1. 他们在动画过程中不会影响到 DOM 结构，因此不会每一帧都触发昂贵的 CSS 布局重新计算。
+1. 不改变布局，不会每帧触发重排。
 
-2. 大多数的现代浏览器都可以在执行 `transform` 动画时利用 GPU 进行硬件加速。
+2. 现代浏览器常对 `transform` 做 GPU 加速。
 
-相比之下，像 `height` 或者 `margin` 这样的属性会触发 CSS 布局变动，因此执行它们的动画效果更昂贵，需要谨慎使用。
+`height`、`margin` 等会触发布局，动画更耗性能，应少用。
 
 ## JavaScript 钩子 {#javascript-hooks}
 
-你可以通过监听 `<Transition>` 组件事件的方式在过渡过程中挂上钩子函数：
+监听 `<Transition>` 事件可在过渡各阶段挂钩子：
 
 ```vue-html
 <Transition
@@ -435,9 +435,9 @@ export default {
 
 </div>
 
-这些钩子可以与 CSS 过渡或动画结合使用，也可以单独使用。
+钩子可配合 CSS，也可单独用 JS 做动画。
 
-在使用仅由 JavaScript 执行的动画时，最好是添加一个 `:css="false"` prop。这显式地向 Vue 表明可以跳过对 CSS 过渡的自动探测。除了性能稍好一些之外，还可以防止 CSS 规则意外地干扰过渡效果：
+纯 JS 动画时，建议加 `:css="false"`，告诉 Vue 不要检测 CSS 过渡。略省性能，也避免 CSS 干扰：
 
 ```vue-html{3}
 <Transition
@@ -448,9 +448,9 @@ export default {
 </Transition>
 ```
 
-在有了 `:css="false"` 后，我们就自己全权负责控制什么时候过渡结束了。这种情况下对于 `@enter` 和 `@leave` 钩子来说，回调函数 `done` 就是必须的。否则，钩子将被同步调用，过渡将立即完成。
+`:css="false"` 时，要自己调用 `done()` 告诉 Vue 动画结束。`@enter`、`@leave` 里 `done` 必填，否则过渡会立刻结束。
 
-这里是使用 [GSAP 库](https://gsap.com/)执行动画的一个示例，你也可以使用任何你想要的库，比如 [Anime.js](https://animejs.com/) 或者 [Motion One](https://motion.dev/)：
+下面用 [GSAP](https://gsap.com/) 举例，也可用 [Anime.js](https://animejs.com/)、[Motion One](https://motion.dev/) 等：
 
 <JsHooks />
 
@@ -467,7 +467,7 @@ export default {
 
 ## 可复用过渡效果 {#reusable-transitions}
 
-得益于 Vue 的组件系统，过渡效果是可以被封装复用的。要创建一个可被复用的过渡，我们需要为 `<Transition>` 组件创建一个包装组件，并向内传入插槽内容：
+过渡可以封装成组件复用：包一层 `<Transition>`，把插槽内容传进去：
 
 ```vue{6} [MyTransition.vue]
 <script>
@@ -493,7 +493,7 @@ export default {
 </style>
 ```
 
-现在 `MyTransition` 可以在导入后像内置组件那样使用了：
+导入后 `MyTransition` 可像内置组件一样用：
 
 ```vue-html
 <MyTransition>
@@ -503,7 +503,7 @@ export default {
 
 ## 出现时过渡 {#transition-on-appear}
 
-如果你想在某个节点初次渲染时应用一个过渡效果，你可以添加 `appear` prop：
+首次渲染也要过渡时，加 `appear`：
 
 ```vue-html
 <Transition appear>
@@ -513,7 +513,7 @@ export default {
 
 ## 元素间过渡 {#transition-between-elements}
 
-除了通过 `v-if` / `v-show` 切换一个元素，我们也可以通过 `v-if` / `v-else` / `v-else-if` 在几个组件间进行切换，只要确保任一时刻只会有一个元素被渲染即可：
+除了 `v-if` / `v-show` 切换单个元素，还可用 `v-if` / `v-else` / `v-else-if` 在多个元素间切换，同一时刻只渲染一个：
 
 ```vue-html
 <Transition>
@@ -529,9 +529,9 @@ export default {
 
 ## 过渡模式 {#transition-modes}
 
-在之前的例子中，进入和离开的元素都是在同时开始动画的，因此我们不得不将它们设为 `position: absolute` 以避免二者同时存在时出现的布局问题。
+前面例子里进入和离开同时动画，常要把元素设为 `position: absolute` 避免叠在一起布局错乱。
 
-然而，很多情况下这可能并不符合需求。我们可能想要先执行离开动画，然后在其完成**之后**再执行元素的进入动画。手动编排这样的动画是非常复杂的，好在我们可以通过向 `<Transition>` 传入一个 `mode` prop 来实现这个行为：
+若要先离开、**再**进入，手写编排很麻烦。给 `<Transition>` 传 `mode` 即可：
 
 ```vue-html
 <Transition mode="out-in">
@@ -539,15 +539,15 @@ export default {
 </Transition>
 ```
 
-将之前的例子改为 `mode="out-in"` 后是这样：
+加上 `mode="out-in"` 后：
 
 <BetweenElements mode="out-in" />
 
-`<Transition>` 也支持 `mode="in-out"`，虽然这并不常用。
+也支持 `mode="in-out"`，但较少用。
 
 ## 组件间过渡 {#transition-between-components}
 
-`<Transition>` 也可以作用于[动态组件](/guide/essentials/component-basics#dynamic-components)之间的切换：
+`<Transition>` 也可用于[动态组件](/guide/essentials/component-basics#dynamic-components)切换：
 
 ```vue-html
 <Transition name="fade" mode="out-in">
@@ -570,7 +570,7 @@ export default {
 
 ## 动态过渡 {#dynamic-transitions}
 
-`<Transition>` 的 props (比如 `name`) 也可以是动态的！这让我们可以根据状态变化动态地应用不同类型的过渡：
+`<Transition>` 的 props（如 `name`）可以是动态的：
 
 ```vue-html
 <Transition :name="transitionName">
@@ -578,15 +578,15 @@ export default {
 </Transition>
 ```
 
-这个特性的用处是可以提前定义好多组 CSS 过渡或动画的 class，然后在它们之间动态切换。
+可先写好多组 CSS class，再按状态切换。
 
-你也可以根据你的组件的当前状态在 JavaScript 过渡钩子中应用不同的行为。最后，创建动态过渡的终极方式还是创建[可复用的过渡组件](#reusable-transitions)，并让这些组件根据动态的 props 来改变过渡的效果。掌握了这些技巧后，就真的只有你想不到，没有做不到的了。
+也可在 JS 钩子里根据状态做不同动画。更灵活的做法是封装[可复用过渡组件](#reusable-transitions)，用动态 props 控制效果。
 
 ## 使用 Key Attribute 过渡 {#transitions-with-the-key-attribute}
 
-有时为了触发过渡，你需要强制重新渲染 DOM 元素。
+有时要强制重新渲染 DOM 才能触发过渡。
 
-以计数器组件为例：
+例如计数器：
 
 <div class="composition-api">
 
@@ -637,7 +637,7 @@ export default {
 
 </div>
 
-如果不使用 `key` attribute，则只有文本节点会被更新，因此不会发生过渡。但是，有了 `key` 属性，Vue 就知道在 `count` 改变时创建一个新的 `span` 元素，因此 `Transition` 组件有两个不同的元素在它们之间进行过渡。
+没有 `key` 时，只会更新文本，不会过渡。加上 `key` 后，`count` 变会新建 `span`，`<Transition>` 才能在两个元素之间做过渡。
 
 <div class="composition-api">
 

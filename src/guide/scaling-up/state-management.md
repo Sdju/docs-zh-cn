@@ -2,7 +2,7 @@
 
 ## 什么是状态管理？ {#what-is-state-management}
 
-理论上来说，每一个 Vue 组件实例都已经在“管理”它自己的响应式状态了。我们以一个简单的计数器组件为例：
+每个 Vue 组件实例本来就在管理自己的响应式状态。看一个简单的计数器：
 
 <div class="composition-api">
 
@@ -50,38 +50,38 @@ export default {
 
 </div>
 
-它是一个独立的单元，由以下几个部分组成：
+这个组件可以分成三部分：
 
-- **状态**：驱动整个应用的数据源；
-- **视图**：对**状态**的一种声明式映射；
-- **交互**：状态根据用户在**视图**中的输入而作出相应变更的可能方式。
+- **状态**：驱动应用的数据
+- **视图**：用声明式方式展示状态
+- **交互**：用户操作视图，从而改变状态
 
-下面是“单向数据流”这一概念的简单图示：
+“单向数据流”可以概括成下图：
 
 <p style="text-align: center">
   <img alt="state flow diagram" src="./images/state-flow.png" width="252px" style="margin: 40px auto">
 </p>
 
-然而，当我们有**多个组件共享一个共同的状态**时，就没有这么简单了：
+但当**多个组件要共享同一份状态**时，事情会变复杂：
 
-1. 多个视图可能都依赖于同一份状态。
-2. 来自不同视图的交互也可能需要更改同一份状态。
+1. 多个视图可能依赖同一份状态
+2. 不同视图里的操作也可能要改同一份状态
 
-对于情景 1，一个可行的办法是将共享状态“提升”到共同的祖先组件上去，再通过 props 传递下来。然而在深层次的组件树结构中这么做的话，很快就会使得代码变得繁琐冗长。这会导致另一个问题：[Prop 逐级透传问题](/guide/components/provide-inject#prop-drilling)。
+**情况 1**：可以把共享状态“提升”到共同祖先，再用 props 往下传。组件树很深时，代码会很快变乱，还会出现 [Prop 逐级透传](/guide/components/provide-inject#prop-drilling) 问题。
 
-对于情景 2，我们经常发现自己会直接通过模板引用获取父/子实例，或者通过触发的事件尝试改变和同步多个状态的副本。但这些模式的健壮性都不甚理想，很容易就会导致代码难以维护。
+**情况 2**：有人会用模板 ref 拿父/子实例，或用事件去同步多份状态副本。这些做法都不稳，后期很难维护。
 
-一个更简单直接的解决方案是抽取出组件间的共享状态，放在一个全局单例中来管理。这样我们的组件树就变成了一个大的“视图”，而任何位置上的组件都可以访问其中的状态或触发动作。
+更直接的做法：把共享状态抽出来，放到一个全局单例里。整棵组件树就像一个大“视图”，任意组件都能读状态或触发更新。
 
 ## 用响应式 API 做简单状态管理 {#simple-state-management-with-reactivity-api}
 
 <div class="options-api">
 
-在选项式 API 中，响应式数据是用 `data()` 选项声明的。在内部，`data()` 的返回值对象会通过 [`reactive()`](/api/reactivity-core#reactive) 这个公开的 API 函数转为响应式。
+在选项式 API 里，响应用 `data()` 声明。内部会用 [`reactive()`](/api/reactivity-core#reactive) 把 `data()` 的返回值变成响应式对象。
 
 </div>
 
-如果你有一部分状态需要在多个组件实例间共享，你可以使用 [`reactive()`](/api/reactivity-core#reactive) 来创建一个响应式对象，并将它导入到多个组件中：
+如果要在多个组件之间共享状态，可以用 [`reactive()`](/api/reactivity-core#reactive) 创建一个响应式对象，并在多个组件里导入：
 
 ```js [store.js]
 import { reactive } from 'vue'
@@ -146,9 +146,9 @@ export default {
 
 </div>
 
-现在每当 `store` 对象被更改时，`<ComponentA>` 与 `<ComponentB>` 都会自动更新它们的视图。现在我们有了单一的数据源。
+`store` 一变，`<ComponentA>` 和 `<ComponentB>` 的视图都会更新。数据源变成了一份。
 
-然而，这也意味着任意一个导入了 `store` 的组件都可以随意修改它的状态：
+但这也意味着：任何导入 `store` 的组件都能直接改它：
 
 ```vue-html{2}
 <template>
@@ -158,7 +158,7 @@ export default {
 </template>
 ```
 
-虽然这在简单的情况下是可行的，但从长远来看，可以被任何组件任意改变的全局状态是不太容易维护的。为了确保改变状态的逻辑像状态本身一样集中，建议在 store 上定义方法，方法的名称应该要能表达出行动的意图：
+小项目也许还能接受，但长期维护时，全局状态谁都能改并不理想。更好的做法是：在 store 上定义方法，用名字表达“要做什么”：
 
 ```js{5-7} [store.js]
 import { reactive } from 'vue'
@@ -191,10 +191,10 @@ export const store = reactive({
 </div>
 
 :::tip
-请注意这里点击的处理函数使用了 `store.increment()`，带上了圆括号作为内联表达式调用，因为它并不是组件的方法，并且必须要以正确的 `this` 上下文来调用。
+这里的点击处理用了 `store.increment()`，并带括号。它不是组件 methods 里的方法，调用时要保证 `this` 指向 store。
 :::
 
-除了我们这里用到的单个响应式对象作为一个 store 之外，你还可以使用其他[响应式 API](/api/reactivity-core) 例如 `ref()` 或是 `computed()`，或是甚至通过一个[组合式函数](/guide/reusability/composables)来返回一个全局状态：
+除了用单个 `reactive` 对象当 store，你还可以用 `ref()`、`computed()`，或通过[组合式函数](/guide/reusability/composables)返回全局状态：
 
 ```js
 import { ref } from 'vue'
@@ -213,25 +213,25 @@ export function useCount() {
 }
 ```
 
-事实上，Vue 的响应性系统与组件层是解耦的，这使得它非常灵活。
+Vue 的响应式系统和组件层是解耦的，所以用法很灵活。
 
 ## SSR 相关细节 {#ssr-considerations}
 
-如果你正在构建一个需要利用[服务端渲染 (SSR)](./ssr) 的应用，由于 store 是跨多个请求共享的单例，上述模式可能会导致问题。这在 SSR 指引那一章节会讨论[更多细节](./ssr#cross-request-state-pollution)。
+如果要做[服务端渲染 (SSR)](./ssr)，store 作为跨请求共享的单例可能出问题。详见 SSR 章节里的[跨请求状态污染](./ssr#cross-request-state-pollution)。
 
 ## Pinia {#pinia}
 
-虽然我们的手动状态管理解决方案在简单的场景中已经足够了，但是在大规模的生产应用中还有很多其他事项需要考虑：
+上面的手写方案适合简单场景。大型项目通常还要考虑：
 
-- 更强的团队协作约定
-- 与 Vue DevTools 集成，包括时间轴、组件内部审查和时间旅行调试
+- 团队协作约定
+- 与 Vue DevTools 集成（时间轴、组件检查、时间旅行调试）
 - 模块热更新 (HMR)
 - 服务端渲染支持
 
-[Pinia](https://pinia.vuejs.org/zh/) 就是一个实现了上述需求的状态管理库，由 Vue 核心团队维护，对 Vue 2 和 Vue 3 都可用。
+[Pinia](https://pinia.vuejs.org/zh/) 由 Vue 核心团队维护，满足这些需求，支持 Vue 2 和 Vue 3。
 
-现有用户可能对 [Vuex](https://vuex.vuejs.org/zh/) 更熟悉，它是 Vue 之前的官方状态管理库。由于 Pinia 在生态系统中能够承担相同的职责且能做得更好，因此 Vuex 现在处于维护模式。它仍然可以工作，但不再接受新的功能。对于新的应用，建议使用 Pinia。
+老项目可能更熟悉 [Vuex](https://vuex.vuejs.org/zh/)——Vue 之前的官方状态库。Pinia 能承担同样职责且体验更好，Vuex 已进入维护模式：仍可用，但不再加新功能。新项目建议用 Pinia。
 
-事实上，Pinia 最初正是为了探索 Vuex 的下一个版本而开发的，因此整合了核心团队关于 Vuex 5 的许多想法。最终，我们意识到 Pinia 已经实现了我们想要在 Vuex 5 中提供的大部分内容，因此决定将其作为新的官方推荐。
+Pinia 最初是为了探索 Vuex 5，吸收了很多团队对下一代 Vuex 的想法。后来发现 Pinia 已经覆盖了大部分目标，于是成为新的官方推荐。
 
-相比于 Vuex，Pinia 提供了更简洁直接的 API，并提供了组合式风格的 API，最重要的是，在使用 TypeScript 时它提供了更完善的类型推导。
+相比 Vuex，Pinia API 更直接，支持组合式风格，TypeScript 类型推导也更完善。

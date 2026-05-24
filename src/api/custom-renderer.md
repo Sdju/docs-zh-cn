@@ -2,7 +2,7 @@
 
 ## createRenderer() {#createrenderer}
 
-创建一个自定义渲染器。通过提供平台特定的节点创建以及更改 API，你可以在非 DOM 环境中也享受到 Vue 核心运行时的特性。
+创建自定义渲染器。提供平台特定的节点创建和更新 API 后，就能在非 DOM 环境中使用 Vue 核心运行时。
 
 - **类型**
 
@@ -74,4 +74,4 @@
   export * from '@vue/runtime-core'
   ```
 
-  Vue 自身的 `@vue/runtime-dom` 也是[利用这套 API 实现的](https://github.com/vuejs/core/blob/main/packages/runtime-dom/src/index.ts)。要想了解一个简单一些的实现，请参考 [`@vue/runtime-test`](https://github.com/vuejs/core/blob/main/packages/runtime-test/src/index.ts)，这是一个 Vue 自己做单元测试的私有包。
+  Vue 的 `@vue/runtime-dom` 也是[利用这套 API 实现的](https://github.com/vuejs/core/blob/main/packages/runtime-dom/src/index.ts)。想了解更简单的实现，可以看 [`@vue/runtime-test`](https://github.com/vuejs/core/blob/main/packages/runtime-test/src/index.ts)——Vue 内部单元测试用的包。

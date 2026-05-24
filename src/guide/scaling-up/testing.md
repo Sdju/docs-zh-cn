@@ -29,37 +29,37 @@ import { VTCodeGroup, VTCodeGroupTab } from '@vue/theme'
 
 ## 为什么需要测试 {#why-test}
 
-自动化测试能够预防无意引入的 bug，并鼓励开发者将应用分解为可测试、可维护的函数、模块、类和组件。这能够帮助你和你的团队更快速、自信地构建复杂的 Vue 应用。与任何应用一样，新的 Vue 应用可能会以多种方式崩溃，因此，在发布前发现并解决这些问题就变得十分重要。
+自动化测试能减少无意引入的 bug，并鼓励你把应用拆成可测试、可维护的函数、模块、类和组件。团队可以更快、更放心地开发复杂 Vue 应用。和任何应用一样，Vue 项目也可能以多种方式出错，发布前发现问题很重要。
 
-在本篇指引中，我们将介绍一些基本术语，并就你的 Vue 3 应用应选择哪些工具提供一些建议。
+本篇会介绍基本术语，并给出 Vue 3 测试工具的建议。
 
-还有一个特定用于 Vue 的小节，介绍了组合式函数的测试，详情请参阅[测试组合式函数](#testing-composables)。
+另有专门小节讲[测试组合式函数](#testing-composables)。
 
 ## 何时测试 {#when-to-test}
 
-越早越好！我们建议你尽快开始编写测试。拖得越久，应用就会有越多的依赖和复杂性，想要开始添加测试也就越困难。
+越早越好。建议尽快开始写测试。拖得越久，依赖和复杂度越高，补测试就越难。
 
 ## 测试的类型 {#testing-types}
 
-当设计你的 Vue 应用的测试策略时，你应该利用以下几种测试类型：
+设计 Vue 测试策略时，通常会用到这几类：
 
-- **单元测试**：检查给定函数、类或组合式函数的输入是否产生预期的输出或副作用。
-- **组件测试**：检查你的组件是否正常挂载和渲染、是否可以与之互动，以及表现是否符合预期。这些测试比单元测试导入了更多的代码，更复杂，需要更多时间来执行。
-- **端到端测试**：检查跨越多个页面的功能，并对生产构建的 Vue 应用进行实际的网络请求。这些测试通常涉及到建立一个数据库或其他后端。
+- **单元测试**：检查函数、类或组合式函数的输入是否产生预期输出或副作用。
+- **组件测试**：检查组件能否挂载、渲染、交互，行为是否符合预期。比单元测试导入更多代码，更慢。
+- **端到端测试 (E2E)**：跨多个页面验证功能，并对生产构建发真实网络请求。常需要数据库或其他后端。
 
-每种测试类型在你的应用的测试策略中都发挥着作用，保护你免受不同类型的问题的影响。
+各类测试各防一类问题，应组合使用。
 
 ## 总览 {#overview}
 
-我们将简要地讨论这些测试是什么，以及如何在 Vue 应用中实现它们，并提供一些普适性建议。
+下面简要说明这些测试是什么、在 Vue 里怎么做，并给出一些通用建议。
 
 ## 单元测试 {#unit-testing}
 
-编写单元测试是为了验证小的、独立的代码单元是否按预期工作。一个单元测试通常覆盖一个单个函数、类、组合式函数或模块。单元测试侧重于逻辑上的正确性，只关注应用整体功能的一小部分。他们可能会模拟你的应用环境的很大一部分(如初始状态、复杂的类、第三方模块和网络请求)。
+单元测试验证小的、独立的代码单元是否按预期工作。通常覆盖单个函数、类、组合式函数或模块，只关注应用的一小块逻辑，可能会 mock 环境（初始状态、复杂类、第三方模块、网络请求）。
 
-一般来说，单元测试将捕获函数的业务逻辑和逻辑正确性的问题。
+单元测试主要发现业务逻辑错误。
 
-以这个 `increment` 函数为例：
+例如 `increment` 函数：
 
 ```js [helpers.js]
 export function increment(current, max = 10) {
@@ -70,9 +70,9 @@ export function increment(current, max = 10) {
 }
 ```
 
-因为它很独立，可以很容易地调用 `increment` 函数并断言它是否返回了所期望的内容，所以我们将编写一个单元测试。
+它很独立，可以直接调用并断言返回值，适合写单元测试。
 
-如果任何一条断言失败了，那么问题一定是出在 `increment` 函数上。
+任一断言失败，问题就在 `increment` 里。
 
 ```js{3-15} [helpers.spec.js]
 import { increment } from './helpers'
@@ -92,60 +92,59 @@ describe('increment', () => {
 })
 ```
 
-如前所述，单元测试通常适用于独立的业务逻辑、组件、类、模块或函数，不涉及 UI 渲染、网络请求或其他环境问题。
+单元测试通常针对独立业务逻辑，不涉及 UI 渲染、网络等环境问题。
 
-这些通常是与 Vue 无关的纯 JavaScript/TypeScript 模块。一般来说，在 Vue 应用中为业务逻辑编写单元测试与使用其他框架的应用没有明显区别。
+这类代码多是与 Vue 无关的纯 JavaScript/TypeScript。为业务逻辑写单元测试，和其他框架差别不大。
 
-但有两种情况，你必须对 Vue 的特定功能进行单元测试：
+但有两类情况需要针对 Vue 特性测试：
 
 1. 组合式函数
 2. 组件
 
 ### 组合式函数 {#composables}
 
-有一类 Vue 应用中特有的函数被称为 [组合式函数](/guide/reusability/composables)，在测试过程中可能需要特殊处理。
-你可以跳转到下方查看 [测试组合式函数](#testing-composables) 了解更多细节。
+[组合式函数](/guide/reusability/composables) 是 Vue 特有概念，测试时可能需要特殊处理。见下方[测试组合式函数](#testing-composables)。
 
 ### 组件的单元测试 {#unit-testing-components}
 
-一个组件可以通过两种方式测试：
+测组件有两种思路：
 
-1. 白盒：单元测试
+1. **白盒（单元测试）**
 
-   白盒测试知晓一个组件的实现细节和依赖关系。它们更专注于将组件进行更 **独立** 的测试。这些测试通常会涉及到模拟一些组件的部分子组件，以及设置插件的状态和依赖性(例如 Pinia)。
+   了解实现细节和依赖，尽量把组件单独测，常会 mock 子组件、插件状态（如 Pinia）等。
 
-2. 黑盒：组件测试
+2. **黑盒（组件测试）**
 
-   黑盒测试不知晓一个组件的实现细节。这些测试尽可能少地模拟，以测试组件在整个系统中的集成情况。它们通常会渲染所有子组件，因而会被认为更像一种“集成测试”。请查看下方的[组件测试建议](#component-testing)作进一步了解。
+   不了解实现细节，尽量少 mock，测组件在系统中的集成，通常会渲染子组件，更像“集成测试”。见下方[组件测试](#component-testing)。
 
 ### 推荐方案 {#recommendation}
 
 - [Vitest](https://vitest.dev/)
 
-  因为由 `create-vue` 创建的官方项目配置是基于 [Vite](https://cn.vitejs.dev/) 的，所以我们推荐你使用一个可以利用同一套 Vite 配置和转换管道的单元测试框架。[Vitest](https://cn.vitest.dev/) 正是一个针对此目标设计的单元测试框架，它由 Vue / Vite 团队成员开发和维护。在 Vite 的项目集成它会非常简单，而且速度非常快。
+  `create-vue` 默认基于 [Vite](https://cn.vitejs.dev/)，推荐用能复用同一套 Vite 配置的测试框架。[Vitest](https://cn.vitest.dev/) 由 Vue / Vite 团队维护，集成简单、速度快。
 
 ### 其他选择 {#other-options}
 
-- [Jest](https://jestjs.io/) 是一个广受欢迎的单元测试框架。不过，我们只推荐你在已有一套 Jest 测试配置、且需要迁移到基于 Vite 的项目时使用它，因为 Vitest 提供了更无缝的集成和更好的性能。
+- [Jest](https://jestjs.io/) 很流行。若你已有 Jest 配置、正在迁到 Vite，可以继续用；否则更推荐 Vitest，集成和性能更好。
 
 ## 组件测试 {#component-testing}
 
-在 Vue 应用中，主要用组件来构建用户界面。因此，当验证应用的行为时，组件是一个很自然的独立单元。从粒度的角度来看，组件测试位于单元测试之上，可以被认为是集成测试的一种形式。你的 Vue 应用中大部分内容都应该由组件测试来覆盖，我们建议每个 Vue 组件都应有自己的组件测试文件。
+Vue 应用主要靠组件构建 UI，因此组件测试是自然的测试单元。从粒度上看，它介于单元测试和集成测试之间。建议每个 Vue 组件都有自己的组件测试文件。
 
-组件测试应该捕捉组件中的 prop、事件、提供的插槽、样式、CSS class 名、生命周期钩子，和其他相关的问题。
+组件测试应覆盖 props、事件、插槽、样式、CSS class、生命周期钩子等对外行为。
 
-组件测试不应该模拟子组件，而应该像用户一样，通过与组件互动来测试组件和其子组件之间的交互。例如，组件测试应该像用户那样点击一个元素，而不是编程式地与组件进行交互。
+**不要**为了测组件而去 mock 子组件。应像用户一样通过交互测试父子关系，例如点击元素，而不是在代码里直接调组件内部 API。
 
-组件测试主要需要关心组件的公开接口而不是内部实现细节。对于大部分的组件来说，公开接口包括触发的事件、prop 和插槽。当进行测试时，请记住，**测试这个组件做了什么，而不是测试它是怎么做到的**。
+组件测试关注**公开接口**（事件、props、插槽），而不是内部实现。
 
-- **推荐的做法**
+- **推荐做法**
 
-  - 对于 **视图** 的测试：根据输入 prop 和插槽断言渲染输出是否正确。
-  - 对于 **交互** 的测试：断言渲染的更新是否正确或触发的事件是否正确地响应了用户输入事件。
+  - **视图**：根据 props 和插槽断言渲染结果。
+  - **交互**：断言 DOM 更新或事件是否响应用户操作。
 
-  在下面的例子中，我们展示了一个步进器 (Stepper) 组件，它拥有一个标记为 `increment` 的可点击的 DOM 元素。我们还传入了一个名为 `max` 的 prop 防止步进器增长超过 `2`，因此如果我们点击了按钮 3 次，视图将仍然显示 `2`。
+  下面是一个 Stepper 组件：有可点击的 `increment` 元素，以及 `max` prop。`max` 为 2 时，点 3 次仍应显示 2。
 
-  我们不了解这个步进器的实现细节，只知道“输入”是这个 `max` prop，“输出”是这个组件状态所呈现出的视图。
+  我们不必知道实现细节，只知道输入是 `max` prop，输出是界面上的数字。
 
 ::: code-group
 
@@ -208,107 +207,105 @@ await fireEvent.click(button)
 
 **应避免的做法**
 
-- 不要去断言一个组件实例的私有状态或测试一个组件的私有方法。测试实现细节会使测试代码太脆弱，因为当实现发生变化时，它们更有可能失败并需要更新重写。
+- 不要断言组件实例的私有状态，也不要测私有方法。测实现细节会让测试很脆，一改实现就要大改测试。
 
-  组件的最终工作是渲染正确的 DOM 输出，所以专注于 DOM 输出的测试提供了足够的正确性保证(如果你不需要更多其他方面测试的话)，同时更加健壮、需要的改动更少。
+  组件的职责是输出正确 DOM，专注 DOM 的测试通常够用，也更稳。
 
-  不要完全依赖快照测试。断言 HTML 字符串并不能完全说明正确性。应当编写有意图的测试。
+- 不要只靠快照测试。比对 HTML 字符串不能说明行为是否正确，应写有明确意图的测试。
 
-  如果一个方法需要测试，把它提取到一个独立的实用函数中，并为它写一个专门的单元测试。如果它不能被直截了当地抽离出来，那么对它的调用应该作为交互测试的一部分。
+- 若某个方法值得单独测，抽成工具函数并写单元测试；若不好抽取，把它当作交互测试的一部分。
 
 ### 推荐方案 {#recommendation-1}
 
-- [Vitest](https://vitest.dev/) 对于组件和组合式函数都采用无头渲染的方式 (例如 VueUse 中的 [`useFavicon`](https://vueuse.org/core/useFavicon/#usefavicon) 函数)。组件和 DOM 都可以通过 [@vue/test-utils](https://github.com/vuejs/test-utils) 来测试。
+- [Vitest](https://vitest.dev/) 用无头方式渲染组件和组合式函数（如 VueUse 的 [`useFavicon`](https://vueuse.org/core/useFavicon/#usefavicon)）。组件和 DOM 可用 [@vue/test-utils](https://github.com/vuejs/test-utils)。
 
-- [Cypress 组件测试](https://on.cypress.io/component) 会预期其准确地渲染样式或者触发原生 DOM 事件。它可以搭配 [@testing-library/cypress](https://testing-library.com/docs/cypress-testing-library/intro) 这个库一同进行测试。
+- [Cypress 组件测试](https://on.cypress.io/component) 在真实浏览器里测样式和原生 DOM 事件，可配合 [@testing-library/cypress](https://testing-library.com/docs/cypress-testing-library/intro)。
 
-Vitest 和基于浏览器的运行器之间的主要区别是速度和执行上下文。简而言之，基于浏览器的运行器，如 Cypress，可以捕捉到基于 Node 的运行器(如 Vitest) 所不能捕捉的问题(比如样式问题、原生 DOM 事件、Cookies、本地存储和网络故障)，但基于浏览器的运行器比 Vitest *慢几个数量级*，因为它们要执行打开浏览器，编译样式表以及其他步骤。Cypress 是一个基于浏览器的运行器，支持组件测试。请阅读 [Vitest 文档的“比较”这一章](https://vitest.dev/guide/comparisons.html#cypress) 了解 Vitest 和 Cypress 最新的比较信息。
+Vitest 与浏览器运行器的主要区别是速度和运行环境。浏览器运行器（如 Cypress）能发现 Node 运行器（如 Vitest）难以发现的问题（样式、原生事件、Cookie、localStorage、网络故障），但通常**慢几个数量级**（要启动浏览器、编译样式等）。Cypress 支持组件测试。Vitest 与 Cypress 的对比见 [Vitest 文档「比较」](https://vitest.dev/guide/comparisons.html#cypress)。
 
 ### 组件挂载库 {#mounting-libraries}
 
-组件测试通常涉及到单独挂载被测试的组件，触发模拟的用户输入事件，并对渲染的 DOM 输出进行断言。有一些专门的工具库可以使这些任务变得更简单。
+组件测试常要：单独挂载组件、模拟用户输入、断言 DOM。以下库可以简化这些步骤：
 
-- [`@vue/test-utils`](https://github.com/vuejs/test-utils) 是官方的底层组件测试库，用来提供给用户访问 Vue 特有的 API。`@testing-library/vue` 也是基于此库构建的。
+- [`@vue/test-utils`](https://github.com/vuejs/test-utils)：官方底层库，暴露 Vue 特有 API。[`@testing-library/vue`](https://github.com/testing-library/vue-testing-library) 基于它构建。
 
-- [`@testing-library/vue`](https://github.com/testing-library/vue-testing-library) 是一个专注于测试组件而不依赖于实现细节的 Vue 测试库。它的指导原则是：测试越是类似于软件的使用方式，它们就能提供越多的信心。
+- [`@testing-library/vue`](https://github.com/testing-library/vue-testing-library)：强调像用户一样测试，少依赖实现细节。
 
-我们推荐在应用中使用 `@vue/test-utils` 测试组件。`@testing-library/vue` 在测试带有 Suspense 的异步组件时存在问题，在使用时需要谨慎。
+推荐在项目中用 `@vue/test-utils`。`@testing-library/vue` 测带 Suspense 的异步组件时可能有问题，需谨慎。
 
 ### 其他选择 {#other-options-1}
 
-- [Nightwatch](https://v2.nightwatchjs.org/) 是一个端到端测试运行器，支持 Vue 的组件测试。(Nightwatch v2 版本的 [示例项目](https://github.com/nightwatchjs-community/todo-vue))
+- [Nightwatch](https://v2.nightwatchjs.org/) 是 E2E 运行器，也支持 Vue 组件测试（[示例](https://github.com/nightwatchjs-community/todo-vue)）。
 
-- [WebdriverIO](https://webdriver.io/docs/component-testing/vue) 用于跨浏览器组件测试，该测试依赖于基于标准自动化的原生用户交互。它也可以与测试库一起使用。
+- [WebdriverIO](https://webdriver.io/docs/component-testing/vue) 做跨浏览器组件测试，依赖标准 WebDriver 交互，也可配合 Testing Library。
 
 ## 端到端 (E2E) 测试 {#e2e-testing}
 
-虽然单元测试为所写的代码提供了一定程度的验证，但单元测试和组件测试在部署到生产时，对应用整体覆盖的能力有限。因此，端到端测试针对的可以说是应用最重要的方面：当用户实际使用你的应用时发生了什么。
+单元测试和组件测试无法覆盖上线后的全部行为。E2E 测试关注**真实用户使用时**应用是否正常。
 
-端到端测试的重点是多页面的应用表现，针对你的应用在生产环境下进行网络请求。他们通常需要建立一个数据库或其他形式的后端，甚至可能针对一个预备上线的环境运行。
+E2E 侧重多页面行为，对生产构建发网络请求，常要搭数据库或后端，有时在预发布环境运行。它能发现路由、状态库、顶层组件（如 App / Layout）、静态资源、请求处理等问题——这些是单元/组件测试难以覆盖的。
 
-端到端测试通常会捕捉到路由、状态管理库、顶级组件(常见为 App 或 Layout)、公共资源或任何请求处理方面的问题。如上所述，它们可以捕捉到单元测试或组件测试无法捕捉的关键问题。
+E2E 不导入 Vue 源码，而是在真实浏览器里浏览整个应用。
 
-端到端测试不导入任何 Vue 应用的代码，而是完全依靠在真实浏览器中浏览整个页面来测试你的应用。
+可在本地构建产物或预发布环境运行。预发布环境会连上真实后端和基础设施。
 
-端到端测试验证了你的应用中的许多层。可以在你的本地构建的应用中，甚至是一个预上线的环境中运行。针对预上线环境的测试不仅包括你的前端代码和静态服务器，还包括所有相关的后端服务和基础设施。
+> 测试越接近真实使用方式，你就越能信任它。—— [Kent C. Dodds](https://twitter.com/kentcdodds/status/977018512689455106)（Testing Library 作者）
 
-> 你的测试越是类似于你的软件的使用方式，它们就越能值得你信赖。- [Kent C. Dodds](https://twitter.com/kentcdodds/status/977018512689455106) - Testing Library 的作者
-
-通过测试用户操作如何影响你的应用，端到端测试通常是提高应用能否正常运行的置信度的关键。
+通过模拟用户操作，E2E 测试最能提高“应用能正常工作”的信心。
 
 ### 选择一个端到端测试解决方案 {#choosing-an-e2e-testing-solution}
 
-虽然因为不可靠且拖慢了开发过程，市面上对 Web 上的端到端测试的评价并不好，但现代端到端工具已经在创建更可靠、更有用和交互性更好的测试方面取得了很大进步。在选择端到端测试框架时，以下小节会为你给应用选择测试框架时需要注意的事项提供一些指导。
+历史上 E2E 常被批评为不稳定、拖慢开发，但现代工具已改进很多。选型时可参考下面几点。
 
 #### 跨浏览器测试 {#cross-browser-testing}
 
-端到端测试的一个主要优点是你可以了解你的应用在多个不同浏览器上运行的情况。尽管理想情况应该是 100% 的跨浏览器覆盖率，但很重要的一点是跨浏览器测试对团队资源的回报是递减的，因为需要额外的时间和机器来持续运行它们。因此，在选择应用所需的跨浏览器测试的数量时，注意权衡是很有必要的。
+E2E 的一大优势是能在多种浏览器里验证应用。100% 跨浏览器覆盖是理想目标，但成本会递增（更多机器、更长的 CI 时间）。要在覆盖率和资源之间权衡。
 
 #### 更快的反馈 {#faster-feedback-loops}
 
-端到端测试和相应开发过程的主要问题之一是，运行整个套件需要很长的时间。通常情况下，这只在持续集成和部署 (CI/CD) 管道中进行。现代的端到端测试框架通过增加并行化等功能来帮助解决这个问题，这使得 CI/CD 管道的运行速度比以前快了几倍。此外，在本地开发时，能够有选择地为你正在工作的页面运行单个测试，同时还提供测试的热重载，大大提高了开发者的工作流程和生产力。
+E2E 套件跑完全部用例往往很慢，通常只在 CI/CD 里跑。现代框架通过并行等方式加速；本地开发时，能只跑当前页面的单个测试并热重载，会明显提升效率。
 
 #### 第一优先级的调试体验 {#first-class-debugging-experience}
 
-传统上，开发者依靠扫描终端窗口中的日志来帮助确定测试中出现的问题，而现代端到端测试框架允许开发者利用他们已经熟悉的工具，例如浏览器开发工具。
+以前常靠看终端日志排错；现代 E2E 可直接用浏览器开发者工具调试。
 
 #### 无头模式下的可见性 {#visibility-in-headless-mode}
 
-当端到端测试在 CI/CD 管道中运行时，它们通常在无头浏览器(即不带界面的浏览器)中运行。因此，当错误发生时，现代端到端测试框架的一个关键特性是能够在不同的测试阶段查看应用的快照、视频，从而深入了解错误的原因。而在很早以前，要手动维护这些集成是非常繁琐的。
+CI 里常在无头浏览器运行。出错时，快照、录像等能帮助定位问题；以前要手动接这些能力，很麻烦。
 
 ### 推荐方案 {#recommendation-2}
 
-- [Playwright](https://playwright.dev/) 是一个非常好的端到端测试解决方案，支持 Chromium、WebKit 和 Firefox。在 Windows、Linux 和 macOS 上进行本地或 CI 测试、无头测试，或使用适用于 Android 和 Mobile Safari 的 Google Chrome 的原生移动端模拟测试。它拥有信息丰富的用户界面、出色的调试能力、内置断言、并行处理功能以及追踪功能，旨在消除不稳定的测试。它还提供对[组件测试](https://playwright.dev/docs/test-components)的支持，但目前处于实验阶段。Playwright 由微软开源并维护。
+- [Playwright](https://playwright.dev/)：支持 Chromium、WebKit、Firefox；可在 Windows / Linux / macOS 本地或 CI 运行，支持无头模式与移动端模拟；UI、调试、断言、并行、追踪较完善；[组件测试](https://playwright.dev/docs/test-components) 为实验功能。由微软维护。
 
-- [Cypress](https://www.cypress.io/) 具有信息丰富的图形界面、出色的调试性、内置断言、存根、抗剥落性、并行化和快照等诸多特性。而且如上所述，它还提供对 [组件测试](https://docs.cypress.io/guides/component-testing/introduction) 的支持。它支持基于 Chromium 的浏览器、Firefox 和 Electron。但 WebKit 被标记为实验性支持。Cypress 采用 MIT 许可，但并行化等部分功能需要订阅 Cypress Cloud。
+- [Cypress](https://www.cypress.io/)：图形界面友好，调试方便，内置断言、stub、抗 flaky、并行、快照；也支持[组件测试](https://docs.cypress.io/guides/component-testing/introduction)。支持 Chromium 系、Firefox、Electron；WebKit 为实验支持。MIT 许可，但并行等部分功能需 Cypress Cloud 订阅。
 
 <div class="lambdatest">
   <a href="https://lambdatest.com" target="_blank">
     <img src="/images/lambdatest.svg">
     <div>
       <div class="testing-partner">测试赞助商</div>
-      <div>Lambdatest 是一个云平台，用于在所有主流浏览器和真实设备上运行 E2E、可访问性和可视化回归测试，并提供人工智能辅助测试生成！</div>
+      <div>Lambdatest 是云平台，可在主流浏览器和真机上运行 E2E、可访问性与视觉回归测试，并提供 AI 辅助生成测试。</div>
     </div>
   </a>
 </div>
 
 ### 其他选项 {#other-options-2}
 
-- [Nightwatch](https://nightwatchjs.org/) 是一个基于 [Selenium WebDriver](https://www.npmjs.com/package/selenium-webdriver) 的端到端测试解决方案。它的浏览器品类支持范围是最广的，包括原生移动测试。基于 Selenium 的解决方案将比 Playwright 或 Cypress 慢。
+- [Nightwatch](https://nightwatchjs.org/) 基于 [Selenium WebDriver](https://www.npmjs.com/package/selenium-webdriver)，浏览器支持最广，含原生移动端；通常比 Playwright 或 Cypress 慢。
 
-- [WebdriverIO](https://webdriver.io/) 是一个基于 WebDriver 协议的网络和移动测试的自动化测试框架。
+- [WebdriverIO](https://webdriver.io/) 基于 WebDriver 协议，用于 Web 与移动端自动化。
 
 ## 用例指南 {#recipes}
 
 ### 添加 Vitest 到项目中 {#adding-vitest-to-a-project}
 
-在一个基于 Vite 的 Vue 项目中，运行如下命令：
+在基于 Vite 的 Vue 项目中运行：
 
 ```sh
 > npm install -D vitest happy-dom @testing-library/vue
 ```
 
-接着，更新你的 Vite 配置，添加上 `test` 选项：
+在 Vite 配置里添加 `test` 选项：
 
 ```js{5-11} [vite.config.js]
 import { defineConfig } from 'vite'
@@ -326,7 +323,7 @@ export default defineConfig({
 ```
 
 :::tip
-如果使用 TypeScript，请将 `vitest/globals` 添加到 `tsconfig.json` 的 `types` 字段当中。
+若使用 TypeScript，在 `tsconfig.json` 的 `types` 中加入 `vitest/globals`：
 
 ```json [tsconfig.json]
 {
@@ -338,7 +335,7 @@ export default defineConfig({
 
 :::
 
-接着，在你的项目中创建名字以 `*.test.js` 结尾的文件。你可以把所有的测试文件放在项目根目录下的 `test` 目录中，或者放在源文件旁边的 `test` 目录中。Vitest 会使用命名规则自动搜索它们。
+创建以 `*.test.js` 结尾的文件。可放在项目根目录的 `test` 下，或源文件旁的 `test` 目录。Vitest 会按命名规则自动发现。
 
 ```js [MyComponent.test.js]
 import { render } from '@testing-library/vue'
@@ -356,7 +353,7 @@ test('it should work', () => {
 })
 ```
 
-最后，在 `package.json` 之中添加测试命令，然后运行它：
+在 `package.json` 添加测试脚本并运行：
 
 ```json{4} [package.json]
 {
@@ -373,16 +370,16 @@ test('it should work', () => {
 
 ### 测试组合式函数 {#testing-composables}
 
-> 这一小节假设你已经读过了[组合式函数](/guide/reusability/composables)这一章。
+> 请先阅读[组合式函数](/guide/reusability/composables)一章。
 
-当涉及到测试组合式函数时，我们可以根据是否依赖宿主组件实例把它们分为两类。
+可按是否依赖宿主组件实例，把组合式函数分成两类。
 
-当一个组合式函数使用以下 API 时，它依赖于一个宿主组件实例：
+若使用了以下 API，就依赖宿主组件：
 
 - 生命周期钩子
-- 供给/注入
+- provide / inject
 
-如果一个组合式程序只使用响应式 API，那么它可以通过直接调用并断言其返回的状态或方法来进行测试。
+若只用响应式 API，可直接调用并断言返回的状态或方法：
 
 ```js [counter.js]
 import { ref } from 'vue'
@@ -410,7 +407,7 @@ test('useCounter', () => {
 })
 ```
 
-一个依赖生命周期钩子或供给/注入的组合式函数需要被包装在一个宿主组件中才可以测试。我们可以创建下面这样的帮手函数：
+依赖生命周期或 provide/inject 的组合式函数，需要包在宿主组件里测试。可写辅助函数：
 
 ```js [test-utils.js]
 import { createApp } from 'vue'
@@ -446,7 +443,7 @@ test('useFoo', () => {
 })
 ```
 
-对于更复杂的组合式函数，通过使用[组件测试](#component-testing)编写针对这个包装器组件的测试，这会容易很多。
+更复杂的组合式函数，用[组件测试](#component-testing) 写包装组件的测试往往更简单。
 
 <!--
 TODO more testing recipes can be added in the future e.g.

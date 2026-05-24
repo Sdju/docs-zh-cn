@@ -1,6 +1,6 @@
 # 列表渲染 {#list-rendering}
 
-我们可以使用 `v-for` 指令来渲染一个基于源数组的列表：
+我们可以用 `v-for` 指令，根据数组来渲染列表：
 
 ```vue-html
 <ul>
@@ -10,9 +10,9 @@
 </ul>
 ```
 
-这里的 `todo` 是一个局部变量，表示当前正在迭代的数组元素。它只能在 `v-for` 所绑定的元素上或是其内部访问，就像函数的作用域一样。
+这里的 `todo` 是一个局部变量，表示当前正在遍历的数组元素。它只能在 `v-for` 绑定的元素上或内部访问，就像函数作用域一样。
 
-注意，我们还给每个 todo 对象设置了唯一的 `id`，并且将它作为<a target="_blank" href="/api/built-in-special-attributes.html#key">特殊的 `key` attribute</a> 绑定到每个 `<li>`。`key` 使得 Vue 能够精确地移动每个 `<li>`，以匹配对应的对象在数组中的位置。
+注意：我们给每个 todo 对象设置了唯一的 `id`，并把它作为<a target="_blank" href="/api/built-in-special-attributes.html#key">特殊的 `key` attribute</a> 绑定到每个 `<li>`。`key` 让 Vue 能精确移动每个 `<li>`，匹配数组里对应对象的位置。
 
 更新列表有两种方式：
 
@@ -33,7 +33,7 @@
 
    </div>
 
-2. 使用新的数组替代原数组：
+2. 用新数组替换原数组：
 
    <div class="composition-api">
 
@@ -50,6 +50,6 @@
 
    </div>
 
-这里有一个简单的 todo 列表——试着实现一下 `addTodo()` 和 `removeTodo()` 这两个方法的逻辑，使列表能够正常工作！
+这里有一个简单的 todo 列表——试着实现 `addTodo()` 和 `removeTodo()` 的逻辑，让列表正常工作！
 
 关于 `v-for` 的更多细节：<a target="_blank" href="/guide/essentials/list.html">指南 - 列表渲染</a>

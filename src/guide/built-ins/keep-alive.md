@@ -4,25 +4,25 @@ import SwitchComponent from './keep-alive-demos/SwitchComponent.vue'
 
 # KeepAlive {#keepalive}
 
-`<KeepAlive>` 是一个内置组件，它的功能是在多个组件间动态切换时缓存被移除的组件实例。
+`<KeepAlive>` 是内置组件，用来在多个组件之间切换时，缓存被切走的组件实例。
 
 ## 基本使用 {#basic-usage}
 
-在组件基础章节中，我们已经介绍了通过特殊的 `<component>` 元素来实现[动态组件](/guide/essentials/component-basics#dynamic-components)的用法：
+在组件基础一章里，我们讲过用 `<component>` 做[动态组件](/guide/essentials/component-basics#dynamic-components)：
 
 ```vue-html
 <component :is="activeComponent" />
 ```
 
-默认情况下，一个组件实例在被替换掉后会被销毁。这会导致它丢失其中所有已变化的状态——当这个组件再一次被显示时，会创建一个只带有初始状态的新实例。
+默认情况下，组件被换掉后，旧实例会被销毁，里面的状态也会一起丢掉。再次显示时，会新建一个只有初始状态的新实例。
 
-在下面的例子中，你会看到两个有状态的组件——A 有一个计数器，而 B 有一个通过 `v-model` 同步 input 框输入内容的文字展示。尝试先更改一下任意一个组件的状态，然后切走，再切回来：
+下面的例子里有两个带状态的组件：A 有计数器，B 用 `v-model` 同步输入框文字。你先改一下任意一边的状态，再切走、再切回来：
 
 <SwitchComponent />
 
-你会发现在切回来之后，之前已更改的状态都被重置了。
+切回来后，你会发现之前改过的状态都没了。
 
-在切换时创建新的组件实例通常是有意义的，但在这个例子中，我们的确想要组件能在被“切走”的时候保留它们的状态。要解决这个问题，我们可以用 `<KeepAlive>` 内置组件将这些动态组件包装起来：
+多数时候，切换时新建实例是合理的；但这个例子里，我们希望组件被切走时仍保留状态。可以用 `<KeepAlive>` 包住动态组件：
 
 ```vue-html
 <!-- 非活跃的组件将会被缓存！ -->
@@ -31,7 +31,7 @@ import SwitchComponent from './keep-alive-demos/SwitchComponent.vue'
 </KeepAlive>
 ```
 
-现在，在组件切换时状态也能被保留了：
+这样切换时，状态就能保留了：
 
 <SwitchComponent use-KeepAlive />
 
@@ -47,12 +47,12 @@ import SwitchComponent from './keep-alive-demos/SwitchComponent.vue'
 </div>
 
 :::tip
-在 [DOM 内模板](/guide/essentials/component-basics#in-dom-template-parsing-caveats)中使用时，它应该被写为 `<keep-alive>`。
+在 [DOM 内模板](/guide/essentials/component-basics#in-dom-template-parsing-caveats)里，标签要写成 `<keep-alive>`。
 :::
 
 ## 包含/排除 {#include-exclude}
 
-`<KeepAlive>` 默认会缓存内部的所有组件实例，但我们可以通过 `include` 和 `exclude` prop 来定制该行为。这两个 prop 的值都可以是一个以英文逗号分隔的字符串、一个正则表达式，或是包含这两种类型的一个数组：
+`<KeepAlive>` 默认会缓存里面所有组件实例。可以用 `include` 和 `exclude` 两个 prop 控制要缓存谁。它们的值可以是：英文逗号分隔的字符串、正则表达式，或数组：
 
 ```vue-html
 <!-- 以英文逗号分隔的字符串 -->
@@ -71,15 +71,15 @@ import SwitchComponent from './keep-alive-demos/SwitchComponent.vue'
 </KeepAlive>
 ```
 
-它会根据组件的 [`name`](/api/options-misc#name) 选项进行匹配，所以组件如果想要条件性地被 `KeepAlive` 缓存，就必须显式声明一个 `name` 选项。
+匹配依据是组件的 [`name`](/api/options-misc#name)。想按条件被 `KeepAlive` 缓存，组件需要声明 `name`。
 
 :::tip
-在 3.2.34 或以上的版本中，使用 `<script setup>` 的单文件组件会自动根据文件名生成对应的 `name` 选项，无需再手动声明。
+3.2.34 及以上：用 `<script setup>` 的单文件组件会按文件名自动生成 `name`，一般不用手写。
 :::
 
 ## 最大缓存实例数 {#max-cached-instances}
 
-我们可以通过传入 `max` prop 来限制可被缓存的最大组件实例数。`<KeepAlive>` 的行为在指定了 `max` 后类似一个 [LRU 缓存](<https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)>)：如果缓存的实例数量即将超过指定的那个最大数量，则最久没有被访问的缓存实例将被销毁，以便为新的实例腾出空间。
+用 `max` prop 可以限制最多缓存多少个实例。设了 `max` 之后，`<KeepAlive>` 类似 [LRU 缓存](<https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)>)：快满时，会先清掉最久没用过的实例，给新的腾地方。
 
 ```vue-html
 <KeepAlive :max="10">
@@ -89,11 +89,11 @@ import SwitchComponent from './keep-alive-demos/SwitchComponent.vue'
 
 ## 缓存实例的生命周期 {#lifecycle-of-cached-instance}
 
-当一个组件实例从 DOM 上移除但因为被 `<KeepAlive>` 缓存而仍作为组件树的一部分时，它将变为**不活跃**状态而不是被卸载。当一个组件实例作为缓存树的一部分插入到 DOM 中时，它将重新**被激活**。
+组件从 DOM 上拿掉，但被 `<KeepAlive>` 缓存时，不会真正卸载，只是变成**不活跃**。再次插回 DOM 时，会重新**激活**。
 
 <div class="composition-api">
 
-一个持续存在的组件可以通过 [`onActivated()`](/api/composition-api-lifecycle#onactivated) 和 [`onDeactivated()`](/api/composition-api-lifecycle#ondeactivated) 注册相应的两个状态的生命周期钩子：
+一直留在树里的组件，可以用 [`onActivated()`](/api/composition-api-lifecycle#onactivated) 和 [`onDeactivated()`](/api/composition-api-lifecycle#ondeactivated) 监听激活、停用：
 
 ```vue
 <script setup>
@@ -114,7 +114,7 @@ onDeactivated(() => {
 </div>
 <div class="options-api">
 
-一个持续存在的组件可以通过 [`activated`](/api/options-lifecycle#activated) 和 [`deactivated`](/api/options-lifecycle#deactivated) 选项来注册相应的两个状态的生命周期钩子：
+一直留在树里的组件，可以用 [`activated`](/api/options-lifecycle#activated) 和 [`deactivated`](/api/options-lifecycle#deactivated) 监听激活、停用：
 
 ```js
 export default {
@@ -133,9 +133,9 @@ export default {
 
 请注意：
 
-- <span class="composition-api">`onActivated`</span><span class="options-api">`activated`</span> 在组件挂载时也会调用，并且 <span class="composition-api">`onDeactivated`</span><span class="options-api">`deactivated`</span> 在组件卸载时也会调用。
+- <span class="composition-api">`onActivated`</span><span class="options-api">`activated`</span> 首次挂载时也会触发；<span class="composition-api">`onDeactivated`</span><span class="options-api">`deactivated`</span> 在组件卸载时也会触发。
 
-- 这两个钩子不仅适用于 `<KeepAlive>` 缓存的根组件，也适用于缓存树中的后代组件。
+- 这两个钩子不只作用于 `<KeepAlive>` 包住的根组件，缓存树里的子组件也会触发。
 ---
 
 **参考**
