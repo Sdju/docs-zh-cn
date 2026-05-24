@@ -6,6 +6,9 @@ import {
   preferCompositionKey
 } from './preferences'
 import { useData, type Header } from 'vitepress'
+import { useWithBase } from '../utils'
+
+const withBase = useWithBase()
 
 const show = ref(false)
 const { page } = useData()
@@ -119,7 +122,7 @@ function dismiss() {
         </p>
       </template>
       <p class="actions">
-        <a href="/guide/introduction#api-styles">了解详情</a>
+        <a :href="withBase('/guide/introduction#api-styles')">了解详情</a>
         <button @click="dismiss">知道了</button>
       </p>
       <div class="arrow-top"></div>

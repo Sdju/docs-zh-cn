@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
+import { useData } from 'vitepress'
 import SiteMap from './SiteMap.vue'
 // import NewsLetter from './NewsLetter.vue'
 import { load, data, base } from './sponsors'
 import SponsorsGroup from './SponsorsGroup.vue'
+import { useWithBase } from '../utils'
 // NOTE: hide the home video
 // https://github.com/vuejs-translations/docs-zh-cn/issues/177
 // import VueMasteryModal from './VueMasteryModal.vue'
+
+const withBase = useWithBase()
+const { site } = useData()
+const uwuLogo = `${site.value.base}logo-uwu.png`
 
 onMounted(load)
 </script>
@@ -24,7 +30,7 @@ onMounted(load)
     <p class="actions">
       <!-- NOTE: hide the home video -->
       <!-- <VueMasteryModal /> -->
-      <a class="get-started" href="/guide/introduction.html">
+      <a class="get-started" :href="withBase('/guide/introduction.html')">
         快速上手
         <svg
           class="icon"
@@ -38,7 +44,7 @@ onMounted(load)
           />
         </svg>
       </a>
-      <a class="setup" href="/guide/quick-start.html">安装</a>
+      <a class="setup" :href="withBase('/guide/quick-start.html')">安装</a>
       <a class="security" href="https://v2.cn.vuejs.org/eol/" target="_blank">
         获取针对 Vue 2 的安全更新
         <svg
@@ -81,7 +87,7 @@ onMounted(load)
   </section>
   <section v-else id="special-spsr">
     <span>
-      <a href="/sponsor/#tier-benefits">
+      <a :href="withBase('/sponsor/#tier-benefits')">
         中国区铂金赞助位现已空缺-立即咨询
       </a>
     </span>
@@ -421,7 +427,7 @@ html:not(.dark) .accent,
   max-width: 720px;
   margin: -120px auto -20px;
   aspect-ratio: 192 / 108;
-  content: url(/logo-uwu.png);
+  content: url(v-bind(uwuLogo));
 }
 
 @media (max-width: 576px) {

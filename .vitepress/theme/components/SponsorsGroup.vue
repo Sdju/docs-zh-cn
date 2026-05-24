@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { SponsorData, data, base, load } from './sponsors'
+import { useWithBase } from '../utils'
+
+const withBase = useWithBase()
 
 type Placement = 'aside' | 'page' | 'landing'
 
@@ -90,14 +93,14 @@ function resolveList(data: SponsorData) {
     </template>
     <a
       v-if="placement !== 'page' && tier !== 'special'"
-      href="/sponsor/"
+      :href="withBase('/sponsor/')"
       class="spsr-item action"
       @click="track(true)"
       >成为赞助商</a
     >
     <a
       v-if="tier === 'special' && data && !data[tier]?.length"
-      href="/sponsor/#tier-benefits"
+      :href="withBase('/sponsor/#tier-benefits')"
       class="spsr-item action"
       @click="track(true)"
       >Inquire about Special Sponsorship</a

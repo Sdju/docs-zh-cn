@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import SponsorsGroup from './SponsorsGroup.vue'
 import { useData } from 'vitepress'
+import { useWithBase } from '../utils'
+
+const withBase = useWithBase()
 const { frontmatter } = useData()
 </script>
 
 <template>
   <div v-if="frontmatter.sponsors !== false">
-    <a class="sponsors-aside-text" href="/sponsor/">赞助位</a>
+    <a class="sponsors-aside-text" :href="withBase('/sponsor/')">赞助位</a>
     <SponsorsGroup tier="platinum_china" />
   </div>
 </template>

@@ -9,7 +9,9 @@ import {
   preferSFC
 } from './preferences'
 import PreferenceTooltip from './PreferenceTooltip.vue'
+import { useWithBase } from '../utils'
 
+const withBase = useWithBase()
 const route = useRoute()
 const show = computed(() =>
   /^\/(guide|tutorial|examples|style-guide)\//.test(route.path)
@@ -91,7 +93,7 @@ function useToggleFn(
         <a
           class="switch-link"
           title="关于 API 风格偏好"
-          href="/guide/introduction.html#api-styles"
+          :href="withBase('/guide/introduction.html#api-styles')"
           @click="closeSideBar"
           >?</a
         >
@@ -109,7 +111,7 @@ function useToggleFn(
         <a
           class="switch-link"
           title="关于单文件组件"
-          href="/guide/scaling-up/sfc.html"
+          :href="withBase('/guide/scaling-up/sfc.html')"
           @click="closeSideBar"
           >?</a
         >

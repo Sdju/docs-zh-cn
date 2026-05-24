@@ -615,10 +615,34 @@ function inlineScript(file: string): HeadConfig {
   ]
 }
 
+function prefixRootPaths(html: string, base: string) {
+  if (!base || base === '/') return html
+
+  const root = base.endsWith('/') ? base.slice(0, -1) : base
+  const prefix = `${root}/`
+
+  return html
+    .replace(
+      /\b(href|src|content)=(["'])\/(?!\/)([^"']*)\2/g,
+      (_, attr, quote, p) => {
+        if (p.startsWith('docs-zh-cn/')) return `${attr}=${quote}/${p}${quote}`
+        return `${attr}=${quote}${prefix}${p}${quote}`
+      }
+    )
+    .replace(/url\(\/(?!\/)([^)]+)\)/g, (match, p) => {
+      if (p.startsWith('docs-zh-cn/')) return match
+      return `url(${prefix}${p})`
+    })
+}
+
 export default defineConfigWithTheme<ThemeConfig>({
   extends: baseConfig,
 
   base: process.env.VP_BASE_URL || '/',
+
+  transformHtml(code, _id, ctx) {
+    return prefixRootPaths(code, ctx.siteConfig.site.base)
+  },
 
   sitemap: {
     hostname: 'https://cn.vuejs.org'

@@ -5,6 +5,11 @@ import { Partner } from './type'
 import { normalizeName, track } from './utils'
 import PartnerCard from './PartnerCard.vue'
 import { VTIconChevronLeft } from '@vue/theme'
+import { useData } from 'vitepress'
+
+const { site } = useData()
+const withBase = (path: string) =>
+  `${site.value.base}${path.replace(/^\//, '')}`
 
 const props = defineProps<{
   partner: string
@@ -24,7 +29,7 @@ const contactLink = computed(() => {
 <template>
   <div class="partner-page">
     <div class="back">
-      <a href="/partners/all.html"
+      <a :href="withBase('/partners/all.html')"
         ><VTIconChevronLeft class="icon" />返回所有合作伙伴</a
       >
     </div>
